@@ -23,7 +23,15 @@ const getAll = async (req, res) => {
   }
 };
 
-module.exports = {
-  create,
-  getAll // 👈 IMPORTANTE
+const updateEstado = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { estado } = req.body;
+    const result = await model.updateEstado(id, estado);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
+
+module.exports = { create, getAll, updateEstado };

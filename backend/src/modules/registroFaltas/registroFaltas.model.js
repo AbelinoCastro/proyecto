@@ -59,34 +59,43 @@ const create = async (data) => {
 // GET ALL
 const getAll = async () => {
   const connection = await db.getConnection();
-
   try {
     const result = await connection.execute(`
-  SELECT 
-    e.NOMBRE,
-    p.NOMBRE_PUESTO,
-    f.DESCRIPCION,
-    r.FECHA,
-    u.USERNAME,
-    r.JUSTIFICACION,
-    e.ESTADO
-  FROM REGISTRO_FALTAS r
-  JOIN EMPLEADO e ON r.ID_EMPLEADO = e.ID_EMPLEADO
-  JOIN PUESTOS p ON e.ID_PUESTO = p.ID_PUESTO
-  JOIN FALTAS f ON r.ID_FALTA = f.ID_FALTA
-  JOIN USUARIOS u ON r.ID_USUARIO = u.ID_USUARIO
-  ORDER BY r.FECHA DESC
-`);
-
+      SELECT
+        r.ID_REGISTRO_FALTA,
+        e.NOMBRE,
+        p.NOMBRE_PUESTO,
+        f.DESCRIPCION,
+        r.FECHA,
+        u.USERNAME,
+        r.JUSTIFICACION,
+        r.ESTADO
+      FROM REGISTRO_FALTAS r
+      JOIN EMPLEADO e ON r.ID_EMPLEADO = e.ID_EMPLEADO
+      JOIN PUESTOS p ON e.ID_PUESTO = p.ID_PUESTO
+      JOIN FALTAS f ON r.ID_FALTA = f.ID_FALTA
+      JOIN USUARIOS u ON r.ID_USUARIO = u.ID_USUARIO
+      ORDER BY r.FECHA DESC
+    `);
     return result.rows;
-
   } finally {
     await connection.close();
   }
 };
 
-// ✅ EXPORT CORRECTO (FUERA)
-module.exports = {
-  create,
-  getAll
+// ACTUALIZAR ESTADO
+const updateEstado = async (id, estado) => {
+  const connection = await db.getConnection();
+  try {
+    await connection.execute(
+      `UPDATE REGISTRO_FALTAS SET estado = :estado WHERE id_registro_falta = :id`,
+      { estado, id: Number(id) },
+      { autoCommit: true }
+    );
+    return { message: 'Estado actualizado' };
+  } finally {
+    await connection.close();
+  }
 };
+
+module.exports = { create, getAll, updateEstado };

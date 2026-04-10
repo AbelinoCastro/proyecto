@@ -43,4 +43,12 @@ const remove = async (req, res) => {
     } catch (err) { return error(res, 'Error al eliminar', 500, err.message); }
 };
 
-module.exports = { getAll, getById, create, update, remove };
+const changeEstado = async (req, res) => {
+    try {
+        const { estado } = req.body;
+        if (!estado) return error(res, 'estado es requerido', 400);
+        return success(res, await model.changeEstado(req.params.id, estado), 'Estado actualizado');
+    } catch (err) { return error(res, 'Error al actualizar estado', 500, err.message); }
+};
+
+module.exports = { getAll, getById, create, update, remove, changeEstado };

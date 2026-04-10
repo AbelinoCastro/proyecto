@@ -81,7 +81,7 @@ const changeEstado = async (req, res) => {
     try {
         const { estado } = req.body;
         if (!['ACTIVO', 'INACTIVO', 'SUSPENDIDO'].includes(estado)) return error(res, 'Estado inválido', 400);
-        const rows = await model.changeEstado(req.params.id, estado);
+        const rows = await model.changeEstado(Number(req.params.id), estado);
         if (rows === 0) return error(res, 'Empleado no encontrado', 404);
         return success(res, null, `Estado cambiado a ${estado}`);
     } catch (err) { return error(res, 'Error al cambiar estado', 500, err.message); }

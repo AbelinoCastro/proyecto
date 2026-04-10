@@ -60,4 +60,15 @@ const remove = async (id) => {
     } finally { await conn.close(); }
 };
 
-module.exports = { getAll, getById, create, update, remove };
+const changeEstado = async (id, estado) => {
+    const conn = await getConnection();
+    try {
+        await conn.execute(
+            `UPDATE DEPARTAMENTOS SET estado = :estado WHERE id_departamento = :id`,
+            { estado, id }, { autoCommit: true }
+        );
+        return { message: 'Estado actualizado' };
+    } finally { await conn.close(); }
+};
+
+module.exports = { getAll, getById, create, update, remove, changeEstado };
