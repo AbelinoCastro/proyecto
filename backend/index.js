@@ -20,6 +20,8 @@ app.use('/api/faltas', require('./src/modules/faltas/faltas.routes'));
 app.use('/api/motivo-baja', require('./src/modules/motivoBaja/motivoBaja.routes'));
 app.use('/api/puestos', require('./src/modules/puestos/puestos.routes'));
 app.use('/api/empleado', require('./src/modules/empleado/empleado.routes'));
+app.use('/api/nomina', require('./src/modules/nomina/nomina.routes'));
+app.use('/api/periodos', require('./src/modules/periodo/periodo.routes'));
 
 app.get('/', (req, res) => res.json({ ok: true, message: 'Proyecto Nomina API corriendo' }));
 

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 
 const menuItems = [
-    { path: '/tipo-usuario', label: 'Tipo Usuario' },
+    /*{ path: '/tipo-usuario', label: 'Tipo Usuario' },
     { path: '/usuarios', label: 'Usuarios' },
     { path: '/departamentos', label: 'Departamentos' },
     { path: '/jornadas', label: 'Jornadas' },
@@ -11,7 +11,9 @@ const menuItems = [
     { path: '/faltas', label: 'Faltas' },
     { path: '/motivo-baja', label: 'Motivo Baja' },
     { path: '/puestos', label: 'Puestos' },
-    { path: '/empleado', label: 'Empleados' },
+    { path: '/empleado', label: 'Empleados' },*/
+    { path: '/calcular-nomina', label: 'Calcular Nómina' },
+    { path: '/periodos', label: 'Períodos' },
 ];
 
 const Sidebar = () => {

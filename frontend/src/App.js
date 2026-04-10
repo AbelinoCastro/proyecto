@@ -10,13 +10,15 @@ import FaltasPage from './pages/faltas/FaltasPage';
 import MotivoBajaPage from './pages/motivoBaja/MotivoBajaPage';
 import PuestosPage from './pages/puestos/PuestosPage';
 import EmpleadoPage from './pages/empleado/EmpleadoPage';
+import CalcularNominaPage from './pages/nomina/CalcularNominaPage';
+import PeriodosPage from './pages/periodos/PeriodosPage';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route index element={<Navigate to="/tipo-usuario" replace />} />
+          <Route index element={<Navigate to="/calcular-nomina" replace />} />
           <Route path="tipo-usuario" element={<TipoUsuarioPage />} />
           <Route path="usuarios" element={<UsuariosPage />} />
           <Route path="departamentos" element={<DepartamentosPage />} />
@@ -27,6 +29,8 @@ function App() {
           <Route path="motivo-baja" element={<MotivoBajaPage />} />
           <Route path="puestos" element={<PuestosPage />} />
           <Route path="empleado" element={<EmpleadoPage />} />
+          <Route path="calcular-nomina" element={<CalcularNominaPage />} />
+          <Route path="periodos" element={<PeriodosPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
