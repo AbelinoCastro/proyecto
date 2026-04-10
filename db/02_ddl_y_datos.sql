@@ -274,76 +274,125 @@ CREATE INDEX idx_hdd_reg_falta      ON HISTORICO_DEDUCCIONES_DETALLE (id_registr
 -- =============================================================
 
 -- DEPARTAMENTOS
-INSERT INTO DEPARTAMENTOS (id_departamento, nombre_departamento, descripcion, estado) VALUES ('01', 'Recursos Humanos', 'Gestión integral del personal', 'ACTIVO');
-INSERT INTO DEPARTAMENTOS (id_departamento, nombre_departamento, descripcion, estado) VALUES ('02', 'Contabilidad', 'Cálculo y control de planilla salarial', 'ACTIVO');
-INSERT INTO DEPARTAMENTOS (id_departamento, nombre_departamento, descripcion, estado) VALUES ('03', 'Ventas', 'Actividades comerciales y comisiones', 'ACTIVO');
-INSERT INTO DEPARTAMENTOS (id_departamento, nombre_departamento, descripcion, estado) VALUES ('04', 'Operaciones', 'Supervisión de productividad y horas extra', 'ACTIVO');
-INSERT INTO DEPARTAMENTOS (id_departamento, nombre_departamento, descripcion, estado) VALUES ('05', 'Gerencia General', 'Supervisión estratégica y toma de decisiones', 'ACTIVO');
+INSERT INTO DEPARTAMENTOS (ID_DEPARTAMENTO, NOMBRE_DEPARTAMENTO, DESCRIPCION, ESTADO) VALUES ('01', 'Recursos Humanos', 'Gestión integral del personal', 'ACTIVO');
+INSERT INTO DEPARTAMENTOS (ID_DEPARTAMENTO, NOMBRE_DEPARTAMENTO, DESCRIPCION, ESTADO) VALUES ('02', 'Contabilidad', 'Cálculo y control de planilla salarial', 'ACTIVO');
+INSERT INTO DEPARTAMENTOS (ID_DEPARTAMENTO, NOMBRE_DEPARTAMENTO, DESCRIPCION, ESTADO) VALUES ('03', 'Ventas', 'Actividades comerciales y comisiones', 'ACTIVO');
+INSERT INTO DEPARTAMENTOS (ID_DEPARTAMENTO, NOMBRE_DEPARTAMENTO, DESCRIPCION, ESTADO) VALUES ('04', 'Operaciones', 'Supervisión de productividad y horas extra', 'ACTIVO');
+INSERT INTO DEPARTAMENTOS (ID_DEPARTAMENTO, NOMBRE_DEPARTAMENTO, DESCRIPCION, ESTADO) VALUES ('05', 'Gerencia General', 'Supervisión estratégica y toma de decisiones', 'ACTIVO');
 
 -- JORNADAS
-INSERT INTO JORNADAS (id_jornada, nombre_jornada, descripcion, hora_inicio, hora_fin, horas_diarias) VALUES ('J1', 'Matutina', 'Turno de mañana', '07:00', '15:00', 8);
-INSERT INTO JORNADAS (id_jornada, nombre_jornada, descripcion, hora_inicio, hora_fin, horas_diarias) VALUES ('J2', 'Vespertina', 'Turno de tarde', '13:00', '21:00', 8);
-INSERT INTO JORNADAS (id_jornada, nombre_jornada, descripcion, hora_inicio, hora_fin, horas_diarias) VALUES ('J3', 'Nocturna', 'Turno de noche', '21:00', '06:00', 8);
-INSERT INTO JORNADAS (id_jornada, nombre_jornada, descripcion, hora_inicio, hora_fin, horas_diarias) VALUES ('J4', 'Mixta', 'Turno mixto', '14:00', '22:00', 7);
+INSERT INTO JORNADAS (ID_JORNADA, NOMBRE_JORNADA, DESCRIPCION, HORA_INICIO, HORA_FIN, HORAS_DIARIAS) VALUES ('J1', 'Matutina', 'Turno de mañana', '07:00', '15:00', 8);
+INSERT INTO JORNADAS (ID_JORNADA, NOMBRE_JORNADA, DESCRIPCION, HORA_INICIO, HORA_FIN, HORAS_DIARIAS) VALUES ('J2', 'Vespertina', 'Turno de tarde', '13:00', '21:00', 8);
+INSERT INTO JORNADAS (ID_JORNADA, NOMBRE_JORNADA, DESCRIPCION, HORA_INICIO, HORA_FIN, HORAS_DIARIAS) VALUES ('J3', 'Nocturna', 'Turno de noche', '21:00', '06:00', 8);
+INSERT INTO JORNADAS (ID_JORNADA, NOMBRE_JORNADA, DESCRIPCION, HORA_INICIO, HORA_FIN, HORAS_DIARIAS) VALUES ('J4', 'Mixta', 'Turno mixto', '14:00', '22:00', 7);
 
 -- PUESTOS
-INSERT INTO PUESTOS (id_puesto, nombre_puesto, id_departamento, descripcion, sueldo_base) VALUES ('RH01', 'Gerente de RRHH', '01', 'Responsable de la gestión del personal', 15000);
-INSERT INTO PUESTOS (id_puesto, nombre_puesto, id_departamento, descripcion, sueldo_base) VALUES ('RH02', 'Analista de RRHH', '01', 'Apoya en contratación y expedientes', 8000);
-INSERT INTO PUESTOS (id_puesto, nombre_puesto, id_departamento, descripcion, sueldo_base) VALUES ('FIN01', 'Gerente Financiero', '02', 'Supervisa las finanzas y contabilidad', 18000);
-INSERT INTO PUESTOS (id_puesto, nombre_puesto, id_departamento, descripcion, sueldo_base) VALUES ('FIN02', 'Contador General', '02', 'Maneja planillas, impuestos y registros', 12000);
-INSERT INTO PUESTOS (id_puesto, nombre_puesto, id_departamento, descripcion, sueldo_base) VALUES ('VEN01', 'Gerente de Ventas', '03', 'Responsable del equipo de ventas', 16000);
-INSERT INTO PUESTOS (id_puesto, nombre_puesto, id_departamento, descripcion, sueldo_base) VALUES ('VEN02', 'Vendedor', '03', 'Realiza ventas y genera comisiones', 6000);
-INSERT INTO PUESTOS (id_puesto, nombre_puesto, id_departamento, descripcion, sueldo_base) VALUES ('OP01', 'Gerente de Operaciones', '04', 'Supervisa productividad y procesos', 17000);
-INSERT INTO PUESTOS (id_puesto, nombre_puesto, id_departamento, descripcion, sueldo_base) VALUES ('OP02', 'Supervisor Operativo', '04', 'Controla actividades del personal', 9000);
-INSERT INTO PUESTOS (id_puesto, nombre_puesto, id_departamento, descripcion, sueldo_base) VALUES ('GG01', 'Gerente General', '05', 'Dirección general de la empresa', 25000);
-INSERT INTO PUESTOS (id_puesto, nombre_puesto, id_departamento, descripcion, sueldo_base) VALUES ('GG02', 'Subgerente General', '05', 'Apoya en decisiones administrativas', 20000);
+INSERT INTO PUESTOS (ID_PUESTO, NOMBRE_PUESTO, ID_DEPARTAMENTO, DESCRIPCION, SUELDO_BASE) VALUES ('FIN01', 'Gerente Financiero', '02', 'Supervisa las finanzas y contabilidad', 18000);
+INSERT INTO PUESTOS (ID_PUESTO, NOMBRE_PUESTO, ID_DEPARTAMENTO, DESCRIPCION, SUELDO_BASE) VALUES ('FIN02', 'Contador General', '02', 'Maneja planillas, impuestos y registros', 12000);
+INSERT INTO PUESTOS (ID_PUESTO, NOMBRE_PUESTO, ID_DEPARTAMENTO, DESCRIPCION, SUELDO_BASE) VALUES ('GG01', 'Gerente General', '05', 'Dirección general de la empresa', 25000);
+INSERT INTO PUESTOS (ID_PUESTO, NOMBRE_PUESTO, ID_DEPARTAMENTO, DESCRIPCION, SUELDO_BASE) VALUES ('GG02', 'Subgerente General', '05', 'Apoya en decisiones administrativas', 20000);
+INSERT INTO PUESTOS (ID_PUESTO, NOMBRE_PUESTO, ID_DEPARTAMENTO, DESCRIPCION, SUELDO_BASE) VALUES ('OP01', 'Gerente de Operaciones', '04', 'Supervisa productividad y procesos', 17000);
+INSERT INTO PUESTOS (ID_PUESTO, NOMBRE_PUESTO, ID_DEPARTAMENTO, DESCRIPCION, SUELDO_BASE) VALUES ('OP02', 'Supervisor Operativo', '04', 'Controla actividades del personal', 9000);
+INSERT INTO PUESTOS (ID_PUESTO, NOMBRE_PUESTO, ID_DEPARTAMENTO, DESCRIPCION, SUELDO_BASE) VALUES ('RH01', 'Gerente de RRHH', '01', 'Responsable de la gestión del personal', 15000);
+INSERT INTO PUESTOS (ID_PUESTO, NOMBRE_PUESTO, ID_DEPARTAMENTO, DESCRIPCION, SUELDO_BASE) VALUES ('RH02', 'Analista de RRHH', '01', 'Apoya en contratación y expedientes', 8000);
+INSERT INTO PUESTOS (ID_PUESTO, NOMBRE_PUESTO, ID_DEPARTAMENTO, DESCRIPCION, SUELDO_BASE) VALUES ('VEN01', 'Gerente de Ventas', '03', 'Responsable del equipo de ventas', 16000);
+INSERT INTO PUESTOS (ID_PUESTO, NOMBRE_PUESTO, ID_DEPARTAMENTO, DESCRIPCION, SUELDO_BASE) VALUES ('VEN02', 'Vendedor', '03', 'Realiza ventas y genera comisiones', 6000);
 
 -- PERCEPCIONES
-INSERT INTO PERCEPCIONES (id_percepcion, nombre_percepcion, descripcion_formula) VALUES ('PER01', 'Sueldo Base', 'Monto fijo mensual según contrato');
-INSERT INTO PERCEPCIONES (id_percepcion, nombre_percepcion, descripcion_formula) VALUES ('PER02', 'Bonificación Incentivo', 'Q250 mensuales obligatorio por ley');
-INSERT INTO PERCEPCIONES (id_percepcion, nombre_percepcion, descripcion_formula) VALUES ('PER03', 'Bono por Productividad', 'Monto fijo o porcentaje por metas cumplidas');
-INSERT INTO PERCEPCIONES (id_percepcion, nombre_percepcion, descripcion_formula) VALUES ('PER04', 'Comisión', 'Porcentaje sobre ventas generadas');
-INSERT INTO PERCEPCIONES (id_percepcion, nombre_percepcion, descripcion_formula) VALUES ('PER05', 'Horas Extra', 'Sueldo por hora x 1.5 o x 2.0 domingo/feriado');
-INSERT INTO PERCEPCIONES (id_percepcion, nombre_percepcion, descripcion_formula) VALUES ('PER06', 'Aguinaldo', 'Un mes de salario pagado en diciembre');
-INSERT INTO PERCEPCIONES (id_percepcion, nombre_percepcion, descripcion_formula) VALUES ('PER07', 'Bono 14', 'Un mes de salario pagado en julio');
-INSERT INTO PERCEPCIONES (id_percepcion, nombre_percepcion, descripcion_formula) VALUES ('PER08', 'Vacaciones', 'Sueldo diario x días de vacaciones');
-INSERT INTO PERCEPCIONES (id_percepcion, nombre_percepcion, descripcion_formula) VALUES ('PER09', 'Viáticos', 'Pago por gastos de viaje o representación');
+INSERT INTO PERCEPCIONES (ID_PERCEPCION, NOMBRE_PERCEPCION, DESCRIPCION_FORMULA) VALUES ('PER01', 'Sueldo Base', 'Monto fijo mensual según contrato');
+INSERT INTO PERCEPCIONES (ID_PERCEPCION, NOMBRE_PERCEPCION, DESCRIPCION_FORMULA) VALUES ('PER02', 'Bonificación Incentivo', 'Q250 mensuales obligatorio por ley');
+INSERT INTO PERCEPCIONES (ID_PERCEPCION, NOMBRE_PERCEPCION, DESCRIPCION_FORMULA) VALUES ('PER03', 'Bono por Productividad', 'Monto fijo o porcentaje por metas cumplidas');
+INSERT INTO PERCEPCIONES (ID_PERCEPCION, NOMBRE_PERCEPCION, DESCRIPCION_FORMULA) VALUES ('PER04', 'Comisión', 'Porcentaje sobre ventas generadas');
+INSERT INTO PERCEPCIONES (ID_PERCEPCION, NOMBRE_PERCEPCION, DESCRIPCION_FORMULA) VALUES ('PER05', 'Horas Extra', 'Sueldo por hora x 1.5 o x 2.0 domingo/feriado');
+INSERT INTO PERCEPCIONES (ID_PERCEPCION, NOMBRE_PERCEPCION, DESCRIPCION_FORMULA) VALUES ('PER06', 'Aguinaldo', 'Un mes de salario pagado en diciembre');
+INSERT INTO PERCEPCIONES (ID_PERCEPCION, NOMBRE_PERCEPCION, DESCRIPCION_FORMULA) VALUES ('PER07', 'Bono 14', 'Un mes de salario pagado en julio');
+INSERT INTO PERCEPCIONES (ID_PERCEPCION, NOMBRE_PERCEPCION, DESCRIPCION_FORMULA) VALUES ('PER08', 'Vacaciones', 'Sueldo diario x días de vacaciones');
+INSERT INTO PERCEPCIONES (ID_PERCEPCION, NOMBRE_PERCEPCION, DESCRIPCION_FORMULA) VALUES ('PER09', 'Viáticos', 'Pago por gastos de viaje o representación');
 
 -- DEDUCCIONES
-INSERT INTO DEDUCCIONES (id_deduccion, nombre_deduccion, descripcion_formula) VALUES ('DED01', 'IGSS', '4.83% del salario ordinario');
-INSERT INTO DEDUCCIONES (id_deduccion, nombre_deduccion, descripcion_formula) VALUES ('DED02', 'ISR', 'Retención de impuesto sobre la renta');
-INSERT INTO DEDUCCIONES (id_deduccion, nombre_deduccion, descripcion_formula) VALUES ('DED03', 'Descuento Judicial', 'Retención ordenada por juez');
-INSERT INTO DEDUCCIONES (id_deduccion, nombre_deduccion, descripcion_formula) VALUES ('DED04', 'Seguro Médico', 'Aporte voluntario de seguro privado');
-INSERT INTO DEDUCCIONES (id_deduccion, nombre_deduccion, descripcion_formula) VALUES ('DED05', 'Parqueo', 'Cobro por uso de parqueo de la empresa');
-INSERT INTO DEDUCCIONES (id_deduccion, nombre_deduccion, descripcion_formula) VALUES ('DED06', 'Préstamo Bantrab', 'Descuento por crédito del Banco de los Trabajadores');
-INSERT INTO DEDUCCIONES (id_deduccion, nombre_deduccion, descripcion_formula) VALUES ('DED07', 'Descuento por Inasistencia', 'Descuento por día no laborado sin justificación');
-INSERT INTO DEDUCCIONES (id_deduccion, nombre_deduccion, descripcion_formula) VALUES ('DED08', 'Séptimo', 'Pérdida del séptimo día por jornada incompleta');
+INSERT INTO DEDUCCIONES (ID_DEDUCCION, NOMBRE_DEDUCCION, DESCRIPCION_FORMULA) VALUES ('DED01', 'IGSS', '4.83% del salario ordinario');
+INSERT INTO DEDUCCIONES (ID_DEDUCCION, NOMBRE_DEDUCCION, DESCRIPCION_FORMULA) VALUES ('DED02', 'ISR', 'Retención de impuesto sobre la renta');
+INSERT INTO DEDUCCIONES (ID_DEDUCCION, NOMBRE_DEDUCCION, DESCRIPCION_FORMULA) VALUES ('DED03', 'Descuento Judicial', 'Retención ordenada por juez');
+INSERT INTO DEDUCCIONES (ID_DEDUCCION, NOMBRE_DEDUCCION, DESCRIPCION_FORMULA) VALUES ('DED04', 'Seguro Médico', 'Aporte voluntario de seguro privado');
+INSERT INTO DEDUCCIONES (ID_DEDUCCION, NOMBRE_DEDUCCION, DESCRIPCION_FORMULA) VALUES ('DED05', 'Parqueo', 'Cobro por uso de parqueo de la empresa');
+INSERT INTO DEDUCCIONES (ID_DEDUCCION, NOMBRE_DEDUCCION, DESCRIPCION_FORMULA) VALUES ('DED06', 'Préstamo Bantrab', 'Descuento por crédito del Banco de los Trabajadores');
+INSERT INTO DEDUCCIONES (ID_DEDUCCION, NOMBRE_DEDUCCION, DESCRIPCION_FORMULA) VALUES ('DED07', 'Descuento por Inasistencia', 'Descuento por día no laborado sin justificación');
+INSERT INTO DEDUCCIONES (ID_DEDUCCION, NOMBRE_DEDUCCION, DESCRIPCION_FORMULA) VALUES ('DED08', 'Séptimo', 'Pérdida del séptimo día por jornada incompleta');
 
 -- FALTAS
-INSERT INTO FALTAS (descripcion, es_pagado) VALUES ('Falta injustificada', 'N');
-INSERT INTO FALTAS (descripcion, es_pagado) VALUES ('Falta justificada', 'S');
-INSERT INTO FALTAS (descripcion, es_pagado) VALUES ('Llegada tarde', 'N');
-INSERT INTO FALTAS (descripcion, es_pagado) VALUES ('Incapacidad IGSS', 'S');
-INSERT INTO FALTAS (descripcion, es_pagado) VALUES ('Permiso con goce de sueldo', 'S');
+INSERT INTO FALTAS (DESCRIPCION, ES_PAGADO) VALUES ('Falta injustificada', 'N');
+INSERT INTO FALTAS (DESCRIPCION, ES_PAGADO) VALUES ('Falta justificada', 'S');
+INSERT INTO FALTAS (DESCRIPCION, ES_PAGADO) VALUES ('Llegada tarde', 'N');
+INSERT INTO FALTAS (DESCRIPCION, ES_PAGADO) VALUES ('Incapacidad IGSS', 'S');
+INSERT INTO FALTAS (DESCRIPCION, ES_PAGADO) VALUES ('Permiso con goce de sueldo', 'S');
 
 -- MOTIVO_BAJA
-INSERT INTO MOTIVO_BAJA (id_motivo_baja, descripcion, estado) VALUES ('MB001', 'Renuncia voluntaria', 'ACTIVO');
-INSERT INTO MOTIVO_BAJA (id_motivo_baja, descripcion, estado) VALUES ('MB002', 'Despido', 'ACTIVO');
-INSERT INTO MOTIVO_BAJA (id_motivo_baja, descripcion, estado) VALUES ('MB003', 'Fin de contrato', 'ACTIVO');
-INSERT INTO MOTIVO_BAJA (id_motivo_baja, descripcion, estado) VALUES ('MB004', 'Jubilación', 'ACTIVO');
-INSERT INTO MOTIVO_BAJA (id_motivo_baja, descripcion, estado) VALUES ('MB005', 'Fallecimiento', 'ACTIVO');
+INSERT INTO MOTIVO_BAJA (ID_MOTIVO_BAJA, DESCRIPCION, ESTADO) VALUES ('MB001', 'Renuncia voluntaria', 'ACTIVO');
+INSERT INTO MOTIVO_BAJA (ID_MOTIVO_BAJA, DESCRIPCION, ESTADO) VALUES ('MB002', 'Despido', 'ACTIVO');
+INSERT INTO MOTIVO_BAJA (ID_MOTIVO_BAJA, DESCRIPCION, ESTADO) VALUES ('MB003', 'Fin de contrato', 'ACTIVO');
+INSERT INTO MOTIVO_BAJA (ID_MOTIVO_BAJA, DESCRIPCION, ESTADO) VALUES ('MB004', 'Jubilación', 'ACTIVO');
+INSERT INTO MOTIVO_BAJA (ID_MOTIVO_BAJA, DESCRIPCION, ESTADO) VALUES ('MB005', 'Fallecimiento', 'ACTIVO');
 
 -- TIPO_USUARIO
-INSERT INTO TIPO_USUARIO (id_tipo_usuario, nombre, descripcion, estado) VALUES ('ADM', 'Administrador', 'Acceso total al sistema', 'ACTIVO');
-INSERT INTO TIPO_USUARIO (id_tipo_usuario, nombre, descripcion, estado) VALUES ('RH', 'Recursos Humanos', 'Gestión de personal', 'ACTIVO');
-INSERT INTO TIPO_USUARIO (id_tipo_usuario, nombre, descripcion, estado) VALUES ('CON', 'Contador', 'Acceso a nómina', 'ACTIVO');
-INSERT INTO TIPO_USUARIO (id_tipo_usuario, nombre, descripcion, estado) VALUES ('VEN', 'Ventas', 'Acceso a módulo de ventas', 'ACTIVO');
+INSERT INTO TIPO_USUARIO (ID_TIPO_USUARIO, NOMBRE, DESCRIPCION, ESTADO) VALUES ('ADM', 'Administrador', 'Acceso total al sistema', 'ACTIVO');
+INSERT INTO TIPO_USUARIO (ID_TIPO_USUARIO, NOMBRE, DESCRIPCION, ESTADO) VALUES ('CON', 'Contador', 'Acceso a nómina', 'ACTIVO');
+INSERT INTO TIPO_USUARIO (ID_TIPO_USUARIO, NOMBRE, DESCRIPCION, ESTADO) VALUES ('ING', 'soporte', 'soporte TI', 'ACTIVO');
+INSERT INTO TIPO_USUARIO (ID_TIPO_USUARIO, NOMBRE, DESCRIPCION, ESTADO) VALUES ('RH', 'Recursos Humanos', 'Gestión de personal', 'ACTIVO');
+INSERT INTO TIPO_USUARIO (ID_TIPO_USUARIO, NOMBRE, DESCRIPCION, ESTADO) VALUES ('VEN', 'Ventas', 'Acceso a módulo de ventas', 'ACTIVO');
 
 -- EMPLEADO
-INSERT INTO EMPLEADO (nombre, fecha_nacimiento, genero, nacionalidad, no_afiliacion_igss, no_dpi_permiso, fecha_inicio, id_puesto, id_jornada, correo, telefono, estado) VALUES ('Gerardo Ramirez', DATE '1999-05-15', 'M', 'Guatemalteca', 'IGSS-0001', 'DPI-0001', DATE '2024-01-01', 'GG01', 'J1', 'gerardo@nomina.gt', '50212345678', 'ACTIVO');
-INSERT INTO EMPLEADO (nombre, fecha_nacimiento, genero, nacionalidad, no_afiliacion_igss, no_dpi_permiso, fecha_inicio, id_puesto, id_jornada, correo, telefono, estado) VALUES ('Ana López', DATE '1995-08-20', 'F', 'Guatemalteca', 'IGSS-0002', 'DPI-0002', DATE '2024-01-01', 'RH01', 'J1', 'ana@nomina.gt', '50287654321', 'ACTIVO');
-INSERT INTO EMPLEADO (nombre, fecha_nacimiento, genero, nacionalidad, no_afiliacion_igss, no_dpi_permiso, fecha_inicio, id_puesto, id_jornada, correo, telefono, estado) VALUES ('Carlos Méndez', DATE '1990-03-10', 'M', 'Guatemalteca', 'IGSS-0003', 'DPI-0003', DATE '2024-01-01', 'FIN02', 'J2', 'carlos@nomina.gt', '50211112222', 'ACTIVO');
-INSERT INTO EMPLEADO (nombre, fecha_nacimiento, genero, nacionalidad, no_afiliacion_igss, no_dpi_permiso, fecha_inicio, id_puesto, id_jornada, correo, telefono, estado) VALUES ('María García', DATE '1992-11-05', 'F', 'Guatemalteca', 'IGSS-0004', 'DPI-0004', DATE '2024-02-01', 'VEN02', 'J1', 'maria@nomina.gt', '50233334444', 'ACTIVO');
-INSERT INTO EMPLEADO (nombre, fecha_nacimiento, genero, nacionalidad, no_afiliacion_igss, no_dpi_permiso, fecha_inicio, id_puesto, id_jornada, correo, telefono, estado) VALUES ('Pedro Ruiz', DATE '1988-07-22', 'M', 'Guatemalteca', 'IGSS-0005', 'DPI-0005', DATE '2023-06-01', 'OP02', 'J3', 'pedro@nomina.gt', '50255556666', 'ACTIVO');
+INSERT INTO EMPLEADO (NOMBRE, FECHA_NACIMIENTO, GENERO, NACIONALIDAD, NO_AFILIACION_IGSS, NO_DPI_PERMISO, FECHA_INICIO, FECHA_FIN, ID_PUESTO, ID_JORNADA, CORREO, TELEFONO, CUENTA_BANCARIA, ESTADO, PORCENTAJE_PAGO_COMISION, ID_MOTIVO_BAJA) VALUES ('Gerardo Ramirez', DATE '1999-05-15', 'M', 'Guatemalteca', 'IGSS-0001', 'DPI-0001', DATE '2024-01-01', DATE '2026-03-21', 'GG01', 'J1', 'gerardo@nomina.gt', '50212345678', NULL, 'ACTIVO', 0, 'MB001');
+INSERT INTO EMPLEADO (NOMBRE, FECHA_NACIMIENTO, GENERO, NACIONALIDAD, NO_AFILIACION_IGSS, NO_DPI_PERMISO, FECHA_INICIO, FECHA_FIN, ID_PUESTO, ID_JORNADA, CORREO, TELEFONO, CUENTA_BANCARIA, ESTADO, PORCENTAJE_PAGO_COMISION, ID_MOTIVO_BAJA) VALUES ('Ana López', DATE '1995-08-20', 'F', 'Guatemalteca', 'IGSS-0002', 'DPI-0002', DATE '2024-01-01', DATE '2026-03-19', 'RH01', 'J1', 'ana@nomina.gt', '50287654321', NULL, 'ACTIVO', 0, 'MB002');
+INSERT INTO EMPLEADO (NOMBRE, FECHA_NACIMIENTO, GENERO, NACIONALIDAD, NO_AFILIACION_IGSS, NO_DPI_PERMISO, FECHA_INICIO, FECHA_FIN, ID_PUESTO, ID_JORNADA, CORREO, TELEFONO, CUENTA_BANCARIA, ESTADO, PORCENTAJE_PAGO_COMISION, ID_MOTIVO_BAJA) VALUES ('Carlos Méndez', DATE '1990-03-10', 'M', 'Guatemalteca', 'IGSS-0003', 'DPI-0003', DATE '2024-01-01', NULL, 'FIN02', 'J2', 'carlos@nomina.gt', '50211112222', NULL, 'ACTIVO', 0, NULL);
+INSERT INTO EMPLEADO (NOMBRE, FECHA_NACIMIENTO, GENERO, NACIONALIDAD, NO_AFILIACION_IGSS, NO_DPI_PERMISO, FECHA_INICIO, FECHA_FIN, ID_PUESTO, ID_JORNADA, CORREO, TELEFONO, CUENTA_BANCARIA, ESTADO, PORCENTAJE_PAGO_COMISION, ID_MOTIVO_BAJA) VALUES ('María García', DATE '1992-11-05', 'F', 'Guatemalteca', 'IGSS-0004', 'DPI-0004', DATE '2024-02-01', NULL, 'VEN02', 'J1', 'maria@nomina.gt', '50233334444', NULL, 'ACTIVO', 0, NULL);
+INSERT INTO EMPLEADO (NOMBRE, FECHA_NACIMIENTO, GENERO, NACIONALIDAD, NO_AFILIACION_IGSS, NO_DPI_PERMISO, FECHA_INICIO, FECHA_FIN, ID_PUESTO, ID_JORNADA, CORREO, TELEFONO, CUENTA_BANCARIA, ESTADO, PORCENTAJE_PAGO_COMISION, ID_MOTIVO_BAJA) VALUES ('juanin guerra', DATE '1997-05-30', 'M', 'Guatemalteca', '2996179200101', '2996179200101', DATE '2026-03-21', NULL, 'FIN01', 'J1', NULL, NULL, NULL, 'ACTIVO', 0, NULL);
+
+-- USUARIOS
+INSERT INTO USUARIOS (ID_TIPO_USUARIO, ID_EMPLEADO, USERNAME, PASSWORD_HASH, ESTADO) VALUES ('VEN', 1, 'admin', '$2b$10$dast3Ir/u/hpUSYhAVrP7eAwOjJAIcoi6zLiAd3ZC3H/XtsWKWrNq', 'ACTIVO');
+INSERT INTO USUARIOS (ID_TIPO_USUARIO, ID_EMPLEADO, USERNAME, PASSWORD_HASH, ESTADO) VALUES ('CON', 2, 'prb', '$2b$10$mtLZk8SLvWYZ3.J88uVXguGZgK3ZogjGLMHewGOAABhYS9b3.FG4S', 'ACTIVO');
+INSERT INTO USUARIOS (ID_TIPO_USUARIO, ID_EMPLEADO, USERNAME, PASSWORD_HASH, ESTADO) VALUES ('VEN', 3, 'mainin', '$2b$10$.RIy.7jtIuAUE9XfgqA2BertMa4kay2IfT8FwIL140o4DfeXz1SxS', 'ACTIVO');
+
+-- PERIODO_NOMINA
+INSERT INTO PERIODO_NOMINA (NUMERO_PERIODO, ANIO, FECHA_INICIO, FECHA_FIN, ESTADO, FECHA_CIERRE) VALUES (3, 2026, DATE '2026-03-01', DATE '2026-03-31', 'CERRADO', DATE '2026-04-10');
+INSERT INTO PERIODO_NOMINA (NUMERO_PERIODO, ANIO, FECHA_INICIO, FECHA_FIN, ESTADO, FECHA_CIERRE) VALUES (4, 2026, DATE '2026-04-01', DATE '2026-04-30', 'ABIERTO', NULL);
+INSERT INTO PERIODO_NOMINA (NUMERO_PERIODO, ANIO, FECHA_INICIO, FECHA_FIN, ESTADO, FECHA_CIERRE) VALUES (1, 2026, DATE '2026-01-01', DATE '2026-01-31', 'CERRADO', DATE '2026-01-31');
+INSERT INTO PERIODO_NOMINA (NUMERO_PERIODO, ANIO, FECHA_INICIO, FECHA_FIN, ESTADO, FECHA_CIERRE) VALUES (2, 2026, DATE '2026-02-01', DATE '2026-02-28', 'CERRADO', DATE '2026-02-28');
+
+-- REGISTRO_HORAS_EXTRA
+INSERT INTO REGISTRO_HORAS_EXTRA (ID_EMPLEADO, ID_JORNADA, ID_USUARIO, FECHA, CANTIDAD, FACTOR, JUSTIFICACION, ESTADO) VALUES (1, 'J1', 1, DATE '2026-03-05', 3, 1.5, 'Cierre de informe mensual', 'APROBADO');
+INSERT INTO REGISTRO_HORAS_EXTRA (ID_EMPLEADO, ID_JORNADA, ID_USUARIO, FECHA, CANTIDAD, FACTOR, JUSTIFICACION, ESTADO) VALUES (1, 'J1', 1, DATE '2026-03-16', 2, 2, 'Trabajo en domingo por urgencia', 'APROBADO');
+INSERT INTO REGISTRO_HORAS_EXTRA (ID_EMPLEADO, ID_JORNADA, ID_USUARIO, FECHA, CANTIDAD, FACTOR, JUSTIFICACION, ESTADO) VALUES (1, 'J1', 1, DATE '2026-03-22', 1.5, 1.5, 'Pendiente de revision', 'PENDIENTE');
+INSERT INTO REGISTRO_HORAS_EXTRA (ID_EMPLEADO, ID_JORNADA, ID_USUARIO, FECHA, CANTIDAD, FACTOR, JUSTIFICACION, ESTADO) VALUES (2, 'J1', 21, DATE '2026-03-10', 4, 1.5, 'Reclutamiento urgente', 'APROBADO');
+INSERT INTO REGISTRO_HORAS_EXTRA (ID_EMPLEADO, ID_JORNADA, ID_USUARIO, FECHA, CANTIDAD, FACTOR, JUSTIFICACION, ESTADO) VALUES (2, 'J1', 21, DATE '2026-03-20', 2, 1.5, 'Sin justificacion suficiente', 'RECHAZADO');
+INSERT INTO REGISTRO_HORAS_EXTRA (ID_EMPLEADO, ID_JORNADA, ID_USUARIO, FECHA, CANTIDAD, FACTOR, JUSTIFICACION, ESTADO) VALUES (3, 'J2', 23, DATE '2026-03-08', 3, 1.5, 'Cierre contable', 'APROBADO');
+INSERT INTO REGISTRO_HORAS_EXTRA (ID_EMPLEADO, ID_JORNADA, ID_USUARIO, FECHA, CANTIDAD, FACTOR, JUSTIFICACION, ESTADO) VALUES (3, 'J2', 23, DATE '2026-03-23', 2.5, 2, 'Domingo de auditoria', 'APROBADO');
+INSERT INTO REGISTRO_HORAS_EXTRA (ID_EMPLEADO, ID_JORNADA, ID_USUARIO, FECHA, CANTIDAD, FACTOR, JUSTIFICACION, ESTADO) VALUES (4, 'J1', 1, DATE '2026-03-14', 2, 1.5, 'Cierre de ventas del mes', 'APROBADO');
+INSERT INTO REGISTRO_HORAS_EXTRA (ID_EMPLEADO, ID_JORNADA, ID_USUARIO, FECHA, CANTIDAD, FACTOR, JUSTIFICACION, ESTADO) VALUES (21, 'J1', 1, DATE '2026-03-18', 3, 1.5, 'Apoyo en area financiera', 'APROBADO');
+INSERT INTO REGISTRO_HORAS_EXTRA (ID_EMPLEADO, ID_JORNADA, ID_USUARIO, FECHA, CANTIDAD, FACTOR, JUSTIFICACION, ESTADO) VALUES (21, 'J1', 1, DATE '2026-03-25', 2, 2, 'Pendiente aprobacion', 'PENDIENTE');
+
+-- REGISTRO_FALTAS
+INSERT INTO REGISTRO_FALTAS (ID_EMPLEADO, ID_FALTA, ID_USUARIO, FECHA, FECHA_FIN, JUSTIFICACION, ESTADO) VALUES (1, 2, 1, DATE '2026-03-12', NULL, 'Cita medica con comprobante', 'APROBADO');
+INSERT INTO REGISTRO_FALTAS (ID_EMPLEADO, ID_FALTA, ID_USUARIO, FECHA, FECHA_FIN, JUSTIFICACION, ESTADO) VALUES (2, 1, 21, DATE '2026-03-07', NULL, 'Sin aviso previo', 'APROBADO');
+INSERT INTO REGISTRO_FALTAS (ID_EMPLEADO, ID_FALTA, ID_USUARIO, FECHA, FECHA_FIN, JUSTIFICACION, ESTADO) VALUES (2, 3, 21, DATE '2026-03-19', NULL, 'Llego 45 minutos tarde', 'PENDIENTE');
+INSERT INTO REGISTRO_FALTAS (ID_EMPLEADO, ID_FALTA, ID_USUARIO, FECHA, FECHA_FIN, JUSTIFICACION, ESTADO) VALUES (3, 4, 23, DATE '2026-03-03', DATE '2026-03-04', 'Incapacidad IGSS presentada', 'APROBADO');
+INSERT INTO REGISTRO_FALTAS (ID_EMPLEADO, ID_FALTA, ID_USUARIO, FECHA, FECHA_FIN, JUSTIFICACION, ESTADO) VALUES (4, 1, 1, DATE '2026-03-11', NULL, 'Ausencia sin justificacion', 'APROBADO');
+INSERT INTO REGISTRO_FALTAS (ID_EMPLEADO, ID_FALTA, ID_USUARIO, FECHA, FECHA_FIN, JUSTIFICACION, ESTADO) VALUES (4, 5, 1, DATE '2026-03-25', NULL, 'Permiso por diligencia personal', 'APROBADO');
+INSERT INTO REGISTRO_FALTAS (ID_EMPLEADO, ID_FALTA, ID_USUARIO, FECHA, FECHA_FIN, JUSTIFICACION, ESTADO) VALUES (21, 1, 1, DATE '2026-03-06', NULL, 'No se presento sin aviso', 'APROBADO');
+INSERT INTO REGISTRO_FALTAS (ID_EMPLEADO, ID_FALTA, ID_USUARIO, FECHA, FECHA_FIN, JUSTIFICACION, ESTADO) VALUES (21, 3, 1, DATE '2026-03-20', NULL, 'Llegada tarde sin justificacion', 'APROBADO');
+
+-- HISTORICO_NOMINA
+INSERT INTO HISTORICO_NOMINA (ID_EMPLEADO, ID_PERIODO, FECHA_PAGO, TOTAL_PERCEPCIONES, TOTAL_DEDUCCIONES, LIQUIDO_A_PAGAR, ESTADO, OBSERVACION) VALUES (21, 23, DATE '2026-04-08', 18337.5, 1200, 17137.5, 'PAGADO', 'Nómina Marzo 2026');
+INSERT INTO HISTORICO_NOMINA (ID_EMPLEADO, ID_PERIODO, FECHA_PAGO, TOTAL_PERCEPCIONES, TOTAL_DEDUCCIONES, LIQUIDO_A_PAGAR, ESTADO, OBSERVACION) VALUES (1, 23, DATE '2026-04-09', 25885.42, 0, 25885.42, 'PAGADO', 'Nómina Marzo 2026');
+
+-- HISTORICO_PERCEPCIONES_DETALLE
+INSERT INTO HISTORICO_PERCEPCIONES_DETALLE (ID_NOMINA, ID_PERCEPCION, ID_HORA_EXTRA, MONTO) VALUES (25, 'PER01', NULL, 18000);
+INSERT INTO HISTORICO_PERCEPCIONES_DETALLE (ID_NOMINA, ID_PERCEPCION, ID_HORA_EXTRA, MONTO) VALUES (25, 'PER05', 25, 337.5);
+INSERT INTO HISTORICO_PERCEPCIONES_DETALLE (ID_NOMINA, ID_PERCEPCION, ID_HORA_EXTRA, MONTO) VALUES (26, 'PER01', NULL, 25000);
+INSERT INTO HISTORICO_PERCEPCIONES_DETALLE (ID_NOMINA, ID_PERCEPCION, ID_HORA_EXTRA, MONTO) VALUES (26, 'PER05', 17, 468.75);
+INSERT INTO HISTORICO_PERCEPCIONES_DETALLE (ID_NOMINA, ID_PERCEPCION, ID_HORA_EXTRA, MONTO) VALUES (26, 'PER05', 18, 416.67);
+
+-- HISTORICO_DEDUCCIONES_DETALLE
+INSERT INTO HISTORICO_DEDUCCIONES_DETALLE (ID_NOMINA, ID_DEDUCCION, ID_REGISTRO_FALTA, MONTO) VALUES (25, 'DED07', 8, 600);
+INSERT INTO HISTORICO_DEDUCCIONES_DETALLE (ID_NOMINA, ID_DEDUCCION, ID_REGISTRO_FALTA, MONTO) VALUES (25, 'DED07', 9, 600);
 
 COMMIT;
