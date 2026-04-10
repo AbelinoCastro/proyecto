@@ -2,18 +2,20 @@ import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 
 const menuItems = [
-    /*{ path: '/tipo-usuario', label: 'Tipo Usuario' },
-    { path: '/usuarios', label: 'Usuarios' },
+    { path: '/calcular-nomina', label: 'Calcular Nómina' },
+    { path: '/periodos', label: 'Períodos' },
+    { path: '/horasextra', label: 'Horas Extra' },
+    { path: '/registro-faltas', label: 'Registro Faltas' },
+    { path: '/empleado', label: 'Empleados' },
     { path: '/departamentos', label: 'Departamentos' },
     { path: '/jornadas', label: 'Jornadas' },
+    { path: '/puestos', label: 'Puestos' },
     { path: '/percepciones', label: 'Percepciones' },
     { path: '/deducciones', label: 'Deducciones' },
     { path: '/faltas', label: 'Faltas' },
     { path: '/motivo-baja', label: 'Motivo Baja' },
-    { path: '/puestos', label: 'Puestos' },
-    { path: '/empleado', label: 'Empleados' },*/
-    { path: '/calcular-nomina', label: 'Calcular Nómina' },
-    { path: '/periodos', label: 'Períodos' },
+    { path: '/usuarios', label: 'Usuarios' },
+    { path: '/tipo-usuario', label: 'Tipo Usuario' },
 ];
 
 const Sidebar = () => {

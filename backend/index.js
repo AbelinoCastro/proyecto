@@ -22,6 +22,8 @@ app.use('/api/puestos', require('./src/modules/puestos/puestos.routes'));
 app.use('/api/empleado', require('./src/modules/empleado/empleado.routes'));
 app.use('/api/nomina', require('./src/modules/nomina/nomina.routes'));
 app.use('/api/periodos', require('./src/modules/periodo/periodo.routes'));
+app.use('/api/horasextra', require('./src/modules/horasextra/horasextra.routes'));
+app.use('/api/registro-faltas', require('./src/modules/registroFaltas/registroFaltas.routes'));
 
 app.get('/', (req, res) => res.json({ ok: true, message: 'Proyecto Nomina API corriendo' }));
 

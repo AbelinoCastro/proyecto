@@ -1,0 +1,128 @@
+/* src/pages/Dashboard/Dashboard.css */
+
+.dashboard-page {
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 0.5rem;
+}
+
+.header-text h1 {
+  font-size: 1.8rem;
+  color: var(--text-title);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.header-text p {
+  color: var(--text-muted);
+  margin-top: 4px;
+  font-size: 0.95rem;
+}
+
+/* --- PREMIUM GRID & CARDS (SOBRIO) --- */
+.premium-grid {
+  display: grid;
+  /* Reducimos el tamaño mínimo para mayor densidad */
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.premium-card {
+  background-color: var(--bg-panel);
+  border-radius: var(--radius-md);
+  padding: 1.8rem; /* Un poco menos de padding */
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: var(--shadow-sm); /* Sombra muy sutil por defecto */
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  border: 1px solid #e2e8f0; /* Borde Slate 200 sutil */
+  min-height: 220px; /* Altura mínima consistente */
+}
+
+/* Efecto Hover Profesional (Menos exagerado) */
+.premium-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+  border-color: #cbd5e1; /* Slate 300 */
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.2rem;
+}
+
+.card-icon {
+  font-size: 2.1rem;
+}
+
+.card-status-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #e2e8f0;
+  border-radius: 50%;
+  transition: var(--transition);
+}
+
+.premium-card:hover .card-status-dot {
+  background-color: var(--success);
+  box-shadow: 0 0 8px var(--success);
+}
+
+.card-body h3 {
+  color: var(--text-title);
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  letter-spacing: -0.01em;
+}
+
+.card-body p {
+  color: var(--text-main);
+  font-size: 0.88rem;
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+}
+
+.card-footer {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 0.85rem;
+  opacity: 0.8;
+  transition: var(--transition);
+  padding-top: 1rem;
+  border-top: 1px solid #f1f5f9; /* Slate 100 */
+}
+
+.premium-card:hover .card-footer {
+  opacity: 1;
+}
+
+.action-arrow {
+  transform: translateX(0);
+  transition: var(--transition);
+  font-size: 1.1rem;
+}
+
+.premium-card:hover .action-arrow {
+  transform: translateX(4px);
+}

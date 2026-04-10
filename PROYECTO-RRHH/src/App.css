@@ -1,0 +1,77 @@
+/* src/App.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+  /* Paleta Enterprise: Slate Ocean */
+  --bg-main: #f1f5f9;       /* Slate 100 - Fondo suave */
+  --bg-panel: #ffffff;      /* Blanco puro para tarjetas */
+  --sidebar-dark: #0f172a;  /* Slate 900 - Sidebar muy serio */
+  
+  /* Colores de Acento Serios */
+  --primary: #1d4ed8;       /* Blue 700 - Menos brillante, más corporativo */
+  --primary-dark: #1e40af;  /* Blue 800 */
+  --primary-light: #dbeafe; /* Blue 100 */
+  
+  /* Tipografía y Textos */
+  --text-title: #0f172a;    /* Slate 900 */
+  --text-main: #334155;     /* Slate 700 */
+  --text-muted: #64748b;    /* Slate 500 */
+  
+  /* Estados */
+  --success: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --info: #38bdf8;
+
+  /* Estructurales */
+  --sidebar-width: 260px;
+  --topbar-height: 70px;
+  --radius-md: 12px;        /* Bordes menos redondeados, más sobrios */
+  --radius-sm: 8px;
+  --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+}
+
+/* Reset y Normalización Profunda */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body, html, #root {
+  width: 100%;
+  height: 100%;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  overflow: hidden; /* Control total del Layout */
+  font-size: 15px; /* Un poco más pequeño para mayor densidad de información */
+}
+
+h1, h2, h3, h4 {
+  color: var(--text-title);
+  font-weight: 700;
+  letter-spacing: -0.025em; /* Nítido y serio */
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: var(--transition);
+}
+
+ul {
+  list-style: none;
+}
+
+button {
+  font-family: inherit;
+  border: none;
+  background: none;
+  cursor: pointer;
+}

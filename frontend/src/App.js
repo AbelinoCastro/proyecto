@@ -12,6 +12,8 @@ import PuestosPage from './pages/puestos/PuestosPage';
 import EmpleadoPage from './pages/empleado/EmpleadoPage';
 import CalcularNominaPage from './pages/nomina/CalcularNominaPage';
 import PeriodosPage from './pages/periodos/PeriodosPage';
+import RegistroHorasExtra from './pages/registroHorasExtras/RegistroHorasExtra';
+import ListadoFaltas from './pages/registroFaltas/ListadoFaltas';
 
 function App() {
   return (
@@ -31,6 +33,8 @@ function App() {
           <Route path="empleado" element={<EmpleadoPage />} />
           <Route path="calcular-nomina" element={<CalcularNominaPage />} />
           <Route path="periodos" element={<PeriodosPage />} />
+          <Route path="horasextra" element={<RegistroHorasExtra />} />
+          <Route path="registro-faltas" element={<ListadoFaltas />} />
         </Route>
       </Routes>
     </BrowserRouter>
