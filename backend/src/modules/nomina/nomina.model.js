@@ -272,6 +272,29 @@ const getDetalleNomina = async (id_nomina) => {
     } finally { await conn.close(); }
 };
 
+// Obtener todos los empleados ACTIVOS para cálculo masivo
+const getAllEmpleadosActivos = async () => {
+    const conn = await getConnection();
+    try {
+        const result = await conn.execute(
+            `SELECT e.id_empleado, e.nombre, e.correo, e.cuenta_bancaria,
+                    e.porcentaje_pago_comision, e.estado,
+                    p.id_puesto, p.nombre_puesto, p.sueldo_base,
+                    j.id_jornada, j.nombre_jornada, j.horas_diarias,
+                    d.nombre_departamento
+             FROM EMPLEADO e
+             JOIN PUESTOS      p ON p.id_puesto      = e.id_puesto
+             JOIN JORNADAS     j ON j.id_jornada     = e.id_jornada
+             JOIN DEPARTAMENTOS d ON d.id_departamento = p.id_departamento
+             WHERE e.estado = 'ACTIVO'
+             ORDER BY e.id_empleado`,
+            [],
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+        return result.rows;
+    } finally { await conn.close(); }
+};
+
 module.exports = {
     getDatosEmpleado,
     getHorasExtra,
@@ -280,5 +303,6 @@ module.exports = {
     getNominaExistente,
     procesarNomina,
     getHistorico,
-    getDetalleNomina
+    getDetalleNomina,
+    getAllEmpleadosActivos
 };

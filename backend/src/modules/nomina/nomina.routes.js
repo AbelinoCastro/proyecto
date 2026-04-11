@@ -9,6 +9,9 @@ router.get('/empleado/:id', ctrl.getVistaPrevia);
 // Procesar y guardar la nómina — POST /api/nomina/procesar
 router.post('/procesar', ctrl.procesarNomina);
 
+// Calcular nómina para TODOS los empleados activos — POST /api/nomina/procesar-todos
+router.post('/procesar-todos', ctrl.procesarTodos);
+
 // Histórico de nóminas procesadas — GET /api/nomina/historico
 router.get('/historico', ctrl.getHistorico);
 

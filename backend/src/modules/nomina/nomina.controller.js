@@ -209,4 +209,97 @@ const getDetalleNomina = async (req, res) => {
     } catch (err) { return error(res, 'Error al obtener detalle de nómina', 500, err.message); }
 };
 
-module.exports = { getVistaPrevia, procesarNomina, getHistorico, getDetalleNomina };
+// POST /api/nomina/procesar-todos
+// Body: { id_periodo, mes, anio }
+const procesarTodos = async (req, res) => {
+    try {
+        const { id_periodo, mes, anio } = req.body;
+        if (!id_periodo || !mes || !anio)
+            return error(res, 'id_periodo, mes y anio son requeridos', 400);
+
+        const empleados = await model.getAllEmpleadosActivos();
+        if (!empleados.length)
+            return error(res, 'No hay empleados activos', 404);
+
+        const fecha_pago = new Date().toISOString().slice(0, 10);
+        const resultados = [];
+
+        for (const empleado of empleados) {
+            const id_empleado = empleado.ID_EMPLEADO;
+            try {
+                // Saltar si ya tiene nómina en este período
+                const existe = await model.getNominaExistente(id_empleado, id_periodo);
+                if (existe) {
+                    resultados.push({ id_empleado, nombre: empleado.NOMBRE, estado: 'omitido', motivo: 'Ya tiene nómina en este período' });
+                    continue;
+                }
+
+                const sueldo_base   = parseFloat(empleado.SUELDO_BASE);
+                const horas_diarias = parseFloat(empleado.HORAS_DIARIAS);
+                const valor_hora    = sueldo_base / 30 / horas_diarias;
+                const valor_dia     = sueldo_base / 30;
+
+                const horasExtra = await model.getHorasExtra(id_empleado, anio, mes);
+                const faltas     = await model.getFaltas(id_empleado, anio, mes);
+                const dedEmp     = await asignacionesModel.getDeduccionesActivasByEmpleado(id_empleado);
+                const perEmp     = await asignacionesModel.getPercepcionesActivasByEmpleado(id_empleado);
+
+                // Percepciones
+                const detalleHE = horasExtra.map(he => ({
+                    id_hora_extra: he.ID_HORA_EXTRA,
+                    monto: parseFloat((valor_hora * parseFloat(he.CANTIDAD) * parseFloat(he.FACTOR)).toFixed(2))
+                }));
+                const total_he = detalleHE.reduce((s, he) => s + he.monto, 0);
+                const perEmpArr = perEmp.map(p => ({ id_percepcion: p.ID_PERCEPCION, monto: parseFloat(p.MONTO) }));
+                const total_per_emp = perEmpArr.reduce((s, p) => s + p.monto, 0);
+                const total_percepciones = parseFloat((sueldo_base + BONIFICACION_INCENTIVO + total_he + total_per_emp).toFixed(2));
+
+                // Deducciones
+                const igss_monto = parseFloat((sueldo_base * IGSS_EMPLEADO_PCT / 100).toFixed(2));
+                const faltasDesc = faltas.filter(f => f.ES_PAGADO === 'N');
+                const total_faltas = parseFloat((faltasDesc.length * valor_dia).toFixed(2));
+                const dedEmpArr = dedEmp.map(d => ({ id_deduccion: d.ID_DEDUCCION, monto: parseFloat(d.MONTO) }));
+                const total_ded_emp = dedEmpArr.reduce((s, d) => s + d.monto, 0);
+                const total_deducciones = parseFloat((igss_monto + total_faltas + total_ded_emp).toFixed(2));
+
+                const liquido_a_pagar = parseFloat((total_percepciones - total_deducciones).toFixed(2));
+
+                // Detalles para historial
+                const detalles_percepciones = [
+                    { id_percepcion: 'PER01', id_hora_extra: null, monto: sueldo_base },
+                    { id_percepcion: 'PER02', id_hora_extra: null, monto: BONIFICACION_INCENTIVO },
+                    ...detalleHE.map(he => ({ id_percepcion: 'PER05', id_hora_extra: he.id_hora_extra, monto: he.monto })),
+                    ...perEmpArr.map(p => ({ id_percepcion: p.id_percepcion, id_hora_extra: null, monto: p.monto }))
+                ];
+                const detalles_deducciones = [
+                    { id_deduccion: 'DED01', id_registro_falta: null, monto: igss_monto },
+                    ...faltasDesc.map(f => ({ id_deduccion: 'DED07', id_registro_falta: f.ID_REGISTRO_FALTA, monto: parseFloat(valor_dia.toFixed(2)) })),
+                    ...dedEmpArr.map(d => ({ id_deduccion: d.id_deduccion, id_registro_falta: null, monto: d.monto }))
+                ];
+
+                const id_nomina = await model.procesarNomina({
+                    id_empleado, id_periodo, fecha_pago,
+                    total_percepciones, total_deducciones, liquido_a_pagar,
+                    observacion: `Nómina masiva mes ${mes}/${anio}`,
+                    detalles_percepciones, detalles_deducciones
+                });
+
+                resultados.push({ id_empleado, nombre: empleado.NOMBRE, estado: 'procesado', id_nomina, liquido_a_pagar });
+            } catch (err) {
+                resultados.push({ id_empleado, nombre: empleado.NOMBRE, estado: 'error', motivo: err.message });
+            }
+        }
+
+        const procesados = resultados.filter(r => r.estado === 'procesado').length;
+        const omitidos   = resultados.filter(r => r.estado === 'omitido').length;
+        const errores    = resultados.filter(r => r.estado === 'error').length;
+
+        return success(res, { resultados, resumen: { procesados, omitidos, errores } },
+            `Proceso completado: ${procesados} procesados, ${omitidos} omitidos, ${errores} errores`);
+
+    } catch (err) {
+        return error(res, 'Error en cálculo masivo', 500, err.message);
+    }
+};
+
+module.exports = { getVistaPrevia, procesarNomina, procesarTodos, getHistorico, getDetalleNomina };

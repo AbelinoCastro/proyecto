@@ -12,3 +12,6 @@ export const getHistoricoNomina = () => api.get('/nomina/historico');
 
 // Obtener detalle completo de una nómina para el recibo
 export const getDetalleNomina = (id_nomina) => api.get(`/nomina/historico/${id_nomina}`);
+
+// Procesar nómina para todos los empleados activos de un período
+export const procesarNominaTodos = (data) => api.post('/nomina/procesar-todos', data);

@@ -1,7 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getEmpleados } from '../../services/empleadoService';
-import { getVistaPreviaNomina, procesarNomina } from '../../services/nominaService';
+import { getVistaPreviaNomina, procesarNomina, procesarNominaTodos } from '../../services/nominaService';
+import { getPeriodos } from '../../services/periodosService';
 
 const formatQ = (n) =>
     `Q ${parseFloat(n || 0).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -30,10 +31,19 @@ const CalcularNominaPage = () => {
     const [resultado, setResultado] = useState(null);
     const printRef = useRef();
 
+    // Cálculo masivo
+    const [periodos, setPeriodos]           = useState([]);
+    const [modalMasivo, setModalMasivo]     = useState(false);
+    const [loadingMasivo, setLoadingMasivo] = useState(false);
+    const [resultadoMasivo, setResultadoMasivo] = useState(null);
+
     useEffect(() => {
         getEmpleados()
             .then(r => setEmpleados(r.data.data))
             .catch(() => setError('Error al cargar empleados'));
+        getPeriodos()
+            .then(r => setPeriodos((r.data.data || []).filter(p => p.ESTADO === 'ABIERTO')))
+            .catch(() => {});
     }, []);
 
     const handleCargar = async () => {
@@ -96,6 +106,26 @@ const CalcularNominaPage = () => {
         }
     };
 
+    const handleProcesarTodos = async (periodo) => {
+        if (!window.confirm(
+            `¿Calcular y procesar la nómina de TODOS los empleados activos para ${MESES[periodo.NUMERO_PERIODO]} ${periodo.ANIO}?\n\nEsta acción no se puede deshacer.`
+        )) return;
+        setLoadingMasivo(true);
+        setResultadoMasivo(null);
+        try {
+            const res = await procesarNominaTodos({
+                id_periodo: periodo.ID_PERIODO,
+                mes: periodo.NUMERO_PERIODO,
+                anio: periodo.ANIO
+            });
+            setResultadoMasivo(res.data.data);
+        } catch (err) {
+            setResultadoMasivo({ error: err.response?.data?.message || 'Error en el proceso masivo' });
+        } finally {
+            setLoadingMasivo(false);
+        }
+    };
+
     const inputCls = 'bg-[#131720] border border-white/10 rounded-lg px-3 py-2 text-sm text-white outline-none w-full';
     const selectCls = 'bg-[#131720] border border-white/10 rounded-lg px-3 py-2 text-sm text-white outline-none w-full';
 
@@ -103,6 +133,12 @@ const CalcularNominaPage = () => {
         <div className="text-white">
             <div className="flex items-center justify-between mb-6">
                 <h1 className="text-xl font-semibold">Calcular Nómina</h1>
+                <button
+                    onClick={() => { setModalMasivo(true); setResultadoMasivo(null); }}
+                    className="bg-emerald-600 hover:bg-emerald-500 text-white text-sm px-4 py-2 rounded-lg font-medium"
+                >
+                    Calcular todos los empleados
+                </button>
             </div>
 
             {/* PASO 1 — SELECCIÓN */}
@@ -430,6 +466,115 @@ const CalcularNominaPage = () => {
                             className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition">
                             Calcular otra nómina
                         </button>
+                    </div>
+                </div>
+            )}
+            {/* MODAL — CÁLCULO MASIVO */}
+            {modalMasivo && (
+                <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/60">
+                    <div className="bg-[#1a1f2e] border border-white/10 rounded-xl p-6 w-full max-w-xl mx-4 max-h-[90vh] overflow-y-auto">
+                        <div className="flex justify-between items-center mb-5">
+                            <h3 className="text-white font-semibold text-base">Calcular nómina — todos los empleados</h3>
+                            <button onClick={() => setModalMasivo(false)} className="text-gray-400 hover:text-white text-xl leading-none">&times;</button>
+                        </div>
+
+                        {!resultadoMasivo && !loadingMasivo && (
+                            <>
+                                <p className="text-gray-400 text-sm mb-4">
+                                    Selecciona el período activo. Se calculará y procesará la nómina de <strong className="text-white">todos los empleados ACTIVOS</strong> de una sola vez. Los empleados que ya tengan nómina en ese período serán omitidos.
+                                </p>
+                                {periodos.length === 0 ? (
+                                    <div className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg text-yellow-400 text-sm mb-4">
+                                        No hay períodos abiertos. Crea uno desde la sección Períodos.
+                                    </div>
+                                ) : (
+                                    <div className="flex flex-col gap-2 mb-5">
+                                        {periodos.map(p => (
+                                            <button
+                                                key={p.ID_PERIODO}
+                                                onClick={() => handleProcesarTodos(p)}
+                                                className="flex justify-between items-center bg-[#131720] hover:bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-left transition"
+                                            >
+                                                <span className="text-white font-medium">{MESES[p.NUMERO_PERIODO]} {p.ANIO}</span>
+                                                <span className="text-xs bg-green-600/20 text-green-400 px-2 py-0.5 rounded-full">ABIERTO</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </>
+                        )}
+
+                        {loadingMasivo && (
+                            <div className="text-center py-10">
+                                <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                                <p className="text-gray-400 text-sm">Procesando nóminas... esto puede tardar unos segundos</p>
+                            </div>
+                        )}
+
+                        {resultadoMasivo && !resultadoMasivo.error && (
+                            <>
+                                {/* Resumen */}
+                                <div className="grid grid-cols-3 gap-3 mb-5">
+                                    <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3 text-center">
+                                        <p className="text-2xl font-bold text-green-400">{resultadoMasivo.resumen.procesados}</p>
+                                        <p className="text-xs text-green-400/70">Procesados</p>
+                                    </div>
+                                    <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3 text-center">
+                                        <p className="text-2xl font-bold text-yellow-400">{resultadoMasivo.resumen.omitidos}</p>
+                                        <p className="text-xs text-yellow-400/70">Ya existían</p>
+                                    </div>
+                                    <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 text-center">
+                                        <p className="text-2xl font-bold text-red-400">{resultadoMasivo.resumen.errores}</p>
+                                        <p className="text-xs text-red-400/70">Errores</p>
+                                    </div>
+                                </div>
+
+                                {/* Detalle */}
+                                <div className="max-h-64 overflow-y-auto">
+                                    <table className="w-full text-sm">
+                                        <thead>
+                                            <tr className="text-xs text-gray-400 uppercase">
+                                                <th className="text-left pb-2">Empleado</th>
+                                                <th className="text-right pb-2">Líquido</th>
+                                                <th className="text-center pb-2">Estado</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {resultadoMasivo.resultados.map((r, i) => (
+                                                <tr key={i} className="border-t border-white/5">
+                                                    <td className="py-1.5 text-white text-xs">{r.nombre}</td>
+                                                    <td className="py-1.5 text-right text-emerald-400 text-xs">
+                                                        {r.liquido_a_pagar ? formatQ(r.liquido_a_pagar) : '—'}
+                                                    </td>
+                                                    <td className="py-1.5 text-center">
+                                                        <span className={`text-xs px-2 py-0.5 rounded-full ${
+                                                            r.estado === 'procesado' ? 'bg-green-600/20 text-green-400' :
+                                                            r.estado === 'omitido'   ? 'bg-yellow-600/20 text-yellow-400' :
+                                                                                       'bg-red-600/20 text-red-400'
+                                                        }`}>
+                                                            {r.estado}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <button
+                                    onClick={() => setModalMasivo(false)}
+                                    className="mt-4 w-full bg-blue-600 hover:bg-blue-500 text-white rounded-lg py-2 text-sm font-medium"
+                                >
+                                    Cerrar
+                                </button>
+                            </>
+                        )}
+
+                        {resultadoMasivo?.error && (
+                            <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
+                                {resultadoMasivo.error}
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
