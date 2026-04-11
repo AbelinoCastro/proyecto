@@ -16,6 +16,9 @@ import CatalogosPage from './pages/catalogos/CatalogosPage';
 import RegistroHorasExtra from './pages/registroHorasExtras/RegistroHorasExtra';
 import ListadoFaltas from './pages/registroFaltas/ListadoFaltas';
 
+// Asignaciones por empleado
+import AsignacionesPage from './pages/asignaciones/AsignacionesPage';
+
 // Páginas individuales de catálogos (acceso directo desde el sidebar)
 import TipoUsuarioPage from './pages/tipoUsuario/TipoUsuarioPage';
 import UsuariosPage from './pages/usuarios/UsuariosPage';
@@ -50,6 +53,7 @@ function App() {
 
           {/* Empleados */}
           <Route path="empleado" element={<EmpleadoPage />} />
+          <Route path="asignaciones" element={<AsignacionesPage />} />
 
           {/* Catálogos individuales (acceso directo) */}
           <Route path="departamentos" element={<DepartamentosPage />} />

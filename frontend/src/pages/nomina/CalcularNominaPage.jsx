@@ -75,8 +75,12 @@ const CalcularNominaPage = () => {
                 id_empleado: preview.empleado.ID_EMPLEADO,
                 id_periodo: preview.periodo.ID_PERIODO,
                 sueldo_base: preview.calculo.sueldo_base,
+                bonificacion_incentivo: preview.calculo.bonificacion_incentivo,
+                igss_monto: preview.calculo.igss_monto,
                 horas_extra: preview.calculo.horas_extra,
                 faltas: preview.calculo.faltas,
+                percepciones_empleado: preview.calculo.percepciones_empleado,
+                deducciones_empleado: preview.calculo.deducciones_empleado,
                 total_percepciones: preview.calculo.total_percepciones,
                 total_deducciones: preview.calculo.total_deducciones,
                 liquido_a_pagar: preview.calculo.liquido_a_pagar,
@@ -319,16 +323,48 @@ const CalcularNominaPage = () => {
                             <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-4">
                                 Paso 3 — Resumen y confirmación
                             </p>
+
+                            {/* Desglose percepciones / deducciones */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div className="bg-[#131720] rounded-lg p-4">
+                                    <p className="text-xs text-green-400 font-medium uppercase tracking-wider mb-3">Percepciones</p>
+                                    <div className="space-y-1.5 text-sm">
+                                        <div className="flex justify-between"><span className="text-gray-400">Sueldo base</span><span className="text-green-400">{formatQ(preview.calculo.sueldo_base)}</span></div>
+                                        <div className="flex justify-between"><span className="text-gray-400">Bonificación incentivo</span><span className="text-green-400">{formatQ(preview.calculo.bonificacion_incentivo)}</span></div>
+                                        {preview.calculo.total_horas_extra > 0 && (
+                                            <div className="flex justify-between"><span className="text-gray-400">Horas extra</span><span className="text-green-400">{formatQ(preview.calculo.total_horas_extra)}</span></div>
+                                        )}
+                                        {(preview.calculo.percepciones_empleado || []).map((p, i) => (
+                                            <div key={i} className="flex justify-between"><span className="text-gray-400">{p.nombre}</span><span className="text-green-400">{formatQ(p.monto)}</span></div>
+                                        ))}
+                                        <div className="flex justify-between border-t border-white/10 pt-1.5 font-semibold"><span className="text-white">Total</span><span className="text-green-400">{formatQ(preview.calculo.total_percepciones)}</span></div>
+                                    </div>
+                                </div>
+                                <div className="bg-[#131720] rounded-lg p-4">
+                                    <p className="text-xs text-red-400 font-medium uppercase tracking-wider mb-3">Deducciones</p>
+                                    <div className="space-y-1.5 text-sm">
+                                        <div className="flex justify-between"><span className="text-gray-400">IGSS ({preview.calculo.igss_porcentaje}%)</span><span className="text-red-400">{formatQ(preview.calculo.igss_monto)}</span></div>
+                                        {preview.calculo.total_descuento_faltas > 0 && (
+                                            <div className="flex justify-between"><span className="text-gray-400">Descuento faltas</span><span className="text-red-400">{formatQ(preview.calculo.total_descuento_faltas)}</span></div>
+                                        )}
+                                        {(preview.calculo.deducciones_empleado || []).map((d, i) => (
+                                            <div key={i} className="flex justify-between"><span className="text-gray-400">{d.nombre}</span><span className="text-red-400">{formatQ(d.monto)}</span></div>
+                                        ))}
+                                        <div className="flex justify-between border-t border-white/10 pt-1.5 font-semibold"><span className="text-white">Total</span><span className="text-red-400">{formatQ(preview.calculo.total_deducciones)}</span></div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div className="grid grid-cols-3 gap-3 mb-5">
                                 <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-4 text-center">
                                     <p className="text-xs text-green-400 mb-1">Total percepciones</p>
                                     <p className="text-lg font-semibold text-green-400">{formatQ(preview.calculo.total_percepciones)}</p>
-                                    <p className="text-xs text-green-400/60 mt-1">Sueldo + horas extra</p>
+                                    <p className="text-xs text-green-400/60 mt-1">Sueldo + bonif + extras</p>
                                 </div>
                                 <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-center">
                                     <p className="text-xs text-red-400 mb-1">Total deducciones</p>
                                     <p className="text-lg font-semibold text-red-400">{formatQ(preview.calculo.total_deducciones)}</p>
-                                    <p className="text-xs text-red-400/60 mt-1">Descuento por faltas</p>
+                                    <p className="text-xs text-red-400/60 mt-1">IGSS + faltas + otros</p>
                                 </div>
                                 <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 text-center">
                                     <p className="text-xs text-blue-400 mb-1">Líquido a pagar</p>

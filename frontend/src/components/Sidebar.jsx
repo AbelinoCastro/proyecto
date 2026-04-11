@@ -27,6 +27,7 @@ const menuGroups = [
         group: 'Personal',
         items: [
             { path: '/catalogos', label: 'Catálogos', icon: '⚙️' },
+            { path: '/asignaciones', label: 'Asignaciones', icon: '🏷️' },
         ],
     },
 ];

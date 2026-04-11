@@ -24,6 +24,7 @@ app.use('/api/nomina', require('./src/modules/nomina/nomina.routes'));
 app.use('/api/periodos', require('./src/modules/periodo/periodo.routes'));
 app.use('/api/horasextra', require('./src/modules/horasextra/horasextra.routes'));
 app.use('/api/registro-faltas', require('./src/modules/registroFaltas/registroFaltas.routes'));
+app.use('/api/emp-asignaciones', require('./src/modules/empAsignaciones/empAsignaciones.routes'));
 
 app.get('/', (req, res) => res.json({ ok: true, message: 'Proyecto Nomina API corriendo' }));
 
