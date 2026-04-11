@@ -40,7 +40,8 @@ const create = async (req, res) => {
 
 const update = async (req, res) => {
     try {
-        const existing = await model.getById(req.params.id);
+        const id = Number(req.params.id);
+        const existing = await model.getById(id);
         if (!existing) return error(res, 'Empleado no encontrado', 404);
 
         const { nombre, genero, nacionalidad, no_afiliacion_igss, no_dpi_permiso,
@@ -49,7 +50,7 @@ const update = async (req, res) => {
         if (!nombre || !genero || !id_puesto || !id_jornada) {
             return error(res, 'nombre, genero, id_puesto e id_jornada son requeridos', 400);
         }
-        return success(res, await model.update(req.params.id, {
+        return success(res, await model.update(id, {
             nombre, genero, nacionalidad, no_afiliacion_igss, no_dpi_permiso,
             id_puesto, id_jornada, correo, telefono, cuenta_bancaria, estado, porcentaje_pago_comision
         }), 'Empleado actualizado');
@@ -58,17 +59,18 @@ const update = async (req, res) => {
 
 const darBaja = async (req, res) => {
     try {
-        const existing = await model.getById(req.params.id);
+        const id = Number(req.params.id);
+        const existing = await model.getById(id);
         if (!existing) return error(res, 'Empleado no encontrado', 404);
         const { id_motivo_baja, fecha_fin } = req.body;
         if (!id_motivo_baja || !fecha_fin) return error(res, 'id_motivo_baja y fecha_fin son requeridos', 400);
-        return success(res, await model.darBaja(req.params.id, { id_motivo_baja, fecha_fin }), 'Empleado dado de baja');
+        return success(res, await model.darBaja(id, { id_motivo_baja, fecha_fin }), 'Empleado dado de baja');
     } catch (err) { return error(res, 'Error al dar de baja', 500, err.message); }
 };
 
 const remove = async (req, res) => {
     try {
-        const rows = await model.remove(req.params.id);
+        const rows = await model.remove(Number(req.params.id));
         if (rows === 0) return error(res, 'Empleado no encontrado', 404);
         return success(res, null, 'Empleado eliminado');
     } catch (err) {

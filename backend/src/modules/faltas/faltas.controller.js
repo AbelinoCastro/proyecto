@@ -8,7 +8,7 @@ const getAll = async (req, res) => {
 
 const getById = async (req, res) => {
     try {
-        const data = await model.getById(req.params.id);
+        const data = await model.getById(Number(req.params.id));
         if (!data) return error(res, 'Falta no encontrada', 404);
         return success(res, data);
     } catch (err) { return error(res, 'Error al obtener falta', 500, err.message); }
@@ -25,18 +25,19 @@ const create = async (req, res) => {
 
 const update = async (req, res) => {
     try {
-        const existing = await model.getById(req.params.id);
+        const id = Number(req.params.id);
+        const existing = await model.getById(id);
         if (!existing) return error(res, 'Falta no encontrada', 404);
         const { descripcion, es_pagado } = req.body;
         if (!descripcion) return error(res, 'descripcion es requerida', 400);
         if (!['S', 'N'].includes(es_pagado)) return error(res, 'es_pagado debe ser S o N', 400);
-        return success(res, await model.update(req.params.id, { descripcion, es_pagado }), 'Falta actualizada');
+        return success(res, await model.update(id, { descripcion, es_pagado }), 'Falta actualizada');
     } catch (err) { return error(res, 'Error al actualizar falta', 500, err.message); }
 };
 
 const remove = async (req, res) => {
     try {
-        const rows = await model.remove(req.params.id);
+        const rows = await model.remove(Number(req.params.id));
         if (rows === 0) return error(res, 'Falta no encontrada', 404);
         return success(res, null, 'Falta eliminada');
     } catch (err) { return error(res, 'Error al eliminar', 500, err.message); }

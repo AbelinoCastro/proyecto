@@ -8,32 +8,62 @@ const API = 'http://localhost:4000/api';
 
 const inputClass = 'bg-[#131720] border border-white/10 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 transition-colors w-full';
 
+const Toast = ({ mensaje, tipo, onClose }) => {
+  useEffect(() => {
+    const t = setTimeout(onClose, 3500);
+    return () => clearTimeout(t);
+  }, [onClose]);
+
+  return (
+    <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl text-sm font-medium text-white max-w-sm ${
+      tipo === 'error' ? 'bg-red-600' : 'bg-green-600'
+    }`}>
+      <span>{tipo === 'error' ? '✖' : '✔'}</span>
+      <span className="flex-1">{mensaje}</span>
+      <button onClick={onClose} className="text-white/70 hover:text-white text-lg leading-none">×</button>
+    </div>
+  );
+};
+
 const ListadoFaltas = () => {
 
-  const [faltas, setFaltas] = useState([]);
-  const [empleados, setEmpleados] = useState([]);
+  const [faltas,     setFaltas]     = useState([]);
+  const [empleados,  setEmpleados]  = useState([]);
   const [tiposFalta, setTiposFalta] = useState([]);
-  const [showModal, setShowModal] = useState(false);
+  const [usuarios,   setUsuarios]   = useState([]);
+  const [showModal,  setShowModal]  = useState(false);
+  const [guardando,  setGuardando]  = useState(false);
+  const [toast,      setToast]      = useState(null);
 
   const [form, setForm] = useState({
     id_empleado: '',
     id_falta: '',
+    id_usuario: '',
     fecha: '',
     fecha_fin: '',
     justificacion: ''
   });
 
+  const mostrarToast = (mensaje, tipo = 'exito') => setToast({ mensaje, tipo });
+
+  const cargarFaltas = async () => {
+    const res = await getRegistroFaltas();
+    setFaltas(res.data);
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [resFaltas, resEmpleados, resTipos] = await Promise.all([
+        const [resFaltas, resEmpleados, resTipos, resUsuarios] = await Promise.all([
           getRegistroFaltas(),
           getEmpleados(),
-          getFaltas()
+          getFaltas(),
+          axios.get(`${API}/usuarios`)
         ]);
         setFaltas(resFaltas.data);
         setEmpleados(resEmpleados.data.data);
         setTiposFalta(resTipos.data.data);
+        setUsuarios(resUsuarios.data.data ?? []);
       } catch (error) {
         console.error(error);
       }
@@ -44,10 +74,10 @@ const ListadoFaltas = () => {
   const actualizarEstado = async (id, nuevoEstado) => {
     try {
       await axios.put(`${API}/registro-faltas/${id}`, { estado: nuevoEstado });
-      const res = await getRegistroFaltas();
-      setFaltas(res.data);
+      await cargarFaltas();
+      mostrarToast(`Falta ${nuevoEstado === 'APROBADO' ? 'aprobada' : 'rechazada'} correctamente.`);
     } catch (e) {
-      alert(e.response?.data?.message || 'Error al actualizar estado');
+      mostrarToast(e.response?.data?.message || 'Error al actualizar estado', 'error');
     }
   };
 
@@ -62,19 +92,21 @@ const ListadoFaltas = () => {
   };
 
   const guardar = async () => {
+    if (!form.id_empleado || !form.id_falta || !form.id_usuario || !form.fecha) {
+      mostrarToast('Complete todos los campos obligatorios.', 'error');
+      return;
+    }
+    setGuardando(true);
     try {
-      if (!form.id_empleado || !form.id_falta || !form.fecha) {
-        alert('Complete los campos obligatorios');
-        return;
-      }
       await createRegistroFalta(form);
-      alert('Falta registrada');
-      setForm({ id_empleado: '', id_falta: '', fecha: '', fecha_fin: '', justificacion: '' });
+      setForm({ id_empleado: '', id_falta: '', id_usuario: '', fecha: '', fecha_fin: '', justificacion: '' });
       setShowModal(false);
-      const res = await getRegistroFaltas();
-      setFaltas(res.data);
+      await cargarFaltas();
+      mostrarToast('Falta registrada correctamente.');
     } catch (error) {
-      alert(error.response?.data?.message || 'Error');
+      mostrarToast(error.response?.data?.message || 'Error al registrar la falta.', 'error');
+    } finally {
+      setGuardando(false);
     }
   };
 
@@ -166,73 +198,73 @@ const ListadoFaltas = () => {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-[#1a1f2e] border border-white/10 rounded-xl p-6 w-full max-w-md">
+          <div className="bg-[#1a1f2e] border border-white/10 rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
             <h2 className="text-lg font-bold text-white mb-4">Registrar Falta</h2>
 
             <div className="flex flex-col gap-3">
-              <select
-                value={form.id_empleado}
-                onChange={(e) => setForm({ ...form, id_empleado: e.target.value })}
-                className={inputClass}
-              >
-                <option value="">Seleccione empleado</option>
-                {empleados.map(e => (
-                  <option key={e.ID_EMPLEADO} value={e.ID_EMPLEADO}>{e.NOMBRE}</option>
-                ))}
-              </select>
+              <div>
+                <label className="block text-xs font-semibold text-gray-400 mb-1 uppercase tracking-wide">Empleado <span className="text-red-400">*</span></label>
+                <select value={form.id_empleado} onChange={(e) => setForm({ ...form, id_empleado: e.target.value })} className={inputClass}>
+                  <option value="">Seleccione empleado</option>
+                  {empleados.map(e => <option key={e.ID_EMPLEADO} value={e.ID_EMPLEADO}>{e.NOMBRE}</option>)}
+                </select>
+              </div>
 
-              <select
-                value={form.id_falta}
-                onChange={(e) => setForm({ ...form, id_falta: e.target.value })}
-                className={inputClass}
-              >
-                <option value="">Seleccione tipo de falta</option>
-                {tiposFalta.map(f => (
-                  <option key={f.ID_FALTA} value={f.ID_FALTA}>{f.DESCRIPCION}</option>
-                ))}
-              </select>
+              <div>
+                <label className="block text-xs font-semibold text-gray-400 mb-1 uppercase tracking-wide">Tipo de falta <span className="text-red-400">*</span></label>
+                <select value={form.id_falta} onChange={(e) => setForm({ ...form, id_falta: e.target.value })} className={inputClass}>
+                  <option value="">Seleccione tipo de falta</option>
+                  {tiposFalta.map(f => <option key={f.ID_FALTA} value={f.ID_FALTA}>{f.DESCRIPCION}</option>)}
+                </select>
+              </div>
 
-              <input
-                type="date"
-                value={form.fecha}
-                onChange={(e) => setForm({ ...form, fecha: e.target.value })}
-                className={inputClass}
-              />
+              <div>
+                <label className="block text-xs font-semibold text-gray-400 mb-1 uppercase tracking-wide">Usuario que registra <span className="text-red-400">*</span></label>
+                <select value={form.id_usuario} onChange={(e) => setForm({ ...form, id_usuario: e.target.value })} className={inputClass}>
+                  <option value="">Seleccione usuario</option>
+                  {usuarios.map(u => <option key={u.ID_USUARIO} value={u.ID_USUARIO}>{u.USERNAME} — {u.EMPLEADO}</option>)}
+                </select>
+              </div>
 
-              <input
-                type="date"
-                value={form.fecha_fin}
-                onChange={(e) => setForm({ ...form, fecha_fin: e.target.value })}
-                className={inputClass}
-                placeholder="Fecha fin (opcional)"
-              />
+              <div>
+                <label className="block text-xs font-semibold text-gray-400 mb-1 uppercase tracking-wide">Fecha de la falta <span className="text-red-400">*</span></label>
+                <input type="date" value={form.fecha} onChange={(e) => setForm({ ...form, fecha: e.target.value })} className={inputClass} />
+              </div>
 
-              <input
-                type="text"
-                placeholder="Justificación"
-                value={form.justificacion}
-                onChange={(e) => setForm({ ...form, justificacion: e.target.value })}
-                className={inputClass}
-              />
+              <div>
+                <label className="block text-xs font-semibold text-gray-400 mb-1 uppercase tracking-wide">
+                  Fecha fin <span className="text-gray-500 normal-case font-normal">(opcional, para incapacidades)</span>
+                </label>
+                <input type="date" value={form.fecha_fin} onChange={(e) => setForm({ ...form, fecha_fin: e.target.value })} className={inputClass} />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-400 mb-1 uppercase tracking-wide">Justificación</label>
+                <input type="text" placeholder="Descripción o motivo" value={form.justificacion} onChange={(e) => setForm({ ...form, justificacion: e.target.value })} className={inputClass} />
+              </div>
             </div>
 
             <div className="flex justify-end gap-2 mt-5">
               <button
                 onClick={() => setShowModal(false)}
-                className="px-4 py-2 text-gray-400 hover:text-white text-sm transition-colors"
+                disabled={guardando}
+                className="px-4 py-2 text-gray-400 hover:text-white text-sm transition-colors disabled:opacity-50"
               >
                 Cancelar
               </button>
               <button
                 onClick={guardar}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                disabled={guardando}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
               >
-                Guardar
+                {guardando ? 'Guardando...' : 'Guardar'}
               </button>
             </div>
           </div>
         </div>
       )}
+
+      {toast && <Toast mensaje={toast.mensaje} tipo={toast.tipo} onClose={() => setToast(null)} />}
     </div>
   );
 };

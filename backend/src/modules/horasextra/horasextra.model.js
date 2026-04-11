@@ -31,18 +31,18 @@ const create = async ({ id_empleado, id_jornada, id_usuario, fecha, cantidad, fa
     const conn = await getConnection();
     try {
         const result = await conn.execute(
-            `INSERT INTO REGISTRO_HORAS_EXTRA 
-             (ID_EMPLEADO, ID_JORNADA, ID_USUARIO, FECHA, CANTIDAD, FACTOR, JUSTIFICACION, ESTADO, CREADO_EN) 
-             VALUES (:id_empleado, :id_jornada, :id_usuario, TO_DATE(:fecha, 'YYYY-MM-DD'), :cantidad, :factor, :justificacion, 'PENDIENTE', SYSTIMESTAMP) 
+            `INSERT INTO REGISTRO_HORAS_EXTRA
+             (ID_EMPLEADO, ID_JORNADA, ID_USUARIO, FECHA, CANTIDAD, FACTOR, JUSTIFICACION, ESTADO, CREADO_EN)
+             VALUES (:id_empleado, :id_jornada, :id_usuario, TO_DATE(:fecha, 'YYYY-MM-DD'), :cantidad, :factor, :justificacion, 'PENDIENTE', SYSTIMESTAMP)
              RETURNING ID_HORA_EXTRA INTO :id_hora_extra`,
             {
-                id_empleado,
+                id_empleado:  Number(id_empleado),
                 id_jornada,
-                id_usuario,
-                fecha, // string "YYYY-MM-DD" desde el frontend
-                cantidad,
-                factor,
-                justificacion,
+                id_usuario:   Number(id_usuario),
+                fecha,
+                cantidad:     Number(cantidad),
+                factor:       parseFloat(factor),
+                justificacion: justificacion || null,
                 id_hora_extra: { dir: oracledb.BIND_OUT, type: oracledb.NUMBER }
             },
             { autoCommit: true }

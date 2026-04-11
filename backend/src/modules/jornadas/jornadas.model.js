@@ -29,7 +29,7 @@ const create = async ({ id_jornada, nombre_jornada, descripcion, hora_inicio, ho
         await conn.execute(
             `INSERT INTO JORNADAS (id_jornada, nombre_jornada, descripcion, hora_inicio, hora_fin, horas_diarias)
        VALUES (:id_jornada, :nombre_jornada, :descripcion, :hora_inicio, :hora_fin, :horas_diarias)`,
-            { id_jornada, nombre_jornada, descripcion: descripcion || null, hora_inicio: hora_inicio || null, hora_fin: hora_fin || null, horas_diarias },
+            { id_jornada, nombre_jornada, descripcion: descripcion || null, hora_inicio: hora_inicio || null, hora_fin: hora_fin || null, horas_diarias: Number(horas_diarias) },
             { autoCommit: true }
         );
         return await getById(id_jornada);
@@ -43,7 +43,7 @@ const update = async (id, { nombre_jornada, descripcion, hora_inicio, hora_fin, 
             `UPDATE JORNADAS SET nombre_jornada = :nombre_jornada, descripcion = :descripcion,
        hora_inicio = :hora_inicio, hora_fin = :hora_fin, horas_diarias = :horas_diarias
        WHERE id_jornada = :id`,
-            { nombre_jornada, descripcion: descripcion || null, hora_inicio: hora_inicio || null, hora_fin: hora_fin || null, horas_diarias, id },
+            { nombre_jornada, descripcion: descripcion || null, hora_inicio: hora_inicio || null, hora_fin: hora_fin || null, horas_diarias: Number(horas_diarias), id },
             { autoCommit: true }
         );
         return await getById(id);

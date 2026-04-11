@@ -12,7 +12,7 @@ const getAll = async (req, res) => {
 
 const getById = async (req, res) => {
     try {
-        const data = await model.getById(req.params.id);
+        const data = await model.getById(Number(req.params.id));
         if (!data) return error(res, 'Usuario no encontrado', 404);
         return success(res, data);
     } catch (err) {
@@ -40,13 +40,14 @@ const create = async (req, res) => {
 
 const update = async (req, res) => {
     try {
-        const existing = await model.getById(req.params.id);
+        const id = Number(req.params.id);
+        const existing = await model.getById(id);
         if (!existing) return error(res, 'Usuario no encontrado', 404);
         const { id_tipo_usuario, username } = req.body;
         if (!id_tipo_usuario || !username) {
             return error(res, 'id_tipo_usuario y username son requeridos', 400);
         }
-        const data = await model.update(req.params.id, { id_tipo_usuario, username });
+        const data = await model.update(id, { id_tipo_usuario, username });
         return success(res, data, 'Usuario actualizado');
     } catch (err) {
         if (err.errorNum === 1) return error(res, 'El username ya está en uso', 400);
@@ -56,13 +57,14 @@ const update = async (req, res) => {
 
 const changePassword = async (req, res) => {
     try {
-        const existing = await model.getById(req.params.id);
+        const id = Number(req.params.id);
+        const existing = await model.getById(id);
         if (!existing) return error(res, 'Usuario no encontrado', 404);
         const { password } = req.body;
         if (!password || password.length < 8) {
             return error(res, 'La contraseña debe tener al menos 8 caracteres', 400);
         }
-        await model.changePassword(req.params.id, password);
+        await model.changePassword(id, password);
         return success(res, null, 'Contraseña actualizada');
     } catch (err) {
         return error(res, 'Error al cambiar contraseña', 500, err.message);
@@ -75,7 +77,7 @@ const changeEstado = async (req, res) => {
         if (!['ACTIVO', 'INACTIVO', 'BLOQUEADO'].includes(estado)) {
             return error(res, 'Estado debe ser ACTIVO, INACTIVO o BLOQUEADO', 400);
         }
-        const rows = await model.changeEstado(req.params.id, estado);
+        const rows = await model.changeEstado(Number(req.params.id), estado);
         if (rows === 0) return error(res, 'Usuario no encontrado', 404);
         return success(res, null, `Estado cambiado a ${estado}`);
     } catch (err) {
@@ -85,7 +87,7 @@ const changeEstado = async (req, res) => {
 
 const remove = async (req, res) => {
     try {
-        const rows = await model.remove(req.params.id);
+        const rows = await model.remove(Number(req.params.id));
         if (rows === 0) return error(res, 'Usuario no encontrado', 404);
         return success(res, null, 'Usuario eliminado');
     } catch (err) {

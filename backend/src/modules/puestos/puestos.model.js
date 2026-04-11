@@ -31,7 +31,7 @@ const create = async ({ id_puesto, nombre_puesto, id_departamento, descripcion, 
         await conn.execute(
             `INSERT INTO PUESTOS (id_puesto, nombre_puesto, id_departamento, descripcion, sueldo_base)
        VALUES (:id_puesto, :nombre_puesto, :id_departamento, :descripcion, :sueldo_base)`,
-            { id_puesto, nombre_puesto, id_departamento, descripcion: descripcion || null, sueldo_base },
+            { id_puesto, nombre_puesto, id_departamento, descripcion: descripcion || null, sueldo_base: Number(sueldo_base) },
             { autoCommit: true }
         );
         return await getById(id_puesto);
@@ -44,7 +44,7 @@ const update = async (id, { nombre_puesto, id_departamento, descripcion, sueldo_
         await conn.execute(
             `UPDATE PUESTOS SET nombre_puesto = :nombre_puesto, id_departamento = :id_departamento,
        descripcion = :descripcion, sueldo_base = :sueldo_base WHERE id_puesto = :id`,
-            { nombre_puesto, id_departamento, descripcion: descripcion || null, sueldo_base, id },
+            { nombre_puesto, id_departamento, descripcion: descripcion || null, sueldo_base: Number(sueldo_base), id },
             { autoCommit: true }
         );
         return await getById(id);

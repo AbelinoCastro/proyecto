@@ -31,17 +31,18 @@ const CATALOGOS = [
 // ─── Definición de campos por catálogo ────────────────────────────────────────
 const CAMPOS = {
     empleados: [
-        { name: 'nombre',            label: 'Nombre completo',  type: 'text',       required: true },
-        { name: 'fecha_nacimiento',  label: 'Fecha nacimiento', type: 'date' },
-        { name: 'genero',            label: 'Género',           type: 'select',
+        { name: 'nombre',            label: 'Nombre completo',  type: 'text',     required: true },
+        { name: 'fecha_nacimiento',  label: 'Fecha nacimiento', type: 'date',     required: true },
+        { name: 'genero',            label: 'Género',           type: 'select',   required: true,
           options: [{ value: 'M', label: 'Masculino' }, { value: 'F', label: 'Femenino' }, { value: 'O', label: 'Otro' }] },
-        { name: 'no_dpi_permiso',    label: 'DPI / Permiso',    type: 'text',       required: true },
-        { name: 'no_afiliacion_igss',label: 'IGSS',             type: 'text' },
-        { name: 'id_puesto',         label: 'Puesto',           type: 'select-api',
-          endpoint: '/puestos', valueKey: 'ID_PUESTO', labelKey: 'NOMBRE_PUESTO', required: true },
-        { name: 'id_jornada',        label: 'Jornada',          type: 'select-api',
-          endpoint: '/jornadas', valueKey: 'ID_JORNADA', labelKey: 'NOMBRE_JORNADA', required: true },
-        { name: 'fecha_inicio',      label: 'Fecha inicio',     type: 'date',       required: true },
+        { name: 'nacionalidad',      label: 'Nacionalidad',     type: 'text',     required: true },
+        { name: 'no_dpi_permiso',    label: 'DPI / Permiso',    type: 'text',     required: true },
+        { name: 'no_afiliacion_igss',label: 'No. Afiliación IGSS', type: 'text', required: true },
+        { name: 'id_puesto',         label: 'Puesto',           type: 'select-api', required: true,
+          endpoint: '/puestos', valueKey: 'ID_PUESTO', labelKey: 'NOMBRE_PUESTO' },
+        { name: 'id_jornada',        label: 'Jornada',          type: 'select-api', required: true,
+          endpoint: '/jornadas', valueKey: 'ID_JORNADA', labelKey: 'NOMBRE_JORNADA' },
+        { name: 'fecha_inicio',      label: 'Fecha inicio',     type: 'date',     required: true },
         { name: 'correo',            label: 'Correo',           type: 'email' },
         { name: 'telefono',          label: 'Teléfono',         type: 'text' },
         { name: 'cuenta_bancaria',   label: 'Cuenta bancaria',  type: 'text' },
@@ -52,33 +53,39 @@ const CAMPOS = {
           endpoint: '/empleado', valueKey: 'ID_EMPLEADO', labelKey: 'NOMBRE', required: true },
         { name: 'id_tipo_usuario', label: 'Rol',        type: 'select-api',
           endpoint: '/tipo-usuario', valueKey: 'ID_TIPO_USUARIO', labelKey: 'NOMBRE', required: true },
-        { name: 'password_hash',   label: 'Contraseña', type: 'text',       required: true, soloCrear: true },
+        { name: 'password',        label: 'Contraseña', type: 'password',   required: true, soloCrear: true },
     ],
     tipos: [
-        { name: 'nombre',      label: 'Nombre',      type: 'text',     required: true },
-        { name: 'descripcion', label: 'Descripción', type: 'textarea' },
+        { name: 'id_tipo_usuario', label: 'Código (ej: ADM)',  type: 'text', required: true, soloCrear: true, placeholder: 'Máx 5 caracteres' },
+        { name: 'nombre',          label: 'Nombre',            type: 'text', required: true },
+        { name: 'descripcion',     label: 'Descripción',       type: 'textarea' },
     ],
     departamentos: [
-        { name: 'nombre_departamento', label: 'Nombre',      type: 'text',     required: true },
-        { name: 'descripcion',         label: 'Descripción', type: 'textarea' },
+        { name: 'id_departamento',     label: 'Código (ej: 01)', type: 'text', required: true, soloCrear: true, placeholder: 'Máx 2 caracteres' },
+        { name: 'nombre_departamento', label: 'Nombre',          type: 'text', required: true },
+        { name: 'descripcion',         label: 'Descripción',     type: 'textarea' },
     ],
     puestos: [
-        { name: 'nombre_puesto',   label: 'Nombre',       type: 'text',       required: true },
-        { name: 'id_departamento', label: 'Departamento', type: 'select-api',
+        { name: 'id_puesto',       label: 'Código (ej: RH01)',  type: 'text',       required: true, soloCrear: true, placeholder: 'Máx 5 caracteres' },
+        { name: 'nombre_puesto',   label: 'Nombre',             type: 'text',       required: true },
+        { name: 'id_departamento', label: 'Departamento',       type: 'select-api',
           endpoint: '/departamentos', valueKey: 'ID_DEPARTAMENTO', labelKey: 'NOMBRE_DEPARTAMENTO', required: true },
-        { name: 'sueldo_base',     label: 'Sueldo Base',  type: 'number',     required: true },
+        { name: 'sueldo_base',     label: 'Sueldo Base',        type: 'number',     required: true },
     ],
     jornadas: [
-        { name: 'nombre_jornada', label: 'Nombre',        type: 'text',   required: true },
-        { name: 'horas_diarias',  label: 'Horas Diarias', type: 'number', required: true },
+        { name: 'id_jornada',     label: 'Código (ej: J5)',  type: 'text',   required: true, soloCrear: true, placeholder: 'Máx 2 caracteres' },
+        { name: 'nombre_jornada', label: 'Nombre',           type: 'text',   required: true },
+        { name: 'horas_diarias',  label: 'Horas Diarias',    type: 'number', required: true },
     ],
     percepciones: [
-        { name: 'nombre_percepcion',   label: 'Nombre',      type: 'text',     required: true },
-        { name: 'descripcion_formula', label: 'Descripción', type: 'textarea' },
+        { name: 'id_percepcion',       label: 'Código (ej: PER10)', type: 'text',     required: true, soloCrear: true, placeholder: 'Máx 5 caracteres' },
+        { name: 'nombre_percepcion',   label: 'Nombre',             type: 'text',     required: true },
+        { name: 'descripcion_formula', label: 'Descripción',        type: 'textarea' },
     ],
     deducciones: [
-        { name: 'nombre_deduccion',    label: 'Nombre',      type: 'text',     required: true },
-        { name: 'descripcion_formula', label: 'Descripción', type: 'textarea' },
+        { name: 'id_deduccion',        label: 'Código (ej: DED09)', type: 'text',     required: true, soloCrear: true, placeholder: 'Máx 5 caracteres' },
+        { name: 'nombre_deduccion',    label: 'Nombre',             type: 'text',     required: true },
+        { name: 'descripcion_formula', label: 'Descripción',        type: 'textarea' },
     ],
     faltas: [
         { name: 'descripcion', label: 'Descripción', type: 'textarea', required: true },
@@ -86,7 +93,8 @@ const CAMPOS = {
           options: [{ value: 'S', label: 'Sí' }, { value: 'N', label: 'No' }] },
     ],
     motivos: [
-        { name: 'descripcion', label: 'Descripción', type: 'textarea', required: true },
+        { name: 'id_motivo_baja', label: 'Código (ej: MB006)', type: 'text',     required: true, soloCrear: true, placeholder: 'Máx 5 caracteres' },
+        { name: 'descripcion',    label: 'Descripción',        type: 'textarea', required: true },
     ],
 };
 
@@ -337,7 +345,7 @@ const CatalogosPage = () => {
             const res = await fetch(`${API_BASE}/empleado/${id}/baja`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id_motivo_baja: Number(id_motivo_baja), fecha_fin }),
+                body: JSON.stringify({ id_motivo_baja, fecha_fin }),
             });
             const data = await res.json();
             if (res.ok) {

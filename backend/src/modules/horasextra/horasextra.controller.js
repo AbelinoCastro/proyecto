@@ -34,7 +34,7 @@ exports.updateEstado = async (req, res) => {
     const conn = await getConnection();
     await conn.execute(
       `UPDATE REGISTRO_HORAS_EXTRA SET ESTADO = :estado WHERE ID_HORA_EXTRA = :id`,
-      { estado, id },
+      { estado, id: Number(id) },
       { autoCommit: true }
     );
 

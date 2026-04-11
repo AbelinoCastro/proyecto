@@ -24,6 +24,7 @@ const create = async (data) => {
     const {
       id_empleado,
       id_falta,
+      id_usuario,
       fecha,
       fecha_fin,
       justificacion
@@ -39,11 +40,11 @@ const create = async (data) => {
       VALUES
       (:id_empleado, :id_falta, :id_usuario, :fecha, :fecha_fin, :justificacion, 'PENDIENTE')`,
       {
-        id_empleado: Number(id_empleado),
-        id_falta: Number(id_falta),
-        id_usuario: 2,
-        fecha: new Date(fecha),
-        fecha_fin: fecha_fin ? new Date(fecha_fin) : null,
+        id_empleado:  Number(id_empleado),
+        id_falta:     Number(id_falta),
+        id_usuario:   Number(id_usuario),
+        fecha:        new Date(fecha),
+        fecha_fin:    fecha_fin ? new Date(fecha_fin) : null,
         justificacion: justificacion || null
       },
       { autoCommit: true }
