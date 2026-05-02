@@ -19,9 +19,8 @@ export default function PatronoPage() {
     });
 
     // ── cargar datos ─────────────────────────────────────────
-    useEffect(() => {
-        fetchPatrono();
-    }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    useEffect(() => { fetchPatrono(); }, []);
 
     const fetchPatrono = async () => {
         setLoading(true);

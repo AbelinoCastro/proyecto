@@ -44,7 +44,7 @@ const IGSSPage = () => {
     const handleChangePeriodo = (e) => {
         const id = e.target.value;
         setPeriodo(id);
-        const p = periodos.find(x => x.ID_PERIODO == id);
+        const p = periodos.find(x => String(x.ID_PERIODO) === String(id));
         setEstadoPeriodo(p?.ESTADO || '');
         setPreview([]);
     };

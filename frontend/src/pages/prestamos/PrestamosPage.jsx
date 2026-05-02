@@ -21,6 +21,7 @@ const PrestamosPage = () => {
         setTimeout(() => setToast(null), 3500);
     };
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => { cargarPrestamos(); }, []);
 
     const cargarPrestamos = async () => {
