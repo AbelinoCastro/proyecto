@@ -25,6 +25,11 @@ app.use('/api/periodos', require('./src/modules/periodo/periodo.routes'));
 app.use('/api/horasextra', require('./src/modules/horasextra/horasextra.routes'));
 app.use('/api/registro-faltas', require('./src/modules/registroFaltas/registroFaltas.routes'));
 app.use('/api/emp-asignaciones', require('./src/modules/empAsignaciones/empAsignaciones.routes'));
+app.use('/api/patrono', require('./src/modules/patrono/patrono.routes'));
+app.use('/api/sat', require('./src/modules/sat/sat.routes'));
+app.use('/api/igss', require('./src/modules/igss/igss.routes'));
+app.use('/api/prestamos', require('./src/modules/prestamo/prestamo.routes'));
+app.use('/api/polizas-seguros', require('./src/modules/polizaSeguros/polizaSeguros.routes'));
 
 app.get('/', (req, res) => res.json({ ok: true, message: 'Proyecto Nomina API corriendo' }));
 

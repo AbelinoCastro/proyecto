@@ -3,8 +3,21 @@ const periodoModel = require('../periodo/periodo.model');
 const asignacionesModel = require('../empAsignaciones/empAsignaciones.model');
 const { success, error } = require('../../helpers/response');
 
-const BONIFICACION_INCENTIVO = 250;   // Q250 fijo por ley (PER02)
-const IGSS_EMPLEADO_PCT      = 4.83;  // 4.83% sobre sueldo base (DED01)
+const BONIFICACION_INCENTIVO = 250;    // Q250 fijo por ley (PER02) — exento de IGSS, gravado ISR
+const IGSS_EMPLEADO_PCT      = 4.83;  // 4.83% sobre sueldo_base + horas_extra (Decreto 78-89 excluye bonif)
+const ISR_EXENCION_ANUAL     = 48000; // Deducción personal anual Q48,000 (Decreto 10-2012)
+const ISR_TRAMO1_LIMITE      = 300000; // Primer tramo: hasta Q300,000 → 5%
+const ISR_TRAMO1_PCT         = 5;
+const ISR_TRAMO2_PCT         = 7;     // Segundo tramo: exceso de Q300,000 → 7%
+
+const calcularISRMensual = (total_percepciones_mes, igss_mes) => {
+    const base_anual = (total_percepciones_mes * 12) - (igss_mes * 12) - ISR_EXENCION_ANUAL;
+    if (base_anual <= 0) return 0;
+    const isr_anual = base_anual <= ISR_TRAMO1_LIMITE
+        ? base_anual * ISR_TRAMO1_PCT / 100
+        : (ISR_TRAMO1_LIMITE * ISR_TRAMO1_PCT / 100) + ((base_anual - ISR_TRAMO1_LIMITE) * ISR_TRAMO2_PCT / 100);
+    return parseFloat((isr_anual / 12).toFixed(2));
+};
 
 // GET /api/nomina/empleado/:id?anio=2026&mes=3
 const getVistaPrevia = async (req, res) => {
@@ -59,7 +72,12 @@ const getVistaPrevia = async (req, res) => {
         );
 
         // ── DEDUCCIONES ────────────────────────────────────────────
-        const igss_monto = parseFloat((sueldo_base * IGSS_EMPLEADO_PCT / 100).toFixed(2));
+        // IGSS: base = sueldo_base + horas_extra (Bonificación Incentivo excluida por Decreto 78-89)
+        const igss_base  = parseFloat((sueldo_base + total_horas_extra).toFixed(2));
+        const igss_monto = parseFloat((igss_base * IGSS_EMPLEADO_PCT / 100).toFixed(2));
+        // ISR: base anual = (percepciones × 12) − (IGSS × 12) − Q48,000; tramos 5%/7%
+        const isr_base_anual = parseFloat(((total_percepciones * 12) - (igss_monto * 12) - ISR_EXENCION_ANUAL).toFixed(2));
+        const isr_monto      = calcularISRMensual(total_percepciones, igss_monto);
 
         const detalleFaltas = faltas.map(f => ({
             id_registro_falta: f.ID_REGISTRO_FALTA,
@@ -81,7 +99,7 @@ const getVistaPrevia = async (req, res) => {
         const total_deducciones_emp = deduccionesEmpleado.reduce((s, d) => s + d.monto, 0);
 
         const total_deducciones = parseFloat(
-            (igss_monto + total_descuento_faltas + total_deducciones_emp).toFixed(2)
+            (igss_monto + isr_monto + total_descuento_faltas + total_deducciones_emp).toFixed(2)
         );
 
         const liquido_a_pagar = parseFloat((total_percepciones - total_deducciones).toFixed(2));
@@ -99,7 +117,10 @@ const getVistaPrevia = async (req, res) => {
                 total_percepciones_emp: parseFloat(total_percepciones_emp.toFixed(2)),
                 total_percepciones,
                 igss_porcentaje: IGSS_EMPLEADO_PCT,
+                igss_base,
                 igss_monto,
+                isr_base_anual: parseFloat(isr_base_anual.toFixed(2)),
+                isr_monto,
                 faltas: detalleFaltas,
                 total_descuento_faltas: parseFloat(total_descuento_faltas.toFixed(2)),
                 deducciones_empleado: deduccionesEmpleado,
@@ -118,7 +139,7 @@ const procesarNomina = async (req, res) => {
     try {
         const {
             id_empleado, id_periodo,
-            sueldo_base, bonificacion_incentivo, igss_monto,
+            sueldo_base, bonificacion_incentivo, igss_monto, isr_monto,
             horas_extra, faltas,
             percepciones_empleado, deducciones_empleado,
             total_percepciones, total_deducciones, liquido_a_pagar,
@@ -155,7 +176,8 @@ const procesarNomina = async (req, res) => {
 
         // Deducciones
         const detalles_deducciones = [
-            { id_deduccion: 'DED01', id_registro_falta: null, monto: parseFloat(igss_monto || 0) }
+            { id_deduccion: 'DED01', id_registro_falta: null, monto: parseFloat(igss_monto || 0) },
+            { id_deduccion: 'DED02', id_registro_falta: null, monto: parseFloat(isr_monto  || 0) }
         ];
         if (faltas?.length > 0) {
             faltas.filter(f => f.descuenta).forEach(f => detalles_deducciones.push({
@@ -254,13 +276,15 @@ const procesarTodos = async (req, res) => {
                 const total_per_emp = perEmpArr.reduce((s, p) => s + p.monto, 0);
                 const total_percepciones = parseFloat((sueldo_base + BONIFICACION_INCENTIVO + total_he + total_per_emp).toFixed(2));
 
-                // Deducciones
-                const igss_monto = parseFloat((sueldo_base * IGSS_EMPLEADO_PCT / 100).toFixed(2));
+                // Deducciones — IGSS base incluye horas_extra, excluye Bonificación Incentivo
+                const igss_base   = sueldo_base + total_he;
+                const igss_monto  = parseFloat((igss_base * IGSS_EMPLEADO_PCT / 100).toFixed(2));
+                const isr_monto   = calcularISRMensual(total_percepciones, igss_monto);
                 const faltasDesc = faltas.filter(f => f.ES_PAGADO === 'N');
                 const total_faltas = parseFloat((faltasDesc.length * valor_dia).toFixed(2));
                 const dedEmpArr = dedEmp.map(d => ({ id_deduccion: d.ID_DEDUCCION, monto: parseFloat(d.MONTO) }));
                 const total_ded_emp = dedEmpArr.reduce((s, d) => s + d.monto, 0);
-                const total_deducciones = parseFloat((igss_monto + total_faltas + total_ded_emp).toFixed(2));
+                const total_deducciones = parseFloat((igss_monto + isr_monto + total_faltas + total_ded_emp).toFixed(2));
 
                 const liquido_a_pagar = parseFloat((total_percepciones - total_deducciones).toFixed(2));
 
@@ -273,6 +297,7 @@ const procesarTodos = async (req, res) => {
                 ];
                 const detalles_deducciones = [
                     { id_deduccion: 'DED01', id_registro_falta: null, monto: igss_monto },
+                    { id_deduccion: 'DED02', id_registro_falta: null, monto: isr_monto  },
                     ...faltasDesc.map(f => ({ id_deduccion: 'DED07', id_registro_falta: f.ID_REGISTRO_FALTA, monto: parseFloat(valor_dia.toFixed(2)) })),
                     ...dedEmpArr.map(d => ({ id_deduccion: d.id_deduccion, id_registro_falta: null, monto: d.monto }))
                 ];

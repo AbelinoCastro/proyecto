@@ -87,6 +87,7 @@ const CalcularNominaPage = () => {
                 sueldo_base: preview.calculo.sueldo_base,
                 bonificacion_incentivo: preview.calculo.bonificacion_incentivo,
                 igss_monto: preview.calculo.igss_monto,
+                isr_monto: preview.calculo.isr_monto,
                 horas_extra: preview.calculo.horas_extra,
                 faltas: preview.calculo.faltas,
                 percepciones_empleado: preview.calculo.percepciones_empleado,
@@ -379,7 +380,22 @@ const CalcularNominaPage = () => {
                                 <div className="bg-[#131720] rounded-lg p-4">
                                     <p className="text-xs text-red-400 font-medium uppercase tracking-wider mb-3">Deducciones</p>
                                     <div className="space-y-1.5 text-sm">
-                                        <div className="flex justify-between"><span className="text-gray-400">IGSS ({preview.calculo.igss_porcentaje}%)</span><span className="text-red-400">{formatQ(preview.calculo.igss_monto)}</span></div>
+                                        <div className="flex justify-between">
+                                            <span className="text-gray-400">IGSS {preview.calculo.igss_porcentaje}% (base {formatQ(preview.calculo.igss_base)})</span>
+                                            <span className="text-red-400">{formatQ(preview.calculo.igss_monto)}</span>
+                                        </div>
+                                        {preview.calculo.isr_monto > 0 && (
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-400">ISR SAT (base anual {formatQ(preview.calculo.isr_base_anual)})</span>
+                                                <span className="text-red-400">{formatQ(preview.calculo.isr_monto)}</span>
+                                            </div>
+                                        )}
+                                        {preview.calculo.isr_monto === 0 && (
+                                            <div className="flex justify-between">
+                                                <span className="text-gray-400">ISR SAT</span>
+                                                <span className="text-gray-600">Exento (bajo Q48,000/año)</span>
+                                            </div>
+                                        )}
                                         {preview.calculo.total_descuento_faltas > 0 && (
                                             <div className="flex justify-between"><span className="text-gray-400">Descuento faltas</span><span className="text-red-400">{formatQ(preview.calculo.total_descuento_faltas)}</span></div>
                                         )}
@@ -400,7 +416,7 @@ const CalcularNominaPage = () => {
                                 <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-center">
                                     <p className="text-xs text-red-400 mb-1">Total deducciones</p>
                                     <p className="text-lg font-semibold text-red-400">{formatQ(preview.calculo.total_deducciones)}</p>
-                                    <p className="text-xs text-red-400/60 mt-1">IGSS + faltas + otros</p>
+                                    <p className="text-xs text-red-400/60 mt-1">IGSS + ISR + faltas + otros</p>
                                 </div>
                                 <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 text-center">
                                     <p className="text-xs text-blue-400 mb-1">Líquido a pagar</p>

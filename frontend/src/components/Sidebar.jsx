@@ -27,7 +27,15 @@ const menuGroups = [
         group: 'Personal',
         items: [
             { path: '/catalogos', label: 'Catálogos', icon: '⚙️' },
+            { path: '/patrono', label: 'Patrono', icon: '🏢' },
+            { path: '/empleado', label: 'Empleados', icon: '👤' },
             { path: '/asignaciones', label: 'Asignaciones', icon: '🏷️' },
+        ],
+    },
+    {
+        group: 'Reportería',
+        items: [
+            { path: '/reporteria', label: 'Reportería', icon: '📊' },
         ],
     },
 ];

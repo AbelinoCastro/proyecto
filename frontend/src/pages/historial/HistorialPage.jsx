@@ -15,6 +15,7 @@ const EstadoBadge = ({ value }) => {
 const HistorialPage = () => {
     const [empleados,         setEmpleados]         = useState([]);
     const [selectedEmpleado,  setSelectedEmpleado]  = useState('');   // '' = ninguno, 'todos' = todos
+    const [selectedPeriodo,   setSelectedPeriodo]   = useState('');   // '' = todos los períodos
     const [todosLosRegistros, setTodosLosRegistros] = useState([]);
     const [cargando,          setCargando]          = useState(true);
     const [error,             setError]             = useState(null);
@@ -29,11 +30,29 @@ const HistorialPage = () => {
             .finally(() => setCargando(false));
     }, []);
 
-    // Filtro: ninguno = vacío | 'todos' = todos | id = filtrado
+    // Períodos únicos derivados de los registros (para el filtro)
+    const periodosUnicos = [...new Map(
+        todosLosRegistros
+            .filter(r => r.ID_PERIODO)
+            .map(r => [r.ID_PERIODO, { id: r.ID_PERIODO, numero: r.NUMERO_PERIODO, anio: r.ANIO }])
+    ).values()].sort((a, b) => a.id - b.id);
+
+    const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    const labelPeriodo = (num, anio) => `${MESES[(num || 1) - 1] || num} ${anio}`;
+
+    // Filtro: ninguno = vacío | 'todos' = todos (+ filtro período) | id = filtrado por empleado
+    const handleChangeEmpleado = (val) => {
+        setSelectedEmpleado(val);
+        setSelectedPeriodo(''); // reset período al cambiar empleado
+    };
+
     const historialFiltrado =
-        selectedEmpleado === ''      ? [] :
-        selectedEmpleado === 'todos' ? todosLosRegistros :
-        todosLosRegistros.filter(p => String(p.ID_EMPLEADO) === selectedEmpleado);
+        selectedEmpleado === '' ? [] :
+        selectedEmpleado === 'todos'
+            ? (selectedPeriodo
+                ? todosLosRegistros.filter(p => String(p.ID_PERIODO) === selectedPeriodo)
+                : todosLosRegistros)
+            : todosLosRegistros.filter(p => String(p.ID_EMPLEADO) === selectedEmpleado);
 
     const empleadoNombre =
         selectedEmpleado === 'todos' ? 'Todos los empleados' :
@@ -129,28 +148,52 @@ const HistorialPage = () => {
                 </div>
             )}
 
-            {/* Filtro */}
+            {/* Filtros */}
             <div className="bg-[#1a1f2e] border border-white/10 rounded-xl p-5 mb-6">
-                <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
-                    Seleccionar colaborador
-                </label>
-                {cargando ? (
-                    <p className="text-gray-500 text-sm">Cargando empleados...</p>
-                ) : (
-                    <select
-                        value={selectedEmpleado}
-                        onChange={(e) => setSelectedEmpleado(e.target.value)}
-                        className={`${inputClass} w-full max-w-sm`}
-                    >
-                        <option value="">— Seleccione un empleado —</option>
-                        <option value="todos">Todos los empleados</option>
-                        {empleados.map((emp) => (
-                            <option key={emp.ID_EMPLEADO} value={emp.ID_EMPLEADO}>
-                                {emp.NOMBRE}
-                            </option>
-                        ))}
-                    </select>
-                )}
+                <div className="flex flex-wrap gap-4 items-end">
+                    <div className="flex-1 min-w-[220px]">
+                        <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+                            Seleccionar colaborador
+                        </label>
+                        {cargando ? (
+                            <p className="text-gray-500 text-sm">Cargando empleados...</p>
+                        ) : (
+                            <select
+                                value={selectedEmpleado}
+                                onChange={(e) => handleChangeEmpleado(e.target.value)}
+                                className={`${inputClass} w-full`}
+                            >
+                                <option value="">— Seleccione un empleado —</option>
+                                <option value="todos">Todos los empleados</option>
+                                {empleados.map((emp) => (
+                                    <option key={emp.ID_EMPLEADO} value={emp.ID_EMPLEADO}>
+                                        {emp.NOMBRE}
+                                    </option>
+                                ))}
+                            </select>
+                        )}
+                    </div>
+
+                    {selectedEmpleado === 'todos' && (
+                        <div className="flex-1 min-w-[200px]">
+                            <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+                                Filtrar por período
+                            </label>
+                            <select
+                                value={selectedPeriodo}
+                                onChange={(e) => setSelectedPeriodo(e.target.value)}
+                                className={`${inputClass} w-full`}
+                            >
+                                <option value="">Todos los períodos</option>
+                                {periodosUnicos.map(p => (
+                                    <option key={p.id} value={String(p.id)}>
+                                        {labelPeriodo(p.numero, p.anio)}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* Tabla */}

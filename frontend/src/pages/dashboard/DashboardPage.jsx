@@ -49,6 +49,13 @@ const modulos = [
         desc: 'Administra departamentos, puestos, jornadas y más.',
         color: 'from-slate-600/20 to-slate-700/10 border-slate-500/30 hover:border-slate-500/60',
     },
+    {
+        title: 'Reportería',
+        icon: '📊',
+        path: '/reporteria',
+        desc: 'IGSS, ISR/SAT y préstamos. Registra pagos y genera comprobantes.',
+        color: 'from-emerald-600/20 to-emerald-700/10 border-emerald-500/30 hover:border-emerald-500/60',
+    },
 ];
 
 const DashboardPage = () => {
