@@ -165,7 +165,7 @@ const FormularioDinamico = ({ catalogo, formData, editandoId, onChange }) => {
     if (!campos.length)
         return <p className="text-gray-400 text-sm text-center py-4">Sin campos configurados para "{catalogo}".</p>;
 
-    const inputClass = 'w-full bg-[#131720] border border-white/10 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 transition-colors placeholder-gray-600';
+    const inputClass = 'w-full bg-[#0b0e14] border border-white/5 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 transition-colors placeholder-gray-600';
 
     return (
         <div className="flex flex-col gap-4">
@@ -224,11 +224,11 @@ const ModalBaja = ({ empleadoId, onClose, onConfirm }) => {
             .catch(() => {});
     }, []);
 
-    const inputClass = 'w-full bg-[#131720] border border-white/10 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 transition-colors';
+    const inputClass = 'w-full bg-[#0b0e14] border border-white/5 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 transition-colors';
 
     return (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-            <div className="bg-[#1a1f2e] border border-white/10 rounded-xl p-6 w-full max-w-sm">
+            <div className="bg-[#121621] border border-white/5 rounded-xl p-6 w-full max-w-sm">
                 <h2 className="text-lg font-bold text-white mb-1">Dar de Baja</h2>
                 <p className="text-gray-400 text-sm mb-4">Esta acción cambia el estado del empleado a INACTIVO.</p>
 
@@ -405,7 +405,7 @@ const CatalogosPage = () => {
                             className={`flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-xl text-xs font-semibold border transition-all ${
                                 activo
                                     ? 'bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-500/20'
-                                    : 'bg-[#1a1f2e] border-white/10 text-gray-400 hover:text-white hover:border-white/20'
+                                    : 'bg-[#121621] border-white/5 text-gray-400 hover:text-white hover:border-white/20'
                             }`}
                         >
                             <span className="text-lg">{cat.icon}</span>
@@ -416,9 +416,9 @@ const CatalogosPage = () => {
             </div>
 
             {/* Card con tabla */}
-            <div className="bg-[#1a1f2e] border border-white/10 rounded-xl overflow-hidden">
+            <div className="bg-[#121621] border border-white/5 rounded-xl overflow-hidden">
                 {/* Header de tabla */}
-                <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
+                <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
                     <h2 className="text-sm font-semibold text-white uppercase tracking-wide">
                         {catActivo?.icon} Gestión de {catActivo?.nombre}
                     </h2>

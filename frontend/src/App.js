@@ -1,32 +1,22 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 
-// Dashboard
+import LoginPage from './pages/login/LoginPage';
 import DashboardPage from './pages/dashboard/DashboardPage';
-
-// Nómina
 import CalcularNominaPage from './pages/nomina/CalcularNominaPage';
 import PeriodosPage from './pages/periodos/PeriodosPage';
 import HistorialPage from './pages/historial/HistorialPage';
-
-// Catálogos unificados (Abelino)
 import CatalogosPage from './pages/catalogos/CatalogosPage';
-
-// Módulos individuales (David / Juan)
 import RegistroHorasExtra from './pages/registroHorasExtras/RegistroHorasExtra';
 import ListadoFaltas from './pages/registroFaltas/ListadoFaltas';
-
-// Asignaciones por empleado
 import AsignacionesPage from './pages/asignaciones/AsignacionesPage';
-
-// Reportería y obligaciones legales
 import ReporteriaPage from './pages/reporteria/ReporteriaPage';
 import ISRPage from './pages/isr/ISRPage';
 import IGSSPage from './pages/igss/IGSSPage';
 import PrestamosPage from './pages/prestamos/PrestamosPage';
 import PolizaSegurosPage from './pages/polizaSeguros/PolizaSegurosPage';
-
-// Páginas individuales de catálogos (acceso directo desde el sidebar)
 import TipoUsuarioPage from './pages/tipoUsuario/TipoUsuarioPage';
 import UsuariosPage from './pages/usuarios/UsuariosPage';
 import DepartamentosPage from './pages/departamentos/DepartamentosPage';
@@ -38,53 +28,61 @@ import MotivoBajaPage from './pages/motivoBaja/MotivoBajaPage';
 import PuestosPage from './pages/puestos/PuestosPage';
 import EmpleadoPage from './pages/empleado/EmpleadoPage';
 import PatronoPage from './pages/patrono/PatronoPage';
+import PermisosPage from './pages/permisos/PermisosPage';
+
+// Wrapper rápido para rutas con módulo requerido
+const P = ({ mod, children }) => (
+    <ProtectedRoute requiereModulo={mod}>{children}</ProtectedRoute>
+);
 
 function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          {/* Dashboard principal */}
-          <Route index element={<DashboardPage />} />
+    return (
+        <AuthProvider>
+            <BrowserRouter>
+                <Routes>
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/" element={
+                        <ProtectedRoute><Layout /></ProtectedRoute>
+                    }>
+                        <Route index element={<Navigate to="/dashboard" replace />} />
+                        <Route path="dashboard"        element={<P mod="DASHBOARD"><DashboardPage /></P>} />
 
-          {/* Nómina */}
-          <Route path="calcular-nomina" element={<CalcularNominaPage />} />
-          <Route path="periodos" element={<PeriodosPage />} />
-          <Route path="historial" element={<HistorialPage />} />
+                        <Route path="calcular-nomina"  element={<P mod="NOMINA"><CalcularNominaPage /></P>} />
+                        <Route path="periodos"         element={<P mod="PERIODOS"><PeriodosPage /></P>} />
+                        <Route path="historial"        element={<P mod="HISTORIAL"><HistorialPage /></P>} />
 
-          {/* Catálogos unificados */}
-          <Route path="catalogos" element={<CatalogosPage />} />
+                        <Route path="catalogos"        element={<P mod="CATALOGOS"><CatalogosPage /></P>} />
+                        <Route path="horasextra"       element={<P mod="HORASEXTRA"><RegistroHorasExtra /></P>} />
+                        <Route path="registro-faltas"  element={<P mod="FALTAS"><ListadoFaltas /></P>} />
 
-          {/* Módulos David & Juan */}
-          <Route path="horasextra" element={<RegistroHorasExtra />} />
-          <Route path="registro-faltas" element={<ListadoFaltas />} />
+                        <Route path="empleado"         element={<P mod="EMPLEADOS"><EmpleadoPage /></P>} />
+                        <Route path="asignaciones"     element={<P mod="ASIGNAC"><AsignacionesPage /></P>} />
 
-          {/* Empleados */}
-          <Route path="empleado" element={<EmpleadoPage />} />
-          <Route path="asignaciones" element={<AsignacionesPage />} />
+                        <Route path="reporteria"       element={<P mod="REPORTERIA"><ReporteriaPage /></P>} />
+                        <Route path="isr"              element={<P mod="ISR"><ISRPage /></P>} />
+                        <Route path="igss"             element={<P mod="IGSS"><IGSSPage /></P>} />
+                        <Route path="prestamos"        element={<P mod="PRESTAMOS"><PrestamosPage /></P>} />
+                        <Route path="polizas-seguros"  element={<P mod="SEGUROS"><PolizaSegurosPage /></P>} />
 
-          {/* Reportería y obligaciones */}
-          <Route path="reporteria" element={<ReporteriaPage />} />
-          <Route path="isr" element={<ISRPage />} />
-          <Route path="igss" element={<IGSSPage />} />
-          <Route path="prestamos" element={<PrestamosPage />} />
-          <Route path="polizas-seguros" element={<PolizaSegurosPage />} />
+                        <Route path="patrono"          element={<P mod="PATRONO"><PatronoPage /></P>} />
+                        <Route path="usuarios"         element={<P mod="USUARIOS"><UsuariosPage /></P>} />
+                        <Route path="permisos"         element={<P mod="PERMISOS"><PermisosPage /></P>} />
 
-          {/* Catálogos individuales (acceso directo) */}
-          <Route path="departamentos" element={<DepartamentosPage />} />
-          <Route path="jornadas" element={<JornadasPage />} />
-          <Route path="percepciones" element={<PercepcionesPage />} />
-          <Route path="deducciones" element={<DeduccionesPage />} />
-          <Route path="faltas" element={<FaltasPage />} />
-          <Route path="motivo-baja" element={<MotivoBajaPage />} />
-          <Route path="puestos" element={<PuestosPage />} />
-          <Route path="usuarios" element={<UsuariosPage />} />
-          <Route path="tipo-usuario" element={<TipoUsuarioPage />} />
-          <Route path="patrono" element={<PatronoPage />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
-  );
+                        {/* Catálogos individuales (acceso directo, sin guarda específica) */}
+                        <Route path="departamentos"    element={<DepartamentosPage />} />
+                        <Route path="jornadas"         element={<JornadasPage />} />
+                        <Route path="percepciones"     element={<PercepcionesPage />} />
+                        <Route path="deducciones"      element={<DeduccionesPage />} />
+                        <Route path="faltas"           element={<FaltasPage />} />
+                        <Route path="motivo-baja"      element={<MotivoBajaPage />} />
+                        <Route path="puestos"          element={<PuestosPage />} />
+                        <Route path="tipo-usuario"     element={<TipoUsuarioPage />} />
+                    </Route>
+                    <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                </Routes>
+            </BrowserRouter>
+        </AuthProvider>
+    );
 }
 
 export default App;

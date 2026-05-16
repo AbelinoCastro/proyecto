@@ -50,8 +50,8 @@ const PeriodosPage = () => {
         }
     };
 
-    const inputCls = 'bg-[#131720] border border-white/10 rounded-lg px-3 py-2 text-sm text-white outline-none w-full';
-    const selectCls = 'bg-[#131720] border border-white/10 rounded-lg px-3 py-2 text-sm text-white outline-none w-full';
+    const inputCls = 'bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white outline-none w-full';
+    const selectCls = 'bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white outline-none w-full';
 
     return (
         <div className="text-white">
@@ -72,10 +72,10 @@ const PeriodosPage = () => {
             )}
 
             {/* TABLA */}
-            <div className="bg-[#1a1f2e] rounded-xl border border-white/10 overflow-hidden">
+            <div className="bg-[#121621] rounded-xl border border-white/5 overflow-hidden">
                 <table className="w-full text-sm">
                     <thead>
-                        <tr className="border-b border-white/10">
+                        <tr className="border-b border-white/5">
                             <th className="px-4 py-3 text-left text-xs text-gray-400 font-medium">Período</th>
                             <th className="px-4 py-3 text-left text-xs text-gray-400 font-medium">Fecha inicio</th>
                             <th className="px-4 py-3 text-left text-xs text-gray-400 font-medium">Fecha fin</th>
@@ -132,7 +132,7 @@ const PeriodosPage = () => {
             {/* MODAL CREAR */}
             {modal && (
                 <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-                    <div className="bg-[#1a1f2e] rounded-xl border border-white/10 p-6 w-full max-w-sm">
+                    <div className="bg-[#121621] rounded-xl border border-white/5 p-6 w-full max-w-sm">
                         <h2 className="text-lg font-semibold mb-4">Crear período de nómina</h2>
                         {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
                         <div className="flex flex-col gap-3">

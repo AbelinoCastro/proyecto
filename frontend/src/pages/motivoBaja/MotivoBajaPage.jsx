@@ -36,19 +36,19 @@ const MotivoBajaPage = () => {
         <div className="text-white">
             <div className="flex items-center justify-between mb-6">
                 <h1 className="text-xl font-semibold">Motivo de Baja</h1>
-                <div className="flex items-center gap-2 bg-[#1a1f2e] border border-white/10 rounded-lg px-3 py-2">
+                <div className="flex items-center gap-2 bg-[#121621] border border-white/5 rounded-lg px-3 py-2">
                     <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                     <input className="bg-transparent text-sm text-white placeholder-gray-500 outline-none w-48" placeholder="Buscar..." value={buscar} onChange={e => setBuscar(e.target.value)} />
                 </div>
             </div>
             <div className="flex gap-2 mb-4">
-                <button onClick={abrirCreate} className="px-4 py-2 bg-[#1a1f2e] border border-white/10 rounded-lg text-sm hover:bg-white/10 transition">+ Create</button>
-                <button onClick={abrirUpdate} disabled={!selected} className="px-4 py-2 bg-[#1a1f2e] border border-white/10 rounded-lg text-sm hover:bg-white/10 transition disabled:opacity-40">Update</button>
+                <button onClick={abrirCreate} className="px-4 py-2 bg-[#121621] border border-white/5 rounded-lg text-sm hover:bg-white/10 transition">+ Create</button>
+                <button onClick={abrirUpdate} disabled={!selected} className="px-4 py-2 bg-[#121621] border border-white/5 rounded-lg text-sm hover:bg-white/10 transition disabled:opacity-40">Update</button>
                 <button onClick={eliminar} disabled={!selected} className="px-4 py-2 bg-red-600/20 border border-red-500/30 text-red-400 rounded-lg text-sm hover:bg-red-600/30 transition disabled:opacity-40">Delete</button>
             </div>
-            <div className="bg-[#1a1f2e] rounded-xl border border-white/10 overflow-hidden">
+            <div className="bg-[#121621] rounded-xl border border-white/5 overflow-hidden">
                 <table className="w-full text-sm">
-                    <thead><tr className="border-b border-white/10">
+                    <thead><tr className="border-b border-white/5">
                         <th className="w-10 px-4 py-3"></th>
                         <th className="px-4 py-3 text-left text-xs text-gray-400 font-medium">ID</th>
                         <th className="px-4 py-3 text-left text-xs text-gray-400 font-medium">DESCRIPCIÓN</th>
@@ -69,13 +69,13 @@ const MotivoBajaPage = () => {
             </div>
             {(modal === 'create' || modal === 'update') && (
                 <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-                    <div className="bg-[#1a1f2e] rounded-xl border border-white/10 p-6 w-full max-w-md">
+                    <div className="bg-[#121621] rounded-xl border border-white/5 p-6 w-full max-w-md">
                         <h2 className="text-lg font-semibold mb-4">{modal === 'create' ? 'Crear Motivo de Baja' : 'Actualizar Motivo de Baja'}</h2>
                         {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
                         <div className="flex flex-col gap-3">
-                            {modal === 'create' && <input className="bg-[#131720] border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none" placeholder="ID (ej: MB001)" value={form.id_motivo_baja} onChange={e => setForm({ ...form, id_motivo_baja: e.target.value.toUpperCase() })} />}
-                            <input className="bg-[#131720] border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none" placeholder="Descripción" value={form.descripcion} onChange={e => setForm({ ...form, descripcion: e.target.value })} />
-                            <select className="bg-[#131720] border border-white/10 rounded-lg px-3 py-2 text-sm text-white outline-none" value={form.estado} onChange={e => setForm({ ...form, estado: e.target.value })}>
+                            {modal === 'create' && <input className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none" placeholder="ID (ej: MB001)" value={form.id_motivo_baja} onChange={e => setForm({ ...form, id_motivo_baja: e.target.value.toUpperCase() })} />}
+                            <input className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none" placeholder="Descripción" value={form.descripcion} onChange={e => setForm({ ...form, descripcion: e.target.value })} />
+                            <select className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white outline-none" value={form.estado} onChange={e => setForm({ ...form, estado: e.target.value })}>
                                 <option value="ACTIVO">ACTIVO</option>
                                 <option value="INACTIVO">INACTIVO</option>
                             </select>

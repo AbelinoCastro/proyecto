@@ -7,6 +7,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Autenticación y permisos (deben ir antes de las demás rutas protegidas)
+app.use('/api/auth',     require('./src/modules/auth/auth.routes'));
+app.use('/api/permisos', require('./src/modules/permisos/permisos.routes'));
+
 // Rutas existentes
 app.use('/api/tipo-usuario', require('./src/modules/tipoUsuario/tipoUsuario.routes'));
 app.use('/api/usuarios', require('./src/modules/usuarios/usuario.routes'));
@@ -30,6 +34,7 @@ app.use('/api/sat', require('./src/modules/sat/sat.routes'));
 app.use('/api/igss', require('./src/modules/igss/igss.routes'));
 app.use('/api/prestamos', require('./src/modules/prestamo/prestamo.routes'));
 app.use('/api/polizas-seguros', require('./src/modules/polizaSeguros/polizaSeguros.routes'));
+app.use('/api/formato-salarios', require('./src/modules/formatoSalarios/formatoSalarios.routes'));
 
 app.get('/', (req, res) => res.json({ ok: true, message: 'Proyecto Nomina API corriendo' }));
 

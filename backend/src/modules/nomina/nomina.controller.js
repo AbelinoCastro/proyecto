@@ -5,6 +5,7 @@ const { success, error } = require('../../helpers/response');
 
 const BONIFICACION_INCENTIVO = 250;    // Q250 fijo por ley (PER02) — exento de IGSS, gravado ISR
 const IGSS_EMPLEADO_PCT      = 4.83;  // 4.83% sobre sueldo_base + horas_extra (Decreto 78-89 excluye bonif)
+const IGSS_PATRONO_PCT       = 10.67; // 10.67% cuota patronal IGSS (la paga la empresa, no se descuenta al empleado)
 const ISR_EXENCION_ANUAL     = 48000; // Deducción personal anual Q48,000 (Decreto 10-2012)
 const ISR_TRAMO1_LIMITE      = 300000; // Primer tramo: hasta Q300,000 → 5%
 const ISR_TRAMO1_PCT         = 5;
@@ -39,10 +40,12 @@ const getVistaPrevia = async (req, res) => {
         if (nominaExistente)
             return error(res, `${empleado.NOMBRE} ya tiene nómina procesada para ${mes}/${anio}`, 400);
 
-        const horasExtra = await model.getHorasExtra(id_empleado, anio, mes);
-        const faltas     = await model.getFaltas(id_empleado, anio, mes);
-        const dedEmp     = await asignacionesModel.getDeduccionesActivasByEmpleado(id_empleado);
-        const perEmp     = await asignacionesModel.getPercepcionesActivasByEmpleado(id_empleado);
+        const horasExtra     = await model.getHorasExtra(id_empleado, anio, mes);
+        const faltas         = await model.getFaltas(id_empleado, anio, mes);
+        const dedEmp         = await asignacionesModel.getDeduccionesActivasByEmpleado(id_empleado);
+        const perEmp         = await asignacionesModel.getPercepcionesActivasByEmpleado(id_empleado);
+        const prestamo_monto = await model.getPrestamoPendiente(id_empleado);
+        const seguro_monto   = await model.getSeguroActivo(id_empleado);
 
         const sueldo_base   = parseFloat(empleado.SUELDO_BASE);
         const horas_diarias = parseFloat(empleado.HORAS_DIARIAS);
@@ -73,8 +76,9 @@ const getVistaPrevia = async (req, res) => {
 
         // ── DEDUCCIONES ────────────────────────────────────────────
         // IGSS: base = sueldo_base + horas_extra (Bonificación Incentivo excluida por Decreto 78-89)
-        const igss_base  = parseFloat((sueldo_base + total_horas_extra).toFixed(2));
-        const igss_monto = parseFloat((igss_base * IGSS_EMPLEADO_PCT / 100).toFixed(2));
+        const igss_base     = parseFloat((sueldo_base + total_horas_extra).toFixed(2));
+        const igss_monto    = parseFloat((igss_base * IGSS_EMPLEADO_PCT / 100).toFixed(2));
+        const igss_patronal = parseFloat((igss_base * IGSS_PATRONO_PCT / 100).toFixed(2));
         // ISR: base anual = (percepciones × 12) − (IGSS × 12) − Q48,000; tramos 5%/7%
         const isr_base_anual = parseFloat(((total_percepciones * 12) - (igss_monto * 12) - ISR_EXENCION_ANUAL).toFixed(2));
         const isr_monto      = calcularISRMensual(total_percepciones, igss_monto);
@@ -96,6 +100,23 @@ const getVistaPrevia = async (req, res) => {
             nombre: d.NOMBRE_DEDUCCION,
             monto: parseFloat(d.MONTO)
         }));
+
+        // Agregar préstamo y seguro automáticamente si el empleado los tiene activos
+        if (prestamo_monto > 0) {
+            deduccionesEmpleado.push({
+                id_deduccion: 'DED06',
+                nombre: 'Préstamo Bantrab',
+                monto: prestamo_monto
+            });
+        }
+        if (seguro_monto > 0) {
+            deduccionesEmpleado.push({
+                id_deduccion: 'DED04',
+                nombre: 'Seguro Médico',
+                monto: seguro_monto
+            });
+        }
+
         const total_deducciones_emp = deduccionesEmpleado.reduce((s, d) => s + d.monto, 0);
 
         const total_deducciones = parseFloat(
@@ -117,10 +138,14 @@ const getVistaPrevia = async (req, res) => {
                 total_percepciones_emp: parseFloat(total_percepciones_emp.toFixed(2)),
                 total_percepciones,
                 igss_porcentaje: IGSS_EMPLEADO_PCT,
+                igss_patronal_porcentaje: IGSS_PATRONO_PCT,
                 igss_base,
                 igss_monto,
+                igss_patronal,
                 isr_base_anual: parseFloat(isr_base_anual.toFixed(2)),
                 isr_monto,
+                prestamo_monto,
+                seguro_monto,
                 faltas: detalleFaltas,
                 total_descuento_faltas: parseFloat(total_descuento_faltas.toFixed(2)),
                 deducciones_empleado: deduccionesEmpleado,

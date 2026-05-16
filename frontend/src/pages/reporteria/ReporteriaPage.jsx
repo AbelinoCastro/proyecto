@@ -46,7 +46,7 @@ const ReporteriaPage = () => {
     const navigate = useNavigate();
 
     return (
-        <div className="p-6 text-slate-100 min-h-screen bg-[#131720]">
+        <div className="p-6 text-slate-100 min-h-screen bg-[#0b0e14]">
             {/* Header */}
             <div className="mb-8">
                 <h1 className="text-2xl font-bold text-white">Reportería</h1>
@@ -60,7 +60,7 @@ const ReporteriaPage = () => {
                     return (
                         <div
                             key={m.path}
-                            className={`bg-[#1a1f2e] border rounded-2xl p-6 flex flex-col gap-4 transition-all duration-200 cursor-pointer ${c.card}`}
+                            className={`bg-[#121621] border rounded-2xl p-6 flex flex-col gap-4 transition-all duration-200 cursor-pointer ${c.card}`}
                             onClick={() => navigate(m.path)}
                         >
                             {/* Ícono + título */}

@@ -10,9 +10,9 @@ const ModalCatalogo = ({ isOpen, onClose, title, onSave, cargando, children }) =
             />
 
             {/* Panel */}
-            <div className="relative z-10 w-full max-w-lg mx-4 bg-[#1a1f2e] border border-white/10 rounded-xl shadow-2xl">
+            <div className="relative z-10 w-full max-w-lg mx-4 bg-[#121621] border border-white/5 rounded-xl shadow-2xl">
                 {/* Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
                     <h3 className="text-white font-semibold text-base">{title}</h3>
                     <button
                         onClick={onClose}
@@ -29,7 +29,7 @@ const ModalCatalogo = ({ isOpen, onClose, title, onSave, cargando, children }) =
                 </div>
 
                 {/* Footer */}
-                <div className="flex justify-end gap-3 px-6 py-4 border-t border-white/10">
+                <div className="flex justify-end gap-3 px-6 py-4 border-t border-white/5">
                     <button
                         onClick={onClose}
                         disabled={cargando}

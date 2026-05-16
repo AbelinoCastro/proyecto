@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getEmpleados } from '../../services/empleadoService';
 import { getHistoricoNomina, getDetalleNomina } from '../../services/nominaService';
+import { urlFormatoUnico } from '../../services/formatoSalariosService';
 
 const EstadoBadge = ({ value }) => {
     const upper = value?.toUpperCase();
@@ -16,6 +17,8 @@ const HistorialPage = () => {
     const [empleados,         setEmpleados]         = useState([]);
     const [selectedEmpleado,  setSelectedEmpleado]  = useState('');   // '' = ninguno, 'todos' = todos
     const [selectedPeriodo,   setSelectedPeriodo]   = useState('');   // '' = todos los períodos
+    const [selectedPuesto,    setSelectedPuesto]    = useState('');   // '' = todos los puestos
+    const [anioFormato,       setAnioFormato]       = useState(new Date().getFullYear());
     const [todosLosRegistros, setTodosLosRegistros] = useState([]);
     const [cargando,          setCargando]          = useState(true);
     const [error,             setError]             = useState(null);
@@ -37,22 +40,31 @@ const HistorialPage = () => {
             .map(r => [r.ID_PERIODO, { id: r.ID_PERIODO, numero: r.NUMERO_PERIODO, anio: r.ANIO }])
     ).values()].sort((a, b) => a.id - b.id);
 
+    // Puestos únicos derivados de los registros (para el filtro)
+    const puestosUnicos = [...new Set(
+        todosLosRegistros
+            .map(r => r.NOMBRE_PUESTO)
+            .filter(Boolean)
+    )].sort();
+
     const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
     const labelPeriodo = (num, anio) => `${MESES[(num || 1) - 1] || num} ${anio}`;
 
-    // Filtro: ninguno = vacío | 'todos' = todos (+ filtro período) | id = filtrado por empleado
+    // Filtro: ninguno = vacío | 'todos' = todos (+ filtros período y puesto) | id = filtrado por empleado
     const handleChangeEmpleado = (val) => {
         setSelectedEmpleado(val);
-        setSelectedPeriodo(''); // reset período al cambiar empleado
+        setSelectedPeriodo('');
+        setSelectedPuesto('');
     };
 
-    const historialFiltrado =
-        selectedEmpleado === '' ? [] :
-        selectedEmpleado === 'todos'
-            ? (selectedPeriodo
-                ? todosLosRegistros.filter(p => String(p.ID_PERIODO) === selectedPeriodo)
-                : todosLosRegistros)
-            : todosLosRegistros.filter(p => String(p.ID_EMPLEADO) === selectedEmpleado);
+    const historialFiltrado = (() => {
+        if (selectedEmpleado === '') return [];
+        if (selectedEmpleado !== 'todos') return todosLosRegistros.filter(p => String(p.ID_EMPLEADO) === selectedEmpleado);
+        return todosLosRegistros.filter(p =>
+            (!selectedPeriodo || String(p.ID_PERIODO) === selectedPeriodo) &&
+            (!selectedPuesto  || p.NOMBRE_PUESTO === selectedPuesto)
+        );
+    })();
 
     const empleadoNombre =
         selectedEmpleado === 'todos' ? 'Todos los empleados' :
@@ -133,7 +145,7 @@ const HistorialPage = () => {
         }
     };
 
-    const inputClass = 'bg-[#131720] border border-white/10 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 transition-colors';
+    const inputClass = 'bg-[#0b0e14] border border-white/5 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 transition-colors';
 
     return (
         <div className="p-6 min-h-full">
@@ -149,7 +161,7 @@ const HistorialPage = () => {
             )}
 
             {/* Filtros */}
-            <div className="bg-[#1a1f2e] border border-white/10 rounded-xl p-5 mb-6">
+            <div className="bg-[#121621] border border-white/5 rounded-xl p-5 mb-6">
                 <div className="flex flex-wrap gap-4 items-end">
                     <div className="flex-1 min-w-[220px]">
                         <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
@@ -175,30 +187,74 @@ const HistorialPage = () => {
                     </div>
 
                     {selectedEmpleado === 'todos' && (
-                        <div className="flex-1 min-w-[200px]">
-                            <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
-                                Filtrar por período
-                            </label>
-                            <select
-                                value={selectedPeriodo}
-                                onChange={(e) => setSelectedPeriodo(e.target.value)}
-                                className={`${inputClass} w-full`}
+                        <>
+                            <div className="flex-1 min-w-[200px]">
+                                <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+                                    Filtrar por período
+                                </label>
+                                <select
+                                    value={selectedPeriodo}
+                                    onChange={(e) => setSelectedPeriodo(e.target.value)}
+                                    className={`${inputClass} w-full`}
+                                >
+                                    <option value="">Todos los períodos</option>
+                                    {periodosUnicos.map(p => (
+                                        <option key={p.id} value={String(p.id)}>
+                                            {labelPeriodo(p.numero, p.anio)}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="flex-1 min-w-[200px]">
+                                <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+                                    Filtrar por puesto
+                                </label>
+                                <select
+                                    value={selectedPuesto}
+                                    onChange={(e) => setSelectedPuesto(e.target.value)}
+                                    className={`${inputClass} w-full`}
+                                >
+                                    <option value="">Todos los puestos</option>
+                                    {puestosUnicos.map(p => (
+                                        <option key={p} value={p}>{p}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </>
+                    )}
+
+                    {/* Botón Formato Único - solo cuando hay empleado específico y al menos 1 pagado */}
+                    {selectedEmpleado && selectedEmpleado !== 'todos' && historialFiltrado.some(p => p.ESTADO === 'PAGADO') && (
+                        <div className="flex items-end gap-2">
+                            <div>
+                                <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
+                                    Año
+                                </label>
+                                <select
+                                    value={anioFormato}
+                                    onChange={(e) => setAnioFormato(Number(e.target.value))}
+                                    className={`${inputClass} w-[100px]`}
+                                >
+                                    {[...new Set(historialFiltrado.filter(p => p.ESTADO === 'PAGADO').map(p => p.ANIO))]
+                                        .sort((a, b) => b - a)
+                                        .map(a => <option key={a} value={a}>{a}</option>)}
+                                </select>
+                            </div>
+                            <button
+                                onClick={() => window.open(urlFormatoUnico(selectedEmpleado, anioFormato), '_blank')}
+                                className="h-[38px] px-4 bg-emerald-700 hover:bg-emerald-600 text-white text-sm rounded-lg transition-colors font-medium flex items-center gap-2"
+                                title="Descarga el formato único de salarios oficial en Excel"
                             >
-                                <option value="">Todos los períodos</option>
-                                {periodosUnicos.map(p => (
-                                    <option key={p.id} value={String(p.id)}>
-                                        {labelPeriodo(p.numero, p.anio)}
-                                    </option>
-                                ))}
-                            </select>
+                                📊 Generar Formato Único
+                            </button>
                         </div>
                     )}
                 </div>
             </div>
 
             {/* Tabla */}
-            <div className="bg-[#1a1f2e] border border-white/10 rounded-xl overflow-hidden">
-                <div className="px-5 py-4 border-b border-white/10">
+            <div className="bg-[#121621] border border-white/5 rounded-xl overflow-hidden">
+                <div className="px-5 py-4 border-b border-white/5">
                     <h2 className="text-sm font-semibold text-white uppercase tracking-wide">
                         Pagos registrados{empleadoNombre ? ` — ${empleadoNombre}` : ''}
                     </h2>

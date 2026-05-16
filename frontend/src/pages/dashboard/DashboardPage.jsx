@@ -106,13 +106,13 @@ const DashboardPage = () => {
 
                 <div className="flex flex-wrap gap-3">
                     {/* Empleados activos */}
-                    <div className="bg-[#1a1f2e] border border-white/10 rounded-xl px-5 py-3 min-w-[150px]">
+                    <div className="bg-[#121621] border border-white/5 rounded-xl px-5 py-3 min-w-[150px]">
                         <p className="text-gray-400 text-xs">Empleados activos</p>
                         <p className="text-white text-2xl font-bold mt-0.5">{stats.empleadosActivos ?? '—'}</p>
                     </div>
 
                     {/* Período actual */}
-                    <div className="bg-[#1a1f2e] border border-white/10 rounded-xl px-5 py-3 min-w-[170px]">
+                    <div className="bg-[#121621] border border-white/5 rounded-xl px-5 py-3 min-w-[170px]">
                         <p className="text-gray-400 text-xs">Período actual</p>
                         {periodoLabel ? (
                             <>
@@ -124,7 +124,7 @@ const DashboardPage = () => {
                     </div>
 
                     {/* Sistema */}
-                    <div className="bg-[#1a1f2e] border border-white/10 rounded-xl px-5 py-3 min-w-[130px]">
+                    <div className="bg-[#121621] border border-white/5 rounded-xl px-5 py-3 min-w-[130px]">
                         <p className="text-gray-400 text-xs">Sistema</p>
                         <div className="flex items-center gap-2 mt-1.5">
                             <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse shrink-0"></span>
@@ -135,7 +135,7 @@ const DashboardPage = () => {
             </div>
 
             {/* Separador */}
-            <div className="border-t border-white/10 mb-6" />
+            <div className="border-t border-white/5 mb-6" />
 
             {/* Grid de módulos */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

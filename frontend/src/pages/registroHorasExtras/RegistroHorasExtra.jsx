@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const API = 'http://localhost:4000/api';
 
-const inputClass = 'bg-[#131720] border border-white/10 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 transition-colors w-full';
+const inputClass = 'bg-[#0b0e14] border border-white/5 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 transition-colors w-full';
 
 const Toast = ({ mensaje, tipo, onClose }) => {
   useEffect(() => {
@@ -114,8 +114,8 @@ const RegistroHorasExtra = () => {
         </button>
       </div>
 
-      <div className="bg-[#1a1f2e] border border-white/10 rounded-xl overflow-hidden">
-        <div className="px-5 py-4 border-b border-white/10">
+      <div className="bg-[#121621] border border-white/5 rounded-xl overflow-hidden">
+        <div className="px-5 py-4 border-b border-white/5">
           <h2 className="text-sm font-semibold text-white uppercase tracking-wide">Registros</h2>
         </div>
         <div className="overflow-x-auto">
@@ -182,7 +182,7 @@ const RegistroHorasExtra = () => {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-[#1a1f2e] border border-white/10 rounded-xl p-6 w-full max-w-md">
+          <div className="bg-[#121621] border border-white/5 rounded-xl p-6 w-full max-w-md">
             <h2 className="text-lg font-bold text-white mb-4">Registrar Horas Extra</h2>
             <form onSubmit={handleSubmit} className="flex flex-col gap-3">
 

@@ -67,6 +67,40 @@ const getFaltas = async (id_empleado, anio, mes) => {
     } finally { await conn.close(); }
 };
 
+// Obtener cuota mensual del préstamo ACTIVO del empleado (0 si no tiene)
+const getPrestamoPendiente = async (id_empleado) => {
+    const conn = await getConnection();
+    try {
+        const result = await conn.execute(
+            `SELECT pago_mensual
+             FROM PRESTAMOS
+             WHERE id_empleado = :id
+               AND estado      = 'ACTIVO'
+             FETCH FIRST 1 ROW ONLY`,
+            { id: id_empleado },
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+        return result.rows.length ? parseFloat(result.rows[0].PAGO_MENSUAL) : 0;
+    } finally { await conn.close(); }
+};
+
+// Obtener prima mensual del seguro vigente del empleado (0 si no tiene)
+const getSeguroActivo = async (id_empleado) => {
+    const conn = await getConnection();
+    try {
+        const result = await conn.execute(
+            `SELECT monto_prima
+             FROM POLIZA_SEGUROS
+             WHERE id_empleado = :id
+               AND fecha_renovacion >= SYSDATE
+             FETCH FIRST 1 ROW ONLY`,
+            { id: id_empleado },
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+        return result.rows.length ? parseFloat(result.rows[0].MONTO_PRIMA) : 0;
+    } finally { await conn.close(); }
+};
+
 // Verificar si ya existe nómina procesada para este empleado y período
 const getNominaExistente = async (id_empleado, id_periodo) => {
     const conn = await getConnection();
@@ -301,6 +335,8 @@ module.exports = {
     getFaltas,
     getOCrearPeriodo,
     getNominaExistente,
+    getPrestamoPendiente,
+    getSeguroActivo,
     procesarNomina,
     getHistorico,
     getDetalleNomina,

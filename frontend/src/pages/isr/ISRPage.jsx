@@ -81,7 +81,7 @@ const ISRPage = () => {
     const canAction = estadoPeriodo !== 'ABIERTO' && !pagado;
 
     return (
-        <div className="p-6 text-slate-100 min-h-screen bg-[#131720]">
+        <div className="p-6 text-slate-100 min-h-screen bg-[#0b0e14]">
             {/* Toast */}
             {toast && (
                 <div className={`fixed top-4 right-4 z-50 px-5 py-3 rounded-xl shadow-lg text-sm font-medium transition-all
@@ -96,7 +96,7 @@ const ISRPage = () => {
                 <p className="text-slate-400 text-sm mt-1">Retención y pago ante la SAT por período de nómina</p>
             </div>
 
-            <div className="bg-[#1a1f2e] rounded-2xl border border-slate-700/60 p-6 max-w-5xl space-y-6">
+            <div className="bg-[#121621] rounded-2xl border border-slate-700/60 p-6 max-w-5xl space-y-6">
 
                 {/* Selector de período */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
@@ -105,7 +105,7 @@ const ISRPage = () => {
                         <select
                             value={periodo}
                             onChange={handleChangePeriodo}
-                            className="w-full bg-[#131720] border border-slate-600 rounded-xl px-3 py-2.5 text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                            className="w-full bg-[#0b0e14] border border-slate-600 rounded-xl px-3 py-2.5 text-white focus:ring-2 focus:ring-blue-500 outline-none"
                         >
                             <option value="">Seleccione período</option>
                             {periodos.map(p => (

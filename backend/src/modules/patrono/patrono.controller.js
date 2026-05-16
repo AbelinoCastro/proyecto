@@ -33,13 +33,13 @@ const createPatrono = async (req, res) => {
 const updatePatrono = async (req, res) => {
     try {
         const { id } = req.params;
-        const { razon_social, direccion, telefono, numero_patronal, cod_formulario } = req.body;
+        const { razon_social, direccion, telefono, numero_patronal, cod_formulario, activo } = req.body;
 
         if (!razon_social || !direccion || !numero_patronal) {
             return error(res, 'Razón social, dirección y número patronal son requeridos', 400);
         }
 
-        const data = await model.update(id, { razon_social, direccion, telefono, numero_patronal, cod_formulario });
+        const data = await model.update(id, { razon_social, direccion, telefono, numero_patronal, cod_formulario, activo });
         if (!data) return error(res, 'Patrono no encontrado', 404);
         return success(res, data, 'Patrono actualizado correctamente');
     } catch (err) {

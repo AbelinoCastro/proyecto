@@ -127,8 +127,8 @@ const CalcularNominaPage = () => {
         }
     };
 
-    const inputCls = 'bg-[#131720] border border-white/10 rounded-lg px-3 py-2 text-sm text-white outline-none w-full';
-    const selectCls = 'bg-[#131720] border border-white/10 rounded-lg px-3 py-2 text-sm text-white outline-none w-full';
+    const inputCls = 'bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white outline-none w-full';
+    const selectCls = 'bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white outline-none w-full';
 
     return (
         <div className="text-white">
@@ -143,7 +143,7 @@ const CalcularNominaPage = () => {
             </div>
 
             {/* PASO 1 — SELECCIÓN */}
-            <div className="bg-[#1a1f2e] rounded-xl border border-white/10 p-5 mb-4">
+            <div className="bg-[#121621] rounded-xl border border-white/5 p-5 mb-4">
                 <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-4">
                     Paso 1 — Seleccionar empleado y período
                 </p>
@@ -239,7 +239,7 @@ const CalcularNominaPage = () => {
             {/* PASO 2 — VISTA PREVIA */}
             {preview && (
                 <div ref={printRef}>
-                    <div className="bg-[#1a1f2e] rounded-xl border border-white/10 p-5 mb-4">
+                    <div className="bg-[#121621] rounded-xl border border-white/5 p-5 mb-4">
                         <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-4">
                             Paso 2 — Vista previa del cálculo
                         </p>
@@ -264,7 +264,7 @@ const CalcularNominaPage = () => {
                                 { label: 'Valor / día', val: formatQ(preview.calculo.valor_dia) },
                                 { label: 'Período', val: `${MESES[mes]} ${anio}` },
                             ].map(({ label, val }) => (
-                                <div key={label} className="bg-[#131720] rounded-lg p-3">
+                                <div key={label} className="bg-[#0b0e14] rounded-lg p-3">
                                     <p className="text-xs text-gray-400 mb-1">{label}</p>
                                     <p className="text-sm font-medium">{val}</p>
                                 </div>
@@ -279,10 +279,10 @@ const CalcularNominaPage = () => {
                             {preview.calculo.horas_extra.length === 0 ? (
                                 <p className="text-sm text-gray-500 italic">Sin horas extra aprobadas este mes</p>
                             ) : (
-                                <div className="bg-[#131720] rounded-lg overflow-hidden">
+                                <div className="bg-[#0b0e14] rounded-lg overflow-hidden">
                                     <table className="w-full text-sm">
                                         <thead>
-                                            <tr className="border-b border-white/10">
+                                            <tr className="border-b border-white/5">
                                                 <th className="text-left py-2 px-4 text-xs text-gray-400 font-medium">Fecha</th>
                                                 <th className="text-left py-2 px-4 text-xs text-gray-400 font-medium">Horas</th>
                                                 <th className="text-left py-2 px-4 text-xs text-gray-400 font-medium">Factor</th>
@@ -320,10 +320,10 @@ const CalcularNominaPage = () => {
                             {preview.calculo.faltas.length === 0 ? (
                                 <p className="text-sm text-gray-500 italic">Sin faltas registradas este mes</p>
                             ) : (
-                                <div className="bg-[#131720] rounded-lg overflow-hidden">
+                                <div className="bg-[#0b0e14] rounded-lg overflow-hidden">
                                     <table className="w-full text-sm">
                                         <thead>
-                                            <tr className="border-b border-white/10">
+                                            <tr className="border-b border-white/5">
                                                 <th className="text-left py-2 px-4 text-xs text-gray-400 font-medium">Fecha</th>
                                                 <th className="text-left py-2 px-4 text-xs text-gray-400 font-medium">Tipo</th>
                                                 <th className="text-left py-2 px-4 text-xs text-gray-400 font-medium">¿Descuenta?</th>
@@ -356,14 +356,14 @@ const CalcularNominaPage = () => {
                         </div>
 
                         {/* PASO 3 — TOTALES Y CONFIRMACIÓN */}
-                        <div className="border-t border-white/10 pt-5">
+                        <div className="border-t border-white/5 pt-5">
                             <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-4">
                                 Paso 3 — Resumen y confirmación
                             </p>
 
                             {/* Desglose percepciones / deducciones */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                                <div className="bg-[#131720] rounded-lg p-4">
+                                <div className="bg-[#0b0e14] rounded-lg p-4">
                                     <p className="text-xs text-green-400 font-medium uppercase tracking-wider mb-3">Percepciones</p>
                                     <div className="space-y-1.5 text-sm">
                                         <div className="flex justify-between"><span className="text-gray-400">Sueldo base</span><span className="text-green-400">{formatQ(preview.calculo.sueldo_base)}</span></div>
@@ -374,10 +374,10 @@ const CalcularNominaPage = () => {
                                         {(preview.calculo.percepciones_empleado || []).map((p, i) => (
                                             <div key={i} className="flex justify-between"><span className="text-gray-400">{p.nombre}</span><span className="text-green-400">{formatQ(p.monto)}</span></div>
                                         ))}
-                                        <div className="flex justify-between border-t border-white/10 pt-1.5 font-semibold"><span className="text-white">Total</span><span className="text-green-400">{formatQ(preview.calculo.total_percepciones)}</span></div>
+                                        <div className="flex justify-between border-t border-white/5 pt-1.5 font-semibold"><span className="text-white">Total</span><span className="text-green-400">{formatQ(preview.calculo.total_percepciones)}</span></div>
                                     </div>
                                 </div>
-                                <div className="bg-[#131720] rounded-lg p-4">
+                                <div className="bg-[#0b0e14] rounded-lg p-4">
                                     <p className="text-xs text-red-400 font-medium uppercase tracking-wider mb-3">Deducciones</p>
                                     <div className="space-y-1.5 text-sm">
                                         <div className="flex justify-between">
@@ -402,7 +402,7 @@ const CalcularNominaPage = () => {
                                         {(preview.calculo.deducciones_empleado || []).map((d, i) => (
                                             <div key={i} className="flex justify-between"><span className="text-gray-400">{d.nombre}</span><span className="text-red-400">{formatQ(d.monto)}</span></div>
                                         ))}
-                                        <div className="flex justify-between border-t border-white/10 pt-1.5 font-semibold"><span className="text-white">Total</span><span className="text-red-400">{formatQ(preview.calculo.total_deducciones)}</span></div>
+                                        <div className="flex justify-between border-t border-white/5 pt-1.5 font-semibold"><span className="text-white">Total</span><span className="text-red-400">{formatQ(preview.calculo.total_deducciones)}</span></div>
                                     </div>
                                 </div>
                             </div>
@@ -435,7 +435,7 @@ const CalcularNominaPage = () => {
                                 </button>
                                 <button
                                     onClick={() => window.print()}
-                                    className="px-5 py-2.5 bg-[#131720] border border-white/10 hover:bg-white/5 text-white text-sm rounded-lg transition"
+                                    className="px-5 py-2.5 bg-[#0b0e14] border border-white/5 hover:bg-white/5 text-white text-sm rounded-lg transition"
                                 >
                                     Imprimir boleta
                                 </button>
@@ -447,7 +447,7 @@ const CalcularNominaPage = () => {
 
             {/* PAGO EXITOSO */}
             {resultado && (
-                <div className="bg-[#1a1f2e] rounded-xl border border-green-500/30 p-6">
+                <div className="bg-[#121621] rounded-xl border border-green-500/30 p-6">
                     <div className="flex items-center gap-3 mb-5">
                         <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
                             <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -466,7 +466,7 @@ const CalcularNominaPage = () => {
                             { label: 'Fecha pago', val: formatFecha(resultado.fecha_pago) },
                             { label: 'Monto pagado', val: formatQ(resultado.liquido_a_pagar) },
                         ].map(({ label, val }) => (
-                            <div key={label} className="bg-[#131720] rounded-lg p-3">
+                            <div key={label} className="bg-[#0b0e14] rounded-lg p-3">
                                 <p className="text-xs text-gray-400 mb-1">{label}</p>
                                 <p className="text-sm font-medium">{val}</p>
                             </div>
@@ -474,7 +474,7 @@ const CalcularNominaPage = () => {
                     </div>
                     <div className="flex gap-3">
                         <button onClick={() => window.print()}
-                            className="px-5 py-2.5 bg-[#131720] border border-white/10 hover:bg-white/5 text-white text-sm rounded-lg transition">
+                            className="px-5 py-2.5 bg-[#0b0e14] border border-white/5 hover:bg-white/5 text-white text-sm rounded-lg transition">
                             Imprimir boleta
                         </button>
                         <button
@@ -488,7 +488,7 @@ const CalcularNominaPage = () => {
             {/* MODAL — CÁLCULO MASIVO */}
             {modalMasivo && (
                 <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/60">
-                    <div className="bg-[#1a1f2e] border border-white/10 rounded-xl p-6 w-full max-w-xl mx-4 max-h-[90vh] overflow-y-auto">
+                    <div className="bg-[#121621] border border-white/5 rounded-xl p-6 w-full max-w-xl mx-4 max-h-[90vh] overflow-y-auto">
                         <div className="flex justify-between items-center mb-5">
                             <h3 className="text-white font-semibold text-base">Calcular nómina — todos los empleados</h3>
                             <button onClick={() => setModalMasivo(false)} className="text-gray-400 hover:text-white text-xl leading-none">&times;</button>
@@ -509,7 +509,7 @@ const CalcularNominaPage = () => {
                                             <button
                                                 key={p.ID_PERIODO}
                                                 onClick={() => handleProcesarTodos(p)}
-                                                className="flex justify-between items-center bg-[#131720] hover:bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-left transition"
+                                                className="flex justify-between items-center bg-[#0b0e14] hover:bg-white/5 border border-white/5 rounded-lg px-4 py-3 text-left transition"
                                             >
                                                 <span className="text-white font-medium">{MESES[p.NUMERO_PERIODO]} {p.ANIO}</span>
                                                 <span className="text-xs bg-green-600/20 text-green-400 px-2 py-0.5 rounded-full">ABIERTO</span>

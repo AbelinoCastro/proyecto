@@ -6,7 +6,7 @@ const Layout = () => {
     const isDashboard = pathname === '/';
 
     return (
-        <div className="flex min-h-screen bg-[#131720]">
+        <div className="flex min-h-screen bg-[#0b0e14]">
             {!isDashboard && <Sidebar />}
             <main className="flex-1 overflow-auto p-8">
                 <Outlet />

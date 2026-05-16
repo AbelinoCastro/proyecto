@@ -48,19 +48,19 @@ const PuestosPage = () => {
         <div className="text-white">
             <div className="flex items-center justify-between mb-6">
                 <h1 className="text-xl font-semibold">Puestos</h1>
-                <div className="flex items-center gap-2 bg-[#1a1f2e] border border-white/10 rounded-lg px-3 py-2">
+                <div className="flex items-center gap-2 bg-[#121621] border border-white/5 rounded-lg px-3 py-2">
                     <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                     <input className="bg-transparent text-sm text-white placeholder-gray-500 outline-none w-48" placeholder="Buscar..." value={buscar} onChange={e => setBuscar(e.target.value)} />
                 </div>
             </div>
             <div className="flex gap-2 mb-4">
-                <button onClick={abrirCreate} className="px-4 py-2 bg-[#1a1f2e] border border-white/10 rounded-lg text-sm hover:bg-white/10 transition">+ Create</button>
-                <button onClick={abrirUpdate} disabled={!selected} className="px-4 py-2 bg-[#1a1f2e] border border-white/10 rounded-lg text-sm hover:bg-white/10 transition disabled:opacity-40">Update</button>
+                <button onClick={abrirCreate} className="px-4 py-2 bg-[#121621] border border-white/5 rounded-lg text-sm hover:bg-white/10 transition">+ Create</button>
+                <button onClick={abrirUpdate} disabled={!selected} className="px-4 py-2 bg-[#121621] border border-white/5 rounded-lg text-sm hover:bg-white/10 transition disabled:opacity-40">Update</button>
                 <button onClick={eliminar} disabled={!selected} className="px-4 py-2 bg-red-600/20 border border-red-500/30 text-red-400 rounded-lg text-sm hover:bg-red-600/30 transition disabled:opacity-40">Delete</button>
             </div>
-            <div className="bg-[#1a1f2e] rounded-xl border border-white/10 overflow-hidden">
+            <div className="bg-[#121621] rounded-xl border border-white/5 overflow-hidden">
                 <table className="w-full text-sm">
-                    <thead><tr className="border-b border-white/10">
+                    <thead><tr className="border-b border-white/5">
                         <th className="w-10 px-4 py-3"></th>
                         <th className="px-4 py-3 text-left text-xs text-gray-400 font-medium">ID</th>
                         <th className="px-4 py-3 text-left text-xs text-gray-400 font-medium">NOMBRE</th>
@@ -84,18 +84,18 @@ const PuestosPage = () => {
 
             {(modal === 'create' || modal === 'update') && (
                 <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-                    <div className="bg-[#1a1f2e] rounded-xl border border-white/10 p-6 w-full max-w-md">
+                    <div className="bg-[#121621] rounded-xl border border-white/5 p-6 w-full max-w-md">
                         <h2 className="text-lg font-semibold mb-4">{modal === 'create' ? 'Crear Puesto' : 'Actualizar Puesto'}</h2>
                         {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
                         <div className="flex flex-col gap-3">
-                            {modal === 'create' && <input className="bg-[#131720] border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none" placeholder="ID (ej: P0004)" value={form.id_puesto} onChange={e => setForm({ ...form, id_puesto: e.target.value.toUpperCase() })} />}
-                            <input className="bg-[#131720] border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none" placeholder="Nombre del puesto" value={form.nombre_puesto} onChange={e => setForm({ ...form, nombre_puesto: e.target.value })} />
-                            <select className="bg-[#131720] border border-white/10 rounded-lg px-3 py-2 text-sm text-white outline-none" value={form.id_departamento} onChange={e => setForm({ ...form, id_departamento: e.target.value })}>
+                            {modal === 'create' && <input className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none" placeholder="ID (ej: P0004)" value={form.id_puesto} onChange={e => setForm({ ...form, id_puesto: e.target.value.toUpperCase() })} />}
+                            <input className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none" placeholder="Nombre del puesto" value={form.nombre_puesto} onChange={e => setForm({ ...form, nombre_puesto: e.target.value })} />
+                            <select className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white outline-none" value={form.id_departamento} onChange={e => setForm({ ...form, id_departamento: e.target.value })}>
                                 <option value="">Selecciona departamento</option>
                                 {departamentos.map(d => <option key={d.ID_DEPARTAMENTO} value={d.ID_DEPARTAMENTO}>{d.NOMBRE_DEPARTAMENTO}</option>)}
                             </select>
-                            <input className="bg-[#131720] border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none" placeholder="Descripción (opcional)" value={form.descripcion} onChange={e => setForm({ ...form, descripcion: e.target.value })} />
-                            <input type="number" className="bg-[#131720] border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none" placeholder="Sueldo base" value={form.sueldo_base} onChange={e => setForm({ ...form, sueldo_base: e.target.value })} />
+                            <input className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none" placeholder="Descripción (opcional)" value={form.descripcion} onChange={e => setForm({ ...form, descripcion: e.target.value })} />
+                            <input type="number" className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none" placeholder="Sueldo base" value={form.sueldo_base} onChange={e => setForm({ ...form, sueldo_base: e.target.value })} />
                         </div>
                         <div className="flex justify-end gap-2 mt-5">
                             <button onClick={() => setModal(null)} className="px-4 py-2 text-sm text-gray-400 hover:text-white transition">Cancelar</button>

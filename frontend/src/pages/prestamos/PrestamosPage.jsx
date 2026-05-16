@@ -128,7 +128,7 @@ const PrestamosPage = () => {
     };
 
     return (
-        <div className="p-6 text-slate-100 min-h-screen bg-[#131720]">
+        <div className="p-6 text-slate-100 min-h-screen bg-[#0b0e14]">
             {/* Toast */}
             {toast && (
                 <div className={`fixed top-4 right-4 z-50 px-5 py-3 rounded-xl shadow-lg text-sm font-medium
@@ -138,7 +138,7 @@ const PrestamosPage = () => {
             )}
 
             {/* Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 bg-[#1a1f2e] p-5 rounded-2xl border border-slate-700/60">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 bg-[#121621] p-5 rounded-2xl border border-slate-700/60">
                 <div>
                     <h1 className="text-2xl font-bold text-white flex items-center gap-2">🏦 Gestión de Préstamos</h1>
                     <p className="text-slate-400 text-sm mt-1">Administración de cuotas y descuentos en nómina (GTQ)</p>
@@ -160,7 +160,7 @@ const PrestamosPage = () => {
             </div>
 
             {/* Tabla principal */}
-            <div className="bg-[#1a1f2e] rounded-2xl border border-slate-700/60 overflow-hidden">
+            <div className="bg-[#121621] rounded-2xl border border-slate-700/60 overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm text-left">
                         <thead className="bg-slate-800/80 text-slate-300 text-xs uppercase font-semibold">
@@ -215,7 +215,7 @@ const PrestamosPage = () => {
             {/* Modal: Cuotas */}
             {showCuotas && (
                 <div className="fixed inset-0 bg-slate-900/80 flex items-center justify-center p-4 backdrop-blur-sm z-50">
-                    <div className="bg-[#1a1f2e] border border-slate-700 rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col">
+                    <div className="bg-[#121621] border border-slate-700 rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col">
                         <div className="flex justify-between items-center p-5 border-b border-slate-700">
                             <div>
                                 <h2 className="text-lg font-bold text-white">Detalle de Cuotas</h2>
@@ -273,7 +273,7 @@ const PrestamosPage = () => {
             {showModal && (
                 <div className="fixed inset-0 bg-slate-900/80 flex items-center justify-center p-4 backdrop-blur-sm z-50">
                     <form onSubmit={handleSubmit}
-                        className="bg-[#1a1f2e] p-7 rounded-2xl border border-slate-700 w-full max-w-md space-y-5">
+                        className="bg-[#121621] p-7 rounded-2xl border border-slate-700 w-full max-w-md space-y-5">
                         <div>
                             <h2 className="text-xl font-bold text-white">Nuevo Préstamo</h2>
                             <p className="text-slate-400 text-sm mt-0.5">La cuota mensual se calcula automáticamente.</p>
@@ -290,7 +290,7 @@ const PrestamosPage = () => {
                                     <input type="number" placeholder={f.placeholder} required
                                         value={formData[f.key]}
                                         onChange={e => setFormData({ ...formData, [f.key]: e.target.value })}
-                                        className="w-full bg-[#131720] border border-slate-600 text-white p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none placeholder-slate-600" />
+                                        className="w-full bg-[#0b0e14] border border-slate-600 text-white p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none placeholder-slate-600" />
                                 </div>
                             ))}
                         </div>

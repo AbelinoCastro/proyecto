@@ -117,8 +117,8 @@ const PolizaSegurosPage = () => {
         XLSX.writeFile(wb, 'polizas_seguros.xlsx');
     };
 
-    const inputCls  = 'w-full bg-[#131720] border border-white/10 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-blue-500/50';
-    const selectCls = 'w-full bg-[#131720] border border-white/10 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-blue-500/50';
+    const inputCls  = 'w-full bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-blue-500/50';
+    const selectCls = 'w-full bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-blue-500/50';
 
     return (
         <div className="p-6 text-white min-h-screen">
@@ -152,7 +152,7 @@ const PolizaSegurosPage = () => {
             )}
 
             {/* Tabla */}
-            <div className="bg-[#1a1f2e] border border-white/10 rounded-xl overflow-hidden">
+            <div className="bg-[#121621] border border-white/5 rounded-xl overflow-hidden">
                 {loading ? (
                     <div className="p-8 text-center text-gray-500 text-sm">Cargando...</div>
                 ) : polizas.length === 0 ? (
@@ -161,7 +161,7 @@ const PolizaSegurosPage = () => {
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm">
                             <thead>
-                                <tr className="border-b border-white/10">
+                                <tr className="border-b border-white/5">
                                     {['ID', 'Empleado', 'Plan', 'Aseguradora', 'Prima mensual', 'Inicio', 'Renovación', ''].map(h => (
                                         <th key={h} className="text-left py-3 px-4 text-xs text-gray-400 font-medium">{h}</th>
                                     ))}
@@ -200,7 +200,7 @@ const PolizaSegurosPage = () => {
             {/* Modal nueva póliza */}
             {modal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-                    <div className="bg-[#1a1f2e] border border-white/10 rounded-2xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+                    <div className="bg-[#121621] border border-white/5 rounded-2xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
                         <div className="flex justify-between items-center mb-5">
                             <h3 className="text-white font-semibold text-base">Nueva póliza de seguro</h3>
                             <button onClick={() => setModal(false)} className="text-gray-400 hover:text-white text-xl leading-none">&times;</button>
@@ -281,7 +281,7 @@ const PolizaSegurosPage = () => {
                                     {saving ? 'Guardando...' : 'Registrar póliza'}
                                 </button>
                                 <button type="button" onClick={() => setModal(false)}
-                                    className="px-5 py-2 bg-[#131720] border border-white/10 hover:bg-white/5 text-white text-sm rounded-lg transition">
+                                    className="px-5 py-2 bg-[#0b0e14] border border-white/5 hover:bg-white/5 text-white text-sm rounded-lg transition">
                                     Cancelar
                                 </button>
                             </div>
