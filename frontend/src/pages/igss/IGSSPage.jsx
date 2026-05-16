@@ -12,6 +12,8 @@ const IGSSPage = () => {
     const [pagado, setPagado]               = useState(false);
     const [preview, setPreview]             = useState([]);
     const [totalIGSS, setTotalIGSS]         = useState(0);
+    const [totalEmpleado, setTotalEmpleado] = useState(0);
+    const [totalPatronal, setTotalPatronal] = useState(0);
     const [loading, setLoading]             = useState(false);
     const [toast, setToast]                 = useState(null);
 
@@ -57,6 +59,8 @@ const IGSSPage = () => {
             const d = res.data?.data || {};
             setPreview(d.empleados || []);
             setTotalIGSS(d.totalIGSS || 0);
+            setTotalEmpleado(d.totalEmpleado || 0);
+            setTotalPatronal(d.totalPatronal || 0);
         } catch {
             showToast('Error al obtener datos IGSS', 'error');
         } finally { setLoading(false); }
@@ -158,7 +162,7 @@ const IGSSPage = () => {
 
                 {/* Info rate */}
                 <div className="bg-slate-800/40 border border-slate-700/40 rounded-xl px-4 py-3 text-sm text-slate-400">
-                    Cuota laboral: <span className="text-white font-semibold">4.83%</span> sobre salario base + horas extra.
+                    Cuota laboral (empleado): <span className="text-white font-semibold">4.83%</span> · Cuota patronal (empresa): <span className="text-white font-semibold">10.67%</span> sobre salario base + horas extra.
                     La Bonificación Incentivo (Q250) <span className="text-white font-semibold">no está sujeta a IGSS</span> (Decreto 78-89).
                 </div>
 
@@ -171,7 +175,9 @@ const IGSSPage = () => {
                                     <th className="px-4 py-3">Empleado</th>
                                     <th className="px-4 py-3">No. Afiliación</th>
                                     <th className="px-4 py-3 text-right">Base IGSS</th>
-                                    <th className="px-4 py-3 text-right">IGSS (4.83%)</th>
+                                    <th className="px-4 py-3 text-right">Empleado 4.83%</th>
+                                    <th className="px-4 py-3 text-right">Patrono 10.67%</th>
+                                    <th className="px-4 py-3 text-right">Total</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-800">
@@ -180,14 +186,26 @@ const IGSSPage = () => {
                                         <td className="px-4 py-2.5 text-slate-200">{emp.EMPLEADO}</td>
                                         <td className="px-4 py-2.5 text-slate-400 font-mono text-xs">{emp.NO_AFILIACION_IGSS || '—'}</td>
                                         <td className="px-4 py-2.5 text-right text-slate-400">Q {Number(emp.IGSS_BASE || 0).toFixed(2)}</td>
-                                        <td className="px-4 py-2.5 text-right font-semibold text-blue-400">Q {Number(emp.IGSS_MONTO).toFixed(2)}</td>
+                                        <td className="px-4 py-2.5 text-right text-blue-400 font-semibold">Q {Number(emp.IGSS_EMPLEADO || emp.IGSS_MONTO || 0).toFixed(2)}</td>
+                                        <td className="px-4 py-2.5 text-right text-amber-400 font-semibold">Q {Number(emp.IGSS_PATRONAL || 0).toFixed(2)}</td>
+                                        <td className="px-4 py-2.5 text-right text-emerald-400 font-bold">Q {Number(emp.IGSS_TOTAL || 0).toFixed(2)}</td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
-                        <div className="px-4 py-3 bg-slate-800/50 flex justify-end gap-4 text-sm font-semibold">
-                            <span className="text-slate-400">Total IGSS:</span>
-                            <span className="text-blue-400">Q {Number(totalIGSS).toFixed(2)}</span>
+                        <div className="px-4 py-3 bg-slate-800/50 flex flex-col gap-1.5 text-sm">
+                            <div className="flex justify-end gap-4">
+                                <span className="text-slate-400">Total cuota empleado (4.83%):</span>
+                                <span className="text-blue-400 font-semibold w-32 text-right">Q {Number(totalEmpleado).toFixed(2)}</span>
+                            </div>
+                            <div className="flex justify-end gap-4">
+                                <span className="text-slate-400">Total cuota patronal (10.67%):</span>
+                                <span className="text-amber-400 font-semibold w-32 text-right">Q {Number(totalPatronal).toFixed(2)}</span>
+                            </div>
+                            <div className="flex justify-end gap-4 pt-1 border-t border-slate-700/60 mt-1">
+                                <span className="text-slate-200 font-bold">Total IGSS a pagar:</span>
+                                <span className="text-emerald-400 font-bold w-32 text-right">Q {Number(totalIGSS).toFixed(2)}</span>
+                            </div>
                         </div>
                     </div>
                 )}

@@ -404,6 +404,15 @@ const CalcularNominaPage = () => {
                                         ))}
                                         <div className="flex justify-between border-t border-white/5 pt-1.5 font-semibold"><span className="text-white">Total</span><span className="text-red-400">{formatQ(preview.calculo.total_deducciones)}</span></div>
                                     </div>
+                                    {preview.calculo.igss_patronal > 0 && (
+                                        <div className="mt-3 pt-3 border-t border-white/5 text-xs">
+                                            <div className="flex justify-between text-amber-400/80">
+                                                <span>IGSS patronal ({preview.calculo.igss_patronal_porcentaje}%) — paga la empresa</span>
+                                                <span className="font-semibold">{formatQ(preview.calculo.igss_patronal)}</span>
+                                            </div>
+                                            <p className="text-gray-600 mt-0.5">Este aporte no se descuenta al empleado.</p>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 

@@ -49,11 +49,12 @@ const validarNominaPagada = async (id_periodo) => {
     } finally { await conn.close(); }
 };
 
-// Registrar pago IGSS
+// Registrar pago IGSS (con total empleado + patrono)
+const IGSS_PATRONO_PCT = 10.67;
+
 const pagarIGSS = async (id_periodo) => {
     const conn = await getConnection();
     try {
-        // Verificar si ya existe
         const existe = await conn.execute(
             `SELECT COUNT(*) AS TOTAL FROM PAGO_IGSS WHERE id_periodo = :id_periodo`,
             { id_periodo: Number(id_periodo) },
@@ -62,28 +63,50 @@ const pagarIGSS = async (id_periodo) => {
         if (existe.rows[0].TOTAL > 0)
             throw new Error('El IGSS ya fue pagado para este período');
 
-        // Calcular total IGSS del período
+        // Empleado: SUM de la deducción DED01
+        // Patrono: SUM(base × 10.67%) donde base = sueldo_base + horas_extra por nómina
         const totRes = await conn.execute(
-            `SELECT NVL(SUM(d.monto), 0) AS total_igss
+            `SELECT
+                NVL(SUM(d.monto), 0) AS total_empleado,
+                NVL(SUM((NVL(p_base.monto, 0) + NVL(p_he.he_total, 0)) * :pct / 100), 0) AS total_patronal
              FROM HISTORICO_NOMINA n
-             JOIN HISTORICO_DEDUCCIONES_DETALLE d
+             LEFT JOIN HISTORICO_DEDUCCIONES_DETALLE d
                  ON d.id_nomina = n.id_nomina AND d.id_deduccion = 'DED01'
+             LEFT JOIN HISTORICO_PERCEPCIONES_DETALLE p_base
+                 ON p_base.id_nomina = n.id_nomina AND p_base.id_percepcion = 'PER01'
+             LEFT JOIN (
+                 SELECT id_nomina, SUM(monto) AS he_total
+                 FROM HISTORICO_PERCEPCIONES_DETALLE
+                 WHERE id_percepcion = 'PER05'
+                 GROUP BY id_nomina
+             ) p_he ON p_he.id_nomina = n.id_nomina
              WHERE n.id_periodo = :id_periodo AND n.estado = 'PAGADO'`,
-            { id_periodo: Number(id_periodo) },
+            { id_periodo: Number(id_periodo), pct: IGSS_PATRONO_PCT },
             { outFormat: oracledb.OUT_FORMAT_OBJECT }
         );
-        const total = Number(totRes.rows[0].TOTAL_IGSS);
+        const totalEmpleado = parseFloat(Number(totRes.rows[0].TOTAL_EMPLEADO).toFixed(2));
+        const totalPatronal = parseFloat(Number(totRes.rows[0].TOTAL_PATRONAL).toFixed(2));
+        const total = parseFloat((totalEmpleado + totalPatronal).toFixed(2));
 
         const pagoId = 'IGSS-' + Date.now().toString();
 
-        await conn.execute(
-            `INSERT INTO PAGO_IGSS (id_pago_igss, id_periodo, total, fecha_pago)
-             VALUES (:id, :periodo, :total, SYSDATE)`,
-            { id: pagoId, periodo: Number(id_periodo), total }
-        );
+        // Intentar insertar con columnas TOTAL_EMPLEADO/TOTAL_PATRONO; si no existen cae al insert simple
+        try {
+            await conn.execute(
+                `INSERT INTO PAGO_IGSS (id_pago_igss, id_periodo, total, fecha_pago, total_empleado, total_patrono)
+                 VALUES (:id, :periodo, :total, SYSDATE, :emp, :pat)`,
+                { id: pagoId, periodo: Number(id_periodo), total, emp: totalEmpleado, pat: totalPatronal }
+            );
+        } catch {
+            await conn.execute(
+                `INSERT INTO PAGO_IGSS (id_pago_igss, id_periodo, total, fecha_pago)
+                 VALUES (:id, :periodo, :total, SYSDATE)`,
+                { id: pagoId, periodo: Number(id_periodo), total }
+            );
+        }
 
         await conn.commit();
-        return { message: 'Pago IGSS registrado correctamente', total };
+        return { message: 'Pago IGSS registrado correctamente', total, total_empleado: totalEmpleado, total_patrono: totalPatronal };
     } catch (err) {
         await conn.rollback();
         throw err;

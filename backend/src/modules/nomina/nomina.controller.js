@@ -286,10 +286,12 @@ const procesarTodos = async (req, res) => {
                 const valor_hora    = sueldo_base / 30 / horas_diarias;
                 const valor_dia     = sueldo_base / 30;
 
-                const horasExtra = await model.getHorasExtra(id_empleado, anio, mes);
-                const faltas     = await model.getFaltas(id_empleado, anio, mes);
-                const dedEmp     = await asignacionesModel.getDeduccionesActivasByEmpleado(id_empleado);
-                const perEmp     = await asignacionesModel.getPercepcionesActivasByEmpleado(id_empleado);
+                const horasExtra     = await model.getHorasExtra(id_empleado, anio, mes);
+                const faltas         = await model.getFaltas(id_empleado, anio, mes);
+                const dedEmp         = await asignacionesModel.getDeduccionesActivasByEmpleado(id_empleado);
+                const perEmp         = await asignacionesModel.getPercepcionesActivasByEmpleado(id_empleado);
+                const prestamo_monto = await model.getPrestamoPendiente(id_empleado);
+                const seguro_monto   = await model.getSeguroActivo(id_empleado);
 
                 // Percepciones
                 const detalleHE = horasExtra.map(he => ({
@@ -308,6 +310,8 @@ const procesarTodos = async (req, res) => {
                 const faltasDesc = faltas.filter(f => f.ES_PAGADO === 'N');
                 const total_faltas = parseFloat((faltasDesc.length * valor_dia).toFixed(2));
                 const dedEmpArr = dedEmp.map(d => ({ id_deduccion: d.ID_DEDUCCION, monto: parseFloat(d.MONTO) }));
+                if (prestamo_monto > 0) dedEmpArr.push({ id_deduccion: 'DED06', monto: prestamo_monto });
+                if (seguro_monto   > 0) dedEmpArr.push({ id_deduccion: 'DED04', monto: seguro_monto   });
                 const total_ded_emp = dedEmpArr.reduce((s, d) => s + d.monto, 0);
                 const total_deducciones = parseFloat((igss_monto + isr_monto + total_faltas + total_ded_emp).toFixed(2));
 
