@@ -21,6 +21,26 @@ const EmpleadoPage = () => {
     const [selected, setSelected] = useState(null);
     const [modal, setModal] = useState(null);
     const [error, setError] = useState('');
+    const [errors, setErrors] = useState({});
+
+    const validar = () => {
+        const e = {};
+        if (!form.nombre?.trim()) e.nombre = true;
+        if (!form.fecha_nacimiento) e.fecha_nacimiento = true;
+        if (!form.fecha_inicio) e.fecha_inicio = true;
+        if (!form.id_puesto) e.id_puesto = true;
+        if (!form.id_jornada) e.id_jornada = true;
+        if (form.no_dpi_permiso && form.no_dpi_permiso.length !== 13) e.no_dpi_permiso = true;
+        if (form.telefono && form.telefono.length !== 8) e.telefono = true;
+        if (form.correo && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.correo)) e.correo = true;
+        setErrors(e);
+        if (Object.keys(e).length > 0) {
+            setError('Revisa los campos marcados en rojo');
+            return false;
+        }
+        setError('');
+        return true;
+    };
 
     const formInicial = { nombre: '', fecha_nacimiento: '', genero: 'M', nacionalidad: 'Guatemalteca', no_afiliacion_igss: '', no_dpi_permiso: '', fecha_inicio: '', id_puesto: '', id_jornada: '', correo: '', telefono: '', cuenta_bancaria: '', estado: 'ACTIVO', porcentaje_pago_comision: 0 };
     const [form, setForm] = useState(formInicial);
@@ -42,7 +62,7 @@ const EmpleadoPage = () => {
         d.NO_DPI_PERMISO.toLowerCase().includes(buscar.toLowerCase())
     );
 
-    const abrirCreate = () => { setForm(formInicial); setError(''); setModal('create'); };
+    const abrirCreate = () => { setForm(formInicial); setError(''); setErrors({}); setModal('create'); };
     const abrirUpdate = () => {
         if (!selected) return;
         setForm({
@@ -54,14 +74,15 @@ const EmpleadoPage = () => {
             cuenta_bancaria: selected.CUENTA_BANCARIA || '', estado: selected.ESTADO,
             porcentaje_pago_comision: selected.PORCENTAJE_PAGO_COMISION
         });
-        setError(''); setModal('update');
+        setError(''); setErrors({}); setModal('update');
     };
 
     const guardar = async () => {
+        if (!validar()) return;
         try {
             if (modal === 'create') await createEmpleado(form);
             else await updateEmpleado(selected.ID_EMPLEADO, form);
-            setModal(null); setSelected(null); cargar();
+            setModal(null); setSelected(null); setErrors({}); cargar();
         } catch (err) { setError(err.response?.data?.message || 'Error al guardar'); }
     };
 
@@ -86,7 +107,10 @@ const EmpleadoPage = () => {
     };
 
     const labelCls = "text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] mb-2 block opacity-60";
-    const inputCls = "bg-[#0b0b0b] border border-white/5 rounded-xl px-4 py-2.5 text-[12px] text-white outline-none focus:border-[#C5A028]/30 transition-all w-full shadow-inner";
+    const inputBase = "bg-[#0b0b0b] rounded-xl px-4 py-2.5 text-[12px] text-white outline-none transition-all w-full shadow-inner";
+    const inputCls = `${inputBase} border border-white/5 focus:border-[#C5A028]/30`;
+    const inputErrCls = `${inputBase} border-2 border-red-500/60 focus:border-red-500 bg-red-950/10`;
+    const cls = (field) => errors[field] ? inputErrCls : inputCls;
 
     return (
         <div className="max-w-[1450px] mx-auto py-10 px-6 animate-in fade-in duration-1000">
@@ -233,12 +257,12 @@ const EmpleadoPage = () => {
                                     <h4 className="text-[#C5A028] text-[9px] font-black uppercase tracking-[0.4em] mb-4 border-b border-[#C5A028]/10 pb-2">Información de Identidad</h4>
                                     <div>
                                         <label className={labelCls}>Nombre Legal Completo</label>
-                                        <input className={inputCls} placeholder="Ej. Juan Carlos Méndez" value={form.nombre} onChange={e => setForm({ ...form, nombre: e.target.value })} />
+                                        <input className={cls('nombre')} placeholder="Ej. Juan Carlos Méndez" value={form.nombre} onChange={e => setForm({ ...form, nombre: e.target.value })} />
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
                                             <label className={labelCls}>Nacimiento</label>
-                                            <input type="date" className={inputCls} value={form.fecha_nacimiento} onChange={e => setForm({ ...form, fecha_nacimiento: e.target.value })} />
+                                            <input type="date" className={cls('fecha_nacimiento')} value={form.fecha_nacimiento} onChange={e => setForm({ ...form, fecha_nacimiento: e.target.value })} />
                                         </div>
                                         <div>
                                             <label className={labelCls}>Género</label>
@@ -269,7 +293,7 @@ const EmpleadoPage = () => {
                                         <div>
                                             <label className={labelCls}>Documento DPI</label>
                                             <input
-                                                className={inputCls}
+                                                className={cls('no_dpi_permiso')}
                                                 inputMode="numeric"
                                                 placeholder="Ej: 1234567890101 (13 dígitos)"
                                                 value={form.no_dpi_permiso}
@@ -278,6 +302,7 @@ const EmpleadoPage = () => {
                                                 title="DPI debe tener exactamente 13 dígitos"
                                                 maxLength={13}
                                             />
+                                            {errors.no_dpi_permiso && <p className="text-red-400 text-[10px] mt-1">El DPI debe tener exactamente 13 dígitos</p>}
                                         </div>
                                     </div>
                                 </div>
@@ -288,7 +313,7 @@ const EmpleadoPage = () => {
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
                                             <label className={labelCls}>Fecha de Inicio</label>
-                                            <input type="date" className={inputCls} value={form.fecha_inicio} onChange={e => setForm({ ...form, fecha_inicio: e.target.value })} />
+                                            <input type="date" className={cls('fecha_inicio')} value={form.fecha_inicio} onChange={e => setForm({ ...form, fecha_inicio: e.target.value })} />
                                         </div>
                                         <div>
                                             <label className={labelCls}>% Comisión</label>
@@ -298,21 +323,29 @@ const EmpleadoPage = () => {
                                                 min="0" max="100" step="0.01"
                                                 placeholder="Ej: 5 (0 a 100)"
                                                 value={form.porcentaje_pago_comision}
-                                                onChange={e => setForm({ ...form, porcentaje_pago_comision: e.target.value })}
+                                                onChange={e => {
+                                                    let v = e.target.value;
+                                                    if (v === '') { setForm({ ...form, porcentaje_pago_comision: '' }); return; }
+                                                    let n = parseFloat(v);
+                                                    if (isNaN(n)) return;
+                                                    if (n < 0) n = 0;
+                                                    if (n > 100) n = 100;
+                                                    setForm({ ...form, porcentaje_pago_comision: n });
+                                                }}
                                                 title="Porcentaje entre 0 y 100"
                                             />
                                         </div>
                                     </div>
                                     <div>
                                         <label className={labelCls}>Asignación de Puesto</label>
-                                        <select className={inputCls} value={form.id_puesto} onChange={e => setForm({ ...form, id_puesto: e.target.value })}>
+                                        <select className={cls('id_puesto')} value={form.id_puesto} onChange={e => setForm({ ...form, id_puesto: e.target.value })}>
                                             <option value="">Selecciona una posición jerárquica...</option>
                                             {puestos.map(p => <option key={p.ID_PUESTO} value={p.ID_PUESTO}>{p.NOMBRE_PUESTO} — Q{Number(p.SUELDO_BASE).toLocaleString()}</option>)}
                                         </select>
                                     </div>
                                     <div>
                                         <label className={labelCls}>Jornada Laboral</label>
-                                        <select className={inputCls} value={form.id_jornada} onChange={e => setForm({ ...form, id_jornada: e.target.value })}>
+                                        <select className={cls('id_jornada')} value={form.id_jornada} onChange={e => setForm({ ...form, id_jornada: e.target.value })}>
                                             <option value="">Selecciona el régimen de horas...</option>
                                             {jornadas.map(j => <option key={j.ID_JORNADA} value={j.ID_JORNADA}>{j.NOMBRE_JORNADA} ({j.HORAS_DIARIAS}h)</option>)}
                                         </select>
@@ -334,18 +367,19 @@ const EmpleadoPage = () => {
                                             <label className={labelCls}>Correo Electrónico</label>
                                             <input
                                                 type="email"
-                                                className={inputCls}
+                                                className={cls('correo')}
                                                 placeholder="Ej: empleado@empresa.gt"
                                                 value={form.correo}
                                                 onChange={e => setForm({ ...form, correo: e.target.value })}
                                                 title="Formato: nombre@dominio.com"
                                             />
+                                            {errors.correo && <p className="text-red-400 text-[10px] mt-1">Formato de correo inválido</p>}
                                         </div>
                                         <div>
                                             <label className={labelCls}>Teléfono Contacto</label>
                                             <input
                                                 type="tel"
-                                                className={inputCls}
+                                                className={cls('telefono')}
                                                 inputMode="numeric"
                                                 placeholder="Ej: 55551234 (8 dígitos)"
                                                 value={form.telefono}
@@ -354,6 +388,7 @@ const EmpleadoPage = () => {
                                                 title="Teléfono GT: 8 dígitos"
                                                 maxLength={8}
                                             />
+                                            {errors.telefono && <p className="text-red-400 text-[10px] mt-1">El teléfono debe tener 8 dígitos</p>}
                                         </div>
                                     </div>
                                 </div>
