@@ -79,49 +79,390 @@ const HistorialPage = () => {
             if (!det) return;
             const enc = det.encabezado;
             const periodoLabel = `${MESES[(enc.NUMERO_PERIODO || 1) - 1] || enc.NUMERO_PERIODO} ${enc.ANIO}`;
+            const slug = (enc.NOMBRE_EMPLEADO || 'empleado').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-zA-Z0-9]/g, '_').replace(/_+/g, '_');
+            const tituloPDF = `Boleta_${slug}_${MESES[(enc.NUMERO_PERIODO || 1) - 1] || enc.NUMERO_PERIODO}_${enc.ANIO}`;
+            const referencia = `REF-${String(enc.ID_NOMINA).padStart(6, '0')}`;
+            const fechaPago = enc.FECHA_PAGO ? new Date(enc.FECHA_PAGO).toLocaleDateString('es-GT', { year: 'numeric', month: 'long', day: '2-digit' }) : '—';
+            const totalPercepciones = (det.percepciones || []).reduce((s, p) => s + Number(p.MONTO || 0), 0);
+            const totalDeducciones  = (det.deducciones || []).reduce((s, d) => s + Number(d.MONTO || 0), 0);
+
             const win = window.open('', '_blank');
             win.document.write(`
-                <html><head><title>Boleta ${enc.ID_NOMINA}</title>
-                <style>
-                  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;700&display=swap');
-                  body { font-family: 'Inter', sans-serif; padding: 40px; color: #1a1a1a; }
-                  .header { border-bottom: 2px solid #D4AF37; padding-bottom: 15px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: end; }
-                  .logo { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 900; }
-                  .info-grid { display: grid; grid-template-cols: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
-                  .info-box { background: #fcfcfc; padding: 12px; border-radius: 6px; border-left: 3px solid #D4AF37; }
-                  .label { font-weight: bold; text-transform: uppercase; font-size: 9px; color: #777; letter-spacing: 1px; margin-bottom: 3px; }
-                  table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-                  th { text-align: left; padding: 10px; font-size: 9px; text-transform: uppercase; border-bottom: 1px solid #eee; color: #999; }
-                  td { padding: 10px; font-size: 12px; border-bottom: 1px solid #f5f5f5; }
-                  .monto { text-align: right; font-weight: bold; }
-                  .footer { margin-top: 40px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee; padding-top: 20px; }
-                  .total-box { background: #111; color: #fff; padding: 15px 30px; border-radius: 12px; text-align: right; }
-                  .total-monto { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 900; }
-                </style></head>
+                <!DOCTYPE html>
+                <html lang="es"><head>
+                  <meta charset="UTF-8">
+                  <title>${tituloPDF}</title>
+                  <link rel="preconnect" href="https://fonts.googleapis.com">
+                  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+                  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+                  <style>
+                    * { margin: 0; padding: 0; box-sizing: border-box; }
+                    @page { size: A4; margin: 0; }
+                    body {
+                      font-family: 'Inter', sans-serif;
+                      color: #1a1a1a;
+                      background: #f5f5f5;
+                      -webkit-print-color-adjust: exact;
+                      print-color-adjust: exact;
+                    }
+                    .page {
+                      max-width: 800px;
+                      margin: 30px auto;
+                      background: white;
+                      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+                      padding: 0;
+                      overflow: hidden;
+                    }
+                    /* Header dorado oscuro */
+                    .hero {
+                      background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 50%, #1f2937 100%);
+                      color: white;
+                      padding: 40px 50px;
+                      position: relative;
+                      overflow: hidden;
+                    }
+                    .hero::before {
+                      content: '';
+                      position: absolute;
+                      top: -50%;
+                      right: -10%;
+                      width: 400px;
+                      height: 400px;
+                      background: radial-gradient(circle, rgba(197,160,40,0.15) 0%, transparent 70%);
+                    }
+                    .hero-content { position: relative; display: flex; justify-content: space-between; align-items: flex-start; }
+                    .brand-logo {
+                      font-family: 'Playfair Display', serif;
+                      font-size: 36px;
+                      font-weight: 900;
+                      letter-spacing: -1px;
+                      line-height: 1;
+                    }
+                    .brand-logo span { color: #C5A028; }
+                    .brand-tag {
+                      font-size: 9px;
+                      letter-spacing: 0.4em;
+                      color: rgba(255,255,255,0.5);
+                      text-transform: uppercase;
+                      margin-top: 6px;
+                      font-weight: 700;
+                    }
+                    .doc-meta {
+                      text-align: right;
+                      padding: 16px 20px;
+                      background: rgba(197,160,40,0.12);
+                      border: 1px solid rgba(197,160,40,0.3);
+                      border-radius: 12px;
+                    }
+                    .doc-meta-label {
+                      font-size: 9px;
+                      letter-spacing: 0.3em;
+                      color: #C5A028;
+                      text-transform: uppercase;
+                      font-weight: 800;
+                      margin-bottom: 4px;
+                    }
+                    .doc-meta-value {
+                      font-family: 'Playfair Display', serif;
+                      font-size: 22px;
+                      font-weight: 700;
+                      color: white;
+                    }
+                    .doc-ref { font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 2px; font-family: monospace; }
+
+                    /* Title section */
+                    .title-section { padding: 36px 50px 24px; text-align: center; border-bottom: 1px solid #f0f0f0; }
+                    .title-section h1 {
+                      font-family: 'Playfair Display', serif;
+                      font-size: 32px;
+                      font-weight: 900;
+                      color: #1a1a1a;
+                      letter-spacing: -0.5px;
+                      line-height: 1.1;
+                    }
+                    .title-section p {
+                      font-size: 11px;
+                      letter-spacing: 0.3em;
+                      color: #888;
+                      text-transform: uppercase;
+                      font-weight: 600;
+                      margin-top: 8px;
+                    }
+
+                    /* Info cards */
+                    .info-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 28px 50px; }
+                    .info-card {
+                      background: #fafafa;
+                      padding: 18px 22px;
+                      border-radius: 10px;
+                      border-left: 3px solid #C5A028;
+                      position: relative;
+                    }
+                    .info-card .label {
+                      font-size: 9px;
+                      letter-spacing: 0.3em;
+                      color: #999;
+                      text-transform: uppercase;
+                      font-weight: 700;
+                      margin-bottom: 8px;
+                    }
+                    .info-card .value {
+                      font-size: 15px;
+                      font-weight: 700;
+                      color: #1a1a1a;
+                      line-height: 1.3;
+                    }
+                    .info-card .subtitle {
+                      font-size: 11px;
+                      color: #666;
+                      margin-top: 4px;
+                      font-weight: 500;
+                    }
+
+                    /* Tables section */
+                    .tables { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 20px 50px 30px; }
+                    .table-block { display: flex; flex-direction: column; }
+                    .table-title {
+                      font-family: 'Playfair Display', serif;
+                      font-size: 18px;
+                      font-weight: 700;
+                      margin-bottom: 12px;
+                      padding-bottom: 8px;
+                      border-bottom: 2px solid;
+                      display: flex;
+                      align-items: center;
+                      gap: 8px;
+                    }
+                    .table-block.income .table-title { color: #0f7a3d; border-color: #0f7a3d; }
+                    .table-block.expense .table-title { color: #9b1c1c; border-color: #9b1c1c; }
+                    .item-row {
+                      display: flex;
+                      justify-content: space-between;
+                      align-items: center;
+                      padding: 11px 4px;
+                      border-bottom: 1px dashed #e5e5e5;
+                      font-size: 12px;
+                    }
+                    .item-row:last-of-type { border-bottom: none; }
+                    .item-name { color: #444; font-weight: 500; }
+                    .item-amount { font-weight: 700; font-family: 'Inter', sans-serif; }
+                    .income .item-amount { color: #0f7a3d; }
+                    .expense .item-amount { color: #9b1c1c; }
+                    .subtotal-row {
+                      display: flex;
+                      justify-content: space-between;
+                      align-items: center;
+                      margin-top: 12px;
+                      padding-top: 12px;
+                      border-top: 2px solid;
+                      font-size: 11px;
+                      letter-spacing: 0.15em;
+                      text-transform: uppercase;
+                      font-weight: 800;
+                    }
+                    .income .subtotal-row { color: #0f7a3d; border-color: #0f7a3d; }
+                    .expense .subtotal-row { color: #9b1c1c; border-color: #9b1c1c; }
+                    .subtotal-row .amount { font-size: 16px; }
+
+                    /* Footer / total */
+                    .total-section {
+                      margin: 0 50px 40px;
+                      background: linear-gradient(135deg, #0f1419 0%, #1f2937 100%);
+                      color: white;
+                      border-radius: 16px;
+                      padding: 28px 36px;
+                      display: flex;
+                      justify-content: space-between;
+                      align-items: center;
+                      position: relative;
+                      overflow: hidden;
+                    }
+                    .total-section::before {
+                      content: '';
+                      position: absolute;
+                      bottom: -50%;
+                      right: -10%;
+                      width: 300px;
+                      height: 300px;
+                      background: radial-gradient(circle, rgba(197,160,40,0.2) 0%, transparent 70%);
+                    }
+                    .total-section .info {
+                      position: relative;
+                    }
+                    .total-section .label {
+                      font-size: 9px;
+                      letter-spacing: 0.4em;
+                      color: #C5A028;
+                      text-transform: uppercase;
+                      font-weight: 800;
+                      margin-bottom: 6px;
+                    }
+                    .total-section .name {
+                      font-size: 13px;
+                      color: rgba(255,255,255,0.6);
+                    }
+                    .total-section .amount {
+                      position: relative;
+                      text-align: right;
+                    }
+                    .total-section .amount-label {
+                      font-size: 9px;
+                      letter-spacing: 0.4em;
+                      color: #C5A028;
+                      text-transform: uppercase;
+                      font-weight: 800;
+                      margin-bottom: 4px;
+                    }
+                    .total-section .amount-value {
+                      font-family: 'Playfair Display', serif;
+                      font-size: 42px;
+                      font-weight: 900;
+                      color: white;
+                      line-height: 1;
+                      letter-spacing: -1px;
+                    }
+                    .total-section .amount-words {
+                      font-size: 10px;
+                      color: rgba(255,255,255,0.5);
+                      font-style: italic;
+                      margin-top: 4px;
+                    }
+
+                    /* Signature & footer */
+                    .signature-area {
+                      padding: 0 50px 30px;
+                      display: grid;
+                      grid-template-columns: 1fr 1fr;
+                      gap: 60px;
+                    }
+                    .signature-line {
+                      border-top: 1px solid #999;
+                      padding-top: 8px;
+                      text-align: center;
+                      font-size: 10px;
+                      letter-spacing: 0.2em;
+                      color: #666;
+                      text-transform: uppercase;
+                      font-weight: 600;
+                      margin-top: 30px;
+                    }
+                    .footer-bar {
+                      background: #1a1f2e;
+                      color: #999;
+                      padding: 16px 50px;
+                      display: flex;
+                      justify-content: space-between;
+                      align-items: center;
+                      font-size: 9px;
+                      letter-spacing: 0.2em;
+                      text-transform: uppercase;
+                    }
+                    .footer-bar .left { color: #C5A028; font-weight: 700; }
+
+                    @media print {
+                      body { background: white; }
+                      .page { box-shadow: none; margin: 0; max-width: 100%; }
+                    }
+                  </style></head>
                 <body>
-                <div class="header">
-                  <div class="logo">NóminaGT</div>
-                  <h3 style="margin:0; font-family:'Playfair Display'">Comprobante de Pago</h3>
-                </div>
-                <div class="info-grid">
-                  <div class="info-box"><p class="label">Colaborador</p><p><strong>${enc.NOMBRE_EMPLEADO}</strong></p><p style="font-size:11px; color:#555">${enc.NOMBRE_PUESTO}</p></div>
-                  <div class="info-box"><p class="label">Ciclo Operativo</p><p><strong>${periodoLabel}</strong></p></div>
-                </div>
-                <div style="display:grid; grid-template-cols: 1fr 1fr; gap: 30px">
-                  <div><h4 class="label">Ingresos</h4><table><thead><tr><th>Descripción</th><th class="monto">Monto</th></tr></thead><tbody>
-                  ${(det.percepciones || []).map(p => `<tr><td>${p.NOMBRE_PERCEPCION}</td><td class="monto">Q ${Number(p.MONTO).toFixed(2)}</td></tr>`).join('')}
-                  </tbody></table></div>
-                  <div><h4 class="label">Egresos</h4><table><thead><tr><th>Descripción</th><th class="monto">Monto</th></tr></thead><tbody>
-                  ${(det.deducciones || []).map(d => `<tr><td>${d.NOMBRE_DEDUCCION}</td><td class="monto">Q ${Number(d.MONTO).toFixed(2)}</td></tr>`).join('')}
-                  </tbody></table></div>
-                </div>
-                <div class="footer">
-                  <p class="label">Emitido el ${new Date(enc.FECHA_PAGO).toLocaleDateString('es-GT')}</p>
-                  <div class="total-box"><p class="label" style="color:#aaa">Neto Pagado</p><p class="total-monto">Q ${Number(enc.LIQUIDO_A_PAGAR).toFixed(2)}</p></div>
-                </div>
+                  <div class="page">
+                    <!-- Hero header -->
+                    <div class="hero">
+                      <div class="hero-content">
+                        <div>
+                          <div class="brand-logo">Nómina<span>GT</span></div>
+                          <p class="brand-tag">Enterprise · v 4.2</p>
+                        </div>
+                        <div class="doc-meta">
+                          <p class="doc-meta-label">Ciclo Operativo</p>
+                          <p class="doc-meta-value">${periodoLabel}</p>
+                          <p class="doc-ref">${referencia}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Title -->
+                    <div class="title-section">
+                      <h1>Comprobante de Pago de Nómina</h1>
+                      <p>Documento Oficial · Reservados los derechos</p>
+                    </div>
+
+                    <!-- Info cards -->
+                    <div class="info-cards">
+                      <div class="info-card">
+                        <p class="label">Colaborador</p>
+                        <p class="value">${enc.NOMBRE_EMPLEADO || '—'}</p>
+                        <p class="subtitle">${enc.NOMBRE_PUESTO || '—'}${enc.NOMBRE_DEPARTAMENTO ? ' · ' + enc.NOMBRE_DEPARTAMENTO : ''}</p>
+                      </div>
+                      <div class="info-card">
+                        <p class="label">Fecha de Pago</p>
+                        <p class="value">${fechaPago}</p>
+                        <p class="subtitle">Procesado vía sistema NóminaGT</p>
+                      </div>
+                    </div>
+
+                    <!-- Tables -->
+                    <div class="tables">
+                      <div class="table-block income">
+                        <h3 class="table-title">▲ Percepciones</h3>
+                        ${(det.percepciones || []).map(p => `
+                          <div class="item-row">
+                            <span class="item-name">${p.NOMBRE_PERCEPCION}</span>
+                            <span class="item-amount">${formatQ(p.MONTO)}</span>
+                          </div>
+                        `).join('')}
+                        <div class="subtotal-row">
+                          <span>Total ingresos</span>
+                          <span class="amount">${formatQ(totalPercepciones)}</span>
+                        </div>
+                      </div>
+
+                      <div class="table-block expense">
+                        <h3 class="table-title">▼ Deducciones</h3>
+                        ${(det.deducciones || []).length > 0
+                          ? (det.deducciones || []).map(d => `
+                            <div class="item-row">
+                              <span class="item-name">${d.NOMBRE_DEDUCCION}</span>
+                              <span class="item-amount">${formatQ(d.MONTO)}</span>
+                            </div>
+                          `).join('')
+                          : '<div class="item-row"><span class="item-name" style="color:#999;font-style:italic">Sin deducciones aplicables</span><span class="item-amount">${formatQ(0)}</span></div>'
+                        }
+                        <div class="subtotal-row">
+                          <span>Total egresos</span>
+                          <span class="amount">${formatQ(totalDeducciones)}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Líquido a pagar -->
+                    <div class="total-section">
+                      <div class="info">
+                        <p class="label">Beneficiario</p>
+                        <p class="name">${enc.NOMBRE_EMPLEADO || '—'}</p>
+                      </div>
+                      <div class="amount">
+                        <p class="amount-label">Líquido a Pagar</p>
+                        <p class="amount-value">${formatQ(enc.LIQUIDO_A_PAGAR)}</p>
+                        <p class="amount-words">Moneda: Quetzales (GTQ)</p>
+                      </div>
+                    </div>
+
+                    <!-- Signatures -->
+                    <div class="signature-area">
+                      <div class="signature-line">Firma del Colaborador</div>
+                      <div class="signature-line">Autorización RRHH</div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="footer-bar">
+                      <span class="left">NóminaGT · Enterprise</span>
+                      <span>Documento generado el ${new Date().toLocaleDateString('es-GT', { year: 'numeric', month: 'long', day: '2-digit' })}</span>
+                    </div>
+                  </div>
                 </body></html>`);
             win.document.close();
-            win.print();
+            setTimeout(() => win.print(), 600);
         } catch { alert('Error al cargar detalle'); }
     };
 

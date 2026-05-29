@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
+import { updateEstadoHoraExtra } from '../../services/horasextraService';
 
 const API = 'http://localhost:4000/api';
 
@@ -62,11 +63,11 @@ const RegistroHorasExtra = () => {
 
   const actualizarEstado = async (id, nuevoEstado) => {
     try {
-      await axios.put(`${API}/horasextra/${id}`, { estado: nuevoEstado });
+      await updateEstadoHoraExtra(id, nuevoEstado);
       await fetchHorasExtra();
-      mostrarToast(`Registro actualizado a ${nuevoEstado} correctamente.`);
+      mostrarToast(`Registro ${nuevoEstado === 'APROBADO' ? 'aprobado' : 'rechazado'} correctamente.`);
     } catch (e) {
-      mostrarToast(e.response?.data?.message || 'Error al actualizar estado', 'error');
+      mostrarToast(e.response?.data?.message || e.response?.data?.error || 'Error al actualizar estado', 'error');
     }
   };
 
@@ -191,8 +192,14 @@ const RegistroHorasExtra = () => {
                       <div className="flex justify-center gap-2">
                         {h.ESTADO === 'PENDIENTE' ? (
                           <>
-                            <button onClick={() => actualizarEstado(h.ID_HORA_EXTRA, 'APROBADO')} className="gold-button text-[9px] px-3 py-1.5 rounded-md shadow-lg active:scale-95">Aprobar</button>
-                            <button onClick={() => actualizarEstado(h.ID_HORA_EXTRA, 'RECHAZADO')} className="dark-button text-[9px] px-3 py-1.5 rounded-md border-red-500/20 text-red-500 hover:bg-red-500/10 active:scale-95">Rechazar</button>
+                            <button onClick={() => actualizarEstado(h.ID_HORA_EXTRA, 'APROBADO')} className="gold-button text-[9px] px-3 py-1.5 rounded-md shadow-lg active:scale-95 flex items-center gap-1.5">
+                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7"/></svg>
+                              Aprobar
+                            </button>
+                            <button onClick={() => actualizarEstado(h.ID_HORA_EXTRA, 'RECHAZADO')} className="dark-button text-[9px] px-3 py-1.5 rounded-md border-red-500/20 text-red-500 hover:bg-red-500/10 active:scale-95 flex items-center gap-1.5">
+                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12"/></svg>
+                              Rechazar
+                            </button>
                           </>
                         ) : (
                           <div className="flex items-center gap-2 text-emerald-500/60 text-[9px] font-black uppercase tracking-widest bg-emerald-500/5 px-4 py-1.5 rounded-lg border border-emerald-500/10">
@@ -254,20 +261,49 @@ const RegistroHorasExtra = () => {
                         </select>
                     </div>
                     <div>
-                        <label className={labelCls}>Fecha</label>
-                        <input type="date" name="fecha" value={formData.fecha} onChange={handleChange} className={inputCls} />
+                        <label className={labelCls}>Fecha de horas trabajadas</label>
+                        <input
+                            type="date"
+                            name="fecha"
+                            value={formData.fecha}
+                            onChange={handleChange}
+                            max={new Date().toISOString().slice(0, 10)}
+                            className={inputCls}
+                            title="Solo fechas pasadas o de hoy"
+                        />
                     </div>
                   </div>
                   <div>
                     <label className={labelCls}>Cantidad Horas</label>
-                    <input type="number" step="0.5" name="cantidad" placeholder="0.0" value={formData.cantidad} onChange={handleChange} className={inputCls} />
+                    <input
+                        type="number"
+                        step="0.5"
+                        min="0.5"
+                        max="12"
+                        name="cantidad"
+                        placeholder="Ej: 2.5"
+                        value={formData.cantidad}
+                        onChange={handleChange}
+                        className={inputCls}
+                        title="Entre 0.5 y 12 horas"
+                    />
                   </div>
                 </div>
               </div>
 
               <div className="mb-10">
                   <label className={labelCls}>Justificación Operativa</label>
-                  <textarea rows="1" name="justificacion" placeholder="Motivo del registro..." value={formData.justificacion} onChange={handleChange} className={inputCls + " resize-none"} />
+                  <textarea
+                      rows="1"
+                      name="justificacion"
+                      placeholder="Ej: Apoyo en cierre contable de fin de mes"
+                      maxLength={250}
+                      value={formData.justificacion}
+                      onChange={handleChange}
+                      onInput={(e) => { e.target.value = e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ0-9\s.,]/g, '').slice(0, 250); }}
+                      className={inputCls + " resize-none"}
+                      title="Sin caracteres especiales, máx 250 caracteres"
+                  />
               </div>
 
               <div className="flex gap-4 border-t border-white/5 pt-8">

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getUsuarios, createUsuario, updateUsuario, cambiarPassword, cambiarEstadoUsr } from '../../services/usuarioService';
+import { getUsuarios, createUsuario, updateUsuario, cambiarPassword, cambiarEstadoUsr, deleteUsuario } from '../../services/usuarioService';
 import { getTiposUsuario } from '../../services/tipoUsuarioService';
 import { getEmpleados } from '../../services/empleadoService';
 import EstadoBadge from '../../components/EstadoBadge';
@@ -79,14 +79,31 @@ const UsuariosPage = () => {
         setModal('estado');
     };
 
+    const validarPassword = (p) => {
+        if (!p || p.length < 8) return 'La contraseña debe tener al menos 8 caracteres';
+        if (!/[A-Z]/.test(p)) return 'La contraseña debe contener al menos una letra mayúscula';
+        if (!/[a-z]/.test(p)) return 'La contraseña debe contener al menos una letra minúscula';
+        if (!/\d/.test(p)) return 'La contraseña debe contener al menos un número';
+        if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?~`]/.test(p)) return 'La contraseña debe contener al menos un símbolo';
+        return null;
+    };
+
     const guardar = async () => {
         try {
             if (modal === 'create') {
+                const errPwd = validarPassword(form.password);
+                if (errPwd) return setError(errPwd);
                 await createUsuario(form);
             } else if (modal === 'update') {
                 await updateUsuario(selected.ID_USUARIO, { id_tipo_usuario: form.id_tipo_usuario, username: form.username });
             } else if (modal === 'password') {
-                if (form.password.length < 8) return setError('La contraseña debe tener al menos 8 caracteres');
+                // Validación robusta: 8+ caracteres, una mayúscula, una minúscula, un número y un símbolo
+                const p = form.password || '';
+                if (p.length < 8) return setError('La contraseña debe tener al menos 8 caracteres');
+                if (!/[A-Z]/.test(p)) return setError('La contraseña debe contener al menos una letra mayúscula');
+                if (!/[a-z]/.test(p)) return setError('La contraseña debe contener al menos una letra minúscula');
+                if (!/\d/.test(p)) return setError('La contraseña debe contener al menos un número');
+                if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?~`]/.test(p)) return setError('La contraseña debe contener al menos un símbolo (!@#$...)');
                 await cambiarPassword(selected.ID_USUARIO, { password: form.password });
             }
             setModal(null);
@@ -107,6 +124,18 @@ const UsuariosPage = () => {
             setToast({ mensaje: `Estatus actualizado a ${nuevoEstado}`, tipo: 'exito' });
         } catch (err) {
             setError(err.response?.data?.message || 'Error al actualizar estatus');
+        }
+    };
+
+    const eliminar = async () => {
+        try {
+            await deleteUsuario(selected.ID_USUARIO);
+            setModal(null);
+            setSelected(null);
+            cargar();
+            setToast({ mensaje: 'Usuario eliminado correctamente', tipo: 'exito' });
+        } catch (err) {
+            setError(err.response?.data?.message || 'Error al eliminar usuario');
         }
     };
 
@@ -158,7 +187,14 @@ const UsuariosPage = () => {
                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg>
                         Seguridad
                     </button>
-                    <button onClick={abrirEstado} disabled={!selected} className="dark-button text-[9px] uppercase tracking-widest px-5 py-2.5 disabled:opacity-20">Estatus</button>
+                    <button onClick={abrirEstado} disabled={!selected} className="dark-button text-[9px] uppercase tracking-widest px-5 py-2.5 disabled:opacity-20 flex items-center gap-2">
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                        Estatus
+                    </button>
+                    <button onClick={() => { setError(''); setModal('eliminar'); }} disabled={!selected} className="bg-red-500/10 border border-red-500/20 text-red-500 px-5 py-2.5 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-red-500/20 transition-all disabled:opacity-20 flex items-center gap-2">
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M14 7V4a1 1 0 00-1-1h-2a1 1 0 00-1 1v3" /></svg>
+                        Eliminar
+                    </button>
                 </div>
             </div>
 
@@ -280,13 +316,14 @@ const UsuariosPage = () => {
                                         <label className={labelCls}>Clave de Acceso Inicial *</label>
                                         <input
                                             className={inputCls}
-                                            placeholder="Mínimo 8 caracteres, mezcla letras y números"
+                                            placeholder="Mínimo 8 caracteres con mayúscula, minúscula, número y símbolo"
                                             type="password"
                                             minLength={8}
                                             value={form.password}
                                             onChange={e => setForm({ ...form, password: e.target.value })}
-                                            title="Mínimo 8 caracteres"
+                                            title="Requisitos: 8+ chars, A-Z, a-z, 0-9, símbolo"
                                         />
+                                        <p className="text-[10px] text-gray-500 mt-1">Mínimo 8 caracteres · 1 mayúscula · 1 minúscula · 1 número · 1 símbolo</p>
                                     </div>
                                 )}
                             </div>
@@ -342,6 +379,31 @@ const UsuariosPage = () => {
                                 </button>
                             ))}
                             <button onClick={() => setModal(null)} className="w-full mt-4 text-[9px] font-black text-gray-600 uppercase tracking-widest hover:text-white transition-colors">Descartar</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal Eliminar Usuario */}
+            {modal === 'eliminar' && selected && (
+                <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-md p-4">
+                    <div className="luxury-card max-w-md w-full border-t-2 border-t-red-500/40 shadow-2xl">
+                        <div className="border-b border-white/[0.04] px-8 py-6">
+                            <p className="text-red-500 text-[10px] font-black uppercase tracking-[0.4em] mb-1 opacity-60">Confirmación</p>
+                            <h3 className="font-serif-title text-3xl text-white tracking-tighter">Eliminar Usuario</h3>
+                        </div>
+                        <div className="p-8 space-y-5">
+                            {error && <p className="text-red-400 text-[11px] font-bold uppercase tracking-widest bg-red-500/5 p-4 rounded-xl border border-red-500/10 text-center">{error}</p>}
+                            <p className="text-gray-400 text-[12px] leading-relaxed">
+                                ¿Confirmas eliminar permanentemente al usuario <span className="text-white font-bold">{selected.USERNAME}</span>?
+                                Esta acción no se puede deshacer.
+                            </p>
+                            <div className="flex gap-3 pt-4">
+                                <button onClick={() => setModal(null)} className="flex-1 dark-button py-4 text-[10px] uppercase tracking-widest">Cancelar</button>
+                                <button onClick={eliminar} className="flex-1 bg-red-500 hover:bg-red-600 text-white py-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
+                                    Eliminar
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

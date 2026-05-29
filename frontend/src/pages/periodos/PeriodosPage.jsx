@@ -64,9 +64,10 @@ const PeriodosPage = () => {
                 </div>
                 <button
                     onClick={() => { setModal(true); setError(''); }}
-                    className="gold-button text-[11px] uppercase tracking-[0.2em] py-3 shadow-2xl"
+                    className="gold-button text-[11px] uppercase tracking-[0.2em] py-3 shadow-2xl flex items-center gap-2"
                 >
-                    + Nuevo Ciclo de Nómina
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                    Nuevo Ciclo de Nómina
                 </button>
             </div>
 
@@ -116,15 +117,17 @@ const PeriodosPage = () => {
                                             {p.ESTADO === 'ABIERTO' ? (
                                                 <button
                                                     onClick={() => handleCambiarEstado(p, 'CERRADO')}
-                                                    className="px-5 py-2 text-[10px] font-black uppercase tracking-widest bg-red-600/10 border border-red-600/20 text-red-500 rounded-lg hover:bg-red-600 hover:text-white transition-all shadow-lg"
+                                                    className="px-5 py-2 text-[10px] font-black uppercase tracking-widest bg-red-600/10 border border-red-600/20 text-red-500 rounded-lg hover:bg-red-600 hover:text-white transition-all shadow-lg flex items-center gap-2"
                                                 >
+                                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
                                                     Cerrar Período
                                                 </button>
                                             ) : (
                                                 <button
                                                     onClick={() => handleCambiarEstado(p, 'ABIERTO')}
-                                                    className="px-5 py-2 text-[10px] font-black uppercase tracking-widest bg-emerald-600/10 border border-emerald-600/20 text-emerald-500 rounded-lg hover:bg-emerald-600 hover:text-white transition-all shadow-lg"
+                                                    className="px-5 py-2 text-[10px] font-black uppercase tracking-widest bg-emerald-600/10 border border-emerald-600/20 text-emerald-500 rounded-lg hover:bg-emerald-600 hover:text-white transition-all shadow-lg flex items-center gap-2"
                                                 >
+                                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/></svg>
                                                     Reabrir Período
                                                 </button>
                                             )}

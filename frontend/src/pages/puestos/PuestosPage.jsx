@@ -39,9 +39,19 @@ const PuestosPage = () => {
     };
 
     const eliminar = async () => {
-        if (!selected || !window.confirm(`¿Eliminar "${selected.NOMBRE_PUESTO}"?`)) return;
-        try { await deletePuesto(selected.ID_PUESTO); setSelected(null); cargar(); }
-        catch (err) { alert(err.response?.data?.message || 'Error al eliminar'); }
+        if (!selected || !window.confirm(`¿Eliminar el puesto "${selected.NOMBRE_PUESTO}"?\n\nNo podrás eliminarlo si tiene empleados asignados.`)) return;
+        try {
+            await deletePuesto(selected.ID_PUESTO);
+            setSelected(null);
+            cargar();
+        }
+        catch (err) {
+            const msg = err.response?.data?.message || err.response?.data?.details || 'Error al eliminar';
+            // El backend devuelve "No se puede eliminar, tiene empleados asignados" cuando hay FK
+            alert(msg.includes('FK') || msg.includes('empleados') || msg.includes('child')
+                ? `No se puede eliminar "${selected.NOMBRE_PUESTO}" porque tiene empleados asignados.\n\nReasigna o da de baja a los empleados primero.`
+                : msg);
+        }
     };
 
     return (
@@ -54,9 +64,9 @@ const PuestosPage = () => {
                 </div>
             </div>
             <div className="flex gap-2 mb-4">
-                <button onClick={abrirCreate} className="px-4 py-2 bg-[#121621] border border-white/5 rounded-lg text-sm hover:bg-white/10 transition">+ Create</button>
-                <button onClick={abrirUpdate} disabled={!selected} className="px-4 py-2 bg-[#121621] border border-white/5 rounded-lg text-sm hover:bg-white/10 transition disabled:opacity-40">Update</button>
-                <button onClick={eliminar} disabled={!selected} className="px-4 py-2 bg-red-600/20 border border-red-500/30 text-red-400 rounded-lg text-sm hover:bg-red-600/30 transition disabled:opacity-40">Delete</button>
+                <button onClick={abrirCreate} className="px-4 py-2 bg-[#121621] border border-white/5 rounded-lg text-sm hover:bg-white/10 transition flex items-center gap-2"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>Crear</button>
+                <button onClick={abrirUpdate} disabled={!selected} className="px-4 py-2 bg-[#121621] border border-white/5 rounded-lg text-sm hover:bg-white/10 transition disabled:opacity-40 flex items-center gap-2"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>Editar</button>
+                <button onClick={eliminar} disabled={!selected} className="px-4 py-2 bg-red-600/20 border border-red-500/30 text-red-400 rounded-lg text-sm hover:bg-red-600/30 transition disabled:opacity-40 flex items-center gap-2"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M14 7V4a1 1 0 00-1-1h-2a1 1 0 00-1 1v3"/></svg>Eliminar</button>
             </div>
             <div className="bg-[#121621] rounded-xl border border-white/5 overflow-hidden">
                 <table className="w-full text-sm">
@@ -97,6 +107,8 @@ const PuestosPage = () => {
                                         maxLength={10}
                                         value={form.id_puesto}
                                         onChange={e => setForm({ ...form, id_puesto: e.target.value.toUpperCase() })}
+                                        onInput={(e) => { e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10); }}
+                                        title="Solo letras y números"
                                     />
                                 </div>
                             )}
@@ -108,6 +120,8 @@ const PuestosPage = () => {
                                     maxLength={80}
                                     value={form.nombre_puesto}
                                     onChange={e => setForm({ ...form, nombre_puesto: e.target.value })}
+                                    onInput={(e) => { e.target.value = e.target.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]/g, '').slice(0, 80); }}
+                                    title="Solo letras y espacios"
                                 />
                             </div>
                             <div>

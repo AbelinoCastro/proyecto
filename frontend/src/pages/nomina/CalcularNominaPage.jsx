@@ -175,20 +175,39 @@ const CalcularNominaPage = () => {
                             value={mes}
                             onChange={e => { setMes(parseInt(e.target.value)); setPreview(null); setResultado(null); setError(''); setErrorTipo(''); }}
                         >
-                            {MESES.slice(1).map((m, i) => (
-                                <option key={i + 1} value={i + 1}>{m}</option>
-                            ))}
+                            {(() => {
+                                // Solo meses con período ABIERTO en el año seleccionado
+                                const mesesDisponibles = periodos
+                                    .filter(p => p.ANIO === anio)
+                                    .map(p => p.NUMERO_PERIODO)
+                                    .sort((a, b) => a - b);
+                                if (mesesDisponibles.length === 0) {
+                                    return <option value="">Sin períodos abiertos en este año</option>;
+                                }
+                                return mesesDisponibles.map(m => (
+                                    <option key={m} value={m}>{MESES[m]}</option>
+                                ));
+                            })()}
                         </select>
                     </div>
                     <div className="md:col-span-3">
                         <label className={labelCls}>Año Calendario</label>
-                        <input
-                            type="number"
+                        <select
                             className={inputCls}
                             value={anio}
                             onChange={e => { setAnio(parseInt(e.target.value)); setPreview(null); setResultado(null); setError(''); setErrorTipo(''); }}
-                            min={2020} max={2099}
-                        />
+                        >
+                            {(() => {
+                                // Solo años con períodos ABIERTOS
+                                const aniosDisponibles = [...new Set(periodos.map(p => p.ANIO))].sort((a, b) => b - a);
+                                if (aniosDisponibles.length === 0) {
+                                    return <option value="">Sin períodos abiertos</option>;
+                                }
+                                return aniosDisponibles.map(a => (
+                                    <option key={a} value={a}>{a}</option>
+                                ));
+                            })()}
+                        </select>
                     </div>
                 </div>
 

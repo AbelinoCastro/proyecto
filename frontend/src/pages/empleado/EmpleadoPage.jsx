@@ -4,7 +4,7 @@ import { getPuestos } from '../../services/puestosService';
 import { getJornadas } from '../../services/jornadasService';
 import { getMotivosBaja } from '../../services/motivoBajaService';
 import EstadoBadge from '../../components/EstadoBadge';
-import { digitsMax, decimalFormat } from '../../utils/validators';
+import { digitsMax, lettersMax } from '../../utils/validators';
 
 const formatFecha = (iso) => {
     if (!iso) return '—';
@@ -257,7 +257,14 @@ const EmpleadoPage = () => {
                                     <h4 className="text-[#C5A028] text-[9px] font-black uppercase tracking-[0.4em] mb-4 border-b border-[#C5A028]/10 pb-2">Información de Identidad</h4>
                                     <div>
                                         <label className={labelCls}>Nombre Legal Completo</label>
-                                        <input className={cls('nombre')} placeholder="Ej. Juan Carlos Méndez" value={form.nombre} onChange={e => setForm({ ...form, nombre: e.target.value })} />
+                                        <input
+                                            className={cls('nombre')}
+                                            placeholder="Ej. Juan Carlos Méndez"
+                                            value={form.nombre}
+                                            onChange={e => setForm({ ...form, nombre: e.target.value })}
+                                            onInput={lettersMax(100)}
+                                            maxLength={100}
+                                            title="Solo letras y espacios" />
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
@@ -275,7 +282,14 @@ const EmpleadoPage = () => {
                                     </div>
                                     <div>
                                         <label className={labelCls}>Nacionalidad</label>
-                                        <input className={inputCls} value={form.nacionalidad} onChange={e => setForm({ ...form, nacionalidad: e.target.value })} />
+                                        <input
+                                            className={inputCls}
+                                            value={form.nacionalidad}
+                                            onChange={e => setForm({ ...form, nacionalidad: e.target.value })}
+                                            onInput={lettersMax(50)}
+                                            maxLength={50}
+                                            placeholder="Ej: Guatemalteca"
+                                            title="Solo letras" />
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>

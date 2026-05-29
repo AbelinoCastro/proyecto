@@ -74,39 +74,85 @@ const getISRPreviewPDF = async (req, res) => {
             const igss = Number(emp.IGSS) || 0;
             return { nombre: emp.EMPLEADO, base_isr: percepciones - igss, isr: Number(emp.ISR_RETENIDO) || 0 };
         });
+        const totalISR = empleados.reduce((s, e) => s + e.isr, 0);
 
-        const doc = new PDFDocument({ margin: 50 });
+        const GOLD = '#C5A028', DARK = '#0f1419', SLATE = '#1f2937', MUTED = '#6b7280';
+
+        const doc = new PDFDocument({ margin: 0, size: 'A4', bufferPages: true });
         res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `inline; filename=preview_isr_${id_periodo}.pdf`);
+        res.setHeader('Content-Disposition', `inline; filename=Preview_ISR_${id_periodo}.pdf`);
         doc.pipe(res);
 
-        doc.fontSize(18).text('Reporte de ISR', { align: 'center' }).moveDown();
-        doc.fontSize(10).text(`Período: ${id_periodo}`, { align: 'right' }).moveDown();
+        const W = doc.page.width;
+        const M = 50;
 
-        let y = doc.y;
-        doc.font('Helvetica-Bold');
-        doc.text('Empleado', 50, y);
-        doc.text('Base ISR', 300, y);
-        doc.text('ISR', 450, y);
-        y += 20;
-        doc.font('Helvetica');
+        // Hero
+        doc.rect(0, 0, W, 110).fill(DARK);
+        doc.rect(0, 105, W, 5).fill(GOLD);
+        doc.fillColor('white').font('Helvetica-Bold').fontSize(24).text('NóminaGT', M, 32, { lineBreak: false });
+        doc.fillColor(GOLD).fontSize(24).text('.', M + 125, 32);
+        doc.fillColor('#9ca3af').fontSize(7).font('Helvetica').text('ENTERPRISE · v 4.2', M, 62, { characterSpacing: 3 });
 
-        let totalISR = 0;
+        doc.fillColor(GOLD).fontSize(7).font('Helvetica-Bold')
+           .text('PREVIEW', W - M - 100, 32, { width: 100, align: 'right', characterSpacing: 2 });
+        doc.fillColor('white').fontSize(13).font('Helvetica-Bold')
+           .text(`Período ${id_periodo}`, W - M - 100, 47, { width: 100, align: 'right' });
+
+        // Título
+        doc.fillColor(DARK).font('Helvetica-Bold').fontSize(20)
+           .text('Reporte de Cálculo ISR', M, 135, { align: 'center', width: W - 2 * M });
+        doc.fillColor(MUTED).fontSize(8).font('Helvetica')
+           .text('Previo a liquidación · No constituye comprobante de pago', M, 162, { align: 'center', width: W - 2 * M, characterSpacing: 2 });
+
+        // Tabla
+        let y = 195;
+        doc.rect(M, y, W - 2 * M, 22).fill(DARK);
+        doc.fillColor(GOLD).fontSize(7).font('Helvetica-Bold');
+        doc.text('EMPLEADO',       M + 10,  y + 8, { width: 220, characterSpacing: 1.5 });
+        doc.text('BASE GRAVABLE',  M + 240, y + 8, { width: 120, align: 'right', characterSpacing: 1.5 });
+        doc.text('ISR MENSUAL',    M + 370, y + 8, { width: 125, align: 'right', characterSpacing: 1.5 });
+        y += 22;
+
+        let rowIdx = 0;
         for (const emp of empleados) {
-            totalISR += emp.isr;
-            doc.text(emp.nombre, 50, y);
-            doc.text(`Q ${Number(emp.base_isr).toFixed(2)}`, 300, y);
-            doc.text(`Q ${Number(emp.isr).toFixed(2)}`, 450, y);
-            y += 18;
+            if (rowIdx % 2 === 0) doc.rect(M, y, W - 2 * M, 22).fill('#f8f8f8');
+            doc.fillColor(DARK).font('Helvetica').fontSize(9);
+            doc.text((emp.nombre || '').substring(0, 42), M + 10, y + 7, { width: 220, lineBreak: false });
+            doc.text(fmtQ(emp.base_isr), M + 240, y + 7, { width: 120, align: 'right' });
+            doc.fillColor('#d97706').font('Helvetica-Bold');
+            doc.text(fmtQ(emp.isr), M + 370, y + 7, { width: 125, align: 'right' });
+            y += 22;
+            rowIdx++;
             if (y > 700) { doc.addPage(); y = 50; }
         }
 
-        doc.moveDown().font('Helvetica-Bold').text(`Total ISR: Q ${totalISR.toFixed(2)}`, { align: 'right' });
+        y += 20;
+        doc.roundedRect(M, y, W - 2 * M, 70, 12).fill(DARK);
+        doc.rect(M, y, 6, 70).fill(GOLD);
+        doc.fillColor(GOLD).fontSize(8).font('Helvetica-Bold')
+           .text('TOTAL ISR ESTIMADO DEL PERÍODO', M + 25, y + 15, { characterSpacing: 3 });
+        doc.fillColor('white').fontSize(24).font('Helvetica-Bold')
+           .text(fmtQ(totalISR), M + 25, y + 32, { width: W - 2 * M - 50, align: 'right' });
+
+        // Footer
+        const range = doc.bufferedPageRange();
+        for (let i = range.start; i < range.start + range.count; i++) {
+            doc.switchToPage(i);
+            doc.rect(0, 800, W, 42).fill(SLATE);
+            doc.fillColor(GOLD).fontSize(7).font('Helvetica-Bold')
+               .text('NóminaGT · Enterprise', M, 815, { characterSpacing: 2 });
+            doc.fillColor('#9ca3af').fontSize(7).font('Helvetica')
+               .text(`Página ${i - range.start + 1} de ${range.count}`, M, 815, { width: W - 2 * M, align: 'center' });
+            doc.text(`Generado ${new Date().toLocaleDateString('es-GT')}`, M, 815, { width: W - 2 * M, align: 'right' });
+        }
+
         doc.end();
     } catch (err) {
         if (!res.headersSent) return error(res, 'Error generando PDF', 500, err.message);
     }
 };
+
+const fmtQ = (n) => `Q ${Number(n || 0).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 // GET /api/sat/isr-comprobante-pdf/:id_periodo
 const getComprobanteISRPDF = async (req, res) => {
@@ -116,56 +162,150 @@ const getComprobanteISRPDF = async (req, res) => {
         const patrono = await model.getPatronoActivo();
 
         const empresa = patrono?.RAZON_SOCIAL || 'Empresa';
+        const nit = patrono?.NIT || 'N/A';
         const numeroPatronal = patrono?.NUMERO_PATRONAL || 'N/A';
         const total = Number(comprobante.pago.TOTAL);
         const fecha = comprobante.pago.FECHA_PAGO
-            ? new Date(comprobante.pago.FECHA_PAGO).toLocaleDateString('es-GT')
+            ? new Date(comprobante.pago.FECHA_PAGO).toLocaleDateString('es-GT', { year: 'numeric', month: 'long', day: '2-digit' })
             : new Date().toLocaleDateString('es-GT');
+        const referencia = `ISR-${String(id_periodo).padStart(6, '0')}`;
 
-        const doc = new PDFDocument({ margin: 50 });
+        // Colores
+        const GOLD     = '#C5A028';
+        const DARK     = '#0f1419';
+        const SLATE    = '#1f2937';
+        const MUTED    = '#6b7280';
+        const LIGHT_BG = '#fafafa';
+
+        const doc = new PDFDocument({ margin: 0, size: 'A4', bufferPages: true });
         res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `inline; filename=comprobante_isr_${id_periodo}.pdf`);
+        res.setHeader('Content-Disposition', `inline; filename=Comprobante_ISR_${id_periodo}.pdf`);
         doc.pipe(res);
 
-        doc.fontSize(18).text('COMPROBANTE DE PAGO ISR', { align: 'center' });
-        doc.moveDown(0.5);
-        doc.fontSize(12).text(empresa, { align: 'center' });
-        doc.text(`Registro Patronal: ${numeroPatronal}`, { align: 'center' });
-        doc.moveDown(2);
+        const W = doc.page.width;
+        const M = 50;
 
-        doc.fontSize(12).text(`Período: ${id_periodo}`).text(`Fecha de pago: ${fecha}`);
-        doc.moveDown();
-        doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke();
-        doc.moveDown(2);
+        // ═══════════════════ HERO ═══════════════════
+        doc.rect(0, 0, W, 130).fill(DARK);
+        doc.rect(0, 125, W, 5).fill(GOLD);
 
-        // Tabla de detalle
-        let y = doc.y;
-        doc.font('Helvetica-Bold');
-        doc.text('Empleado', 50, y);
-        doc.text('Base ISR', 300, y);
-        doc.text('ISR Retenido', 430, y);
-        y += 20;
-        doc.font('Helvetica');
+        doc.fillColor('white').font('Helvetica-Bold').fontSize(28).text('NóminaGT', M, 35, { lineBreak: false });
+        doc.fillColor(GOLD).fontSize(28).text('.', M + 145, 35);
+        doc.fillColor('#9ca3af').fontSize(8).font('Helvetica').text('ENTERPRISE · v 4.2', M, 70, { characterSpacing: 3 });
 
+        doc.fillColor(GOLD).fontSize(8).font('Helvetica-Bold')
+           .text('REFERENCIA', W - M - 150, 35, { width: 150, align: 'right', characterSpacing: 2 });
+        doc.fillColor('white').fontSize(16).font('Helvetica-Bold')
+           .text(referencia, W - M - 150, 50, { width: 150, align: 'right' });
+        doc.fillColor('#9ca3af').fontSize(8).font('Helvetica')
+           .text(`Período ${id_periodo}`, W - M - 150, 75, { width: 150, align: 'right' });
+        doc.text(fecha, W - M - 150, 88, { width: 150, align: 'right' });
+
+        // ═══════════════════ TÍTULO ═══════════════════
+        doc.fillColor(DARK).font('Helvetica-Bold').fontSize(24)
+           .text('Comprobante de Retención ISR', M, 160, { align: 'center', width: W - 2 * M });
+        doc.fillColor(MUTED).fontSize(9).font('Helvetica')
+           .text('Superintendencia de Administración Tributaria · SAT', M, 195, { align: 'center', width: W - 2 * M, characterSpacing: 2 });
+
+        const lineY = 220;
+        doc.moveTo(W / 2 - 30, lineY).lineTo(W / 2 + 30, lineY).lineWidth(2).stroke(GOLD);
+
+        // ═══════════════════ INFO CARDS (entidad) ═══════════════════
+        const cardY = 245;
+        const cardW = (W - 2 * M - 15) / 2;
+        const cardH = 75;
+
+        // Card empresa
+        doc.roundedRect(M, cardY, cardW, cardH, 8).fill(LIGHT_BG);
+        doc.rect(M, cardY, 4, cardH).fill(GOLD);
+        doc.fillColor(MUTED).fontSize(7).font('Helvetica-Bold')
+           .text('AGENTE RETENEDOR', M + 16, cardY + 14, { characterSpacing: 2 });
+        doc.fillColor(DARK).fontSize(12).font('Helvetica-Bold')
+           .text(empresa.substring(0, 38), M + 16, cardY + 30, { width: cardW - 30 });
+        doc.fillColor(MUTED).fontSize(8).font('Helvetica')
+           .text(`NIT: ${nit} · Patronal: ${numeroPatronal}`, M + 16, cardY + 52);
+
+        // Card resumen
+        const c2x = M + cardW + 15;
+        doc.roundedRect(c2x, cardY, cardW, cardH, 8).fill(LIGHT_BG);
+        doc.rect(c2x, cardY, 4, cardH).fill(GOLD);
+        doc.fillColor(MUTED).fontSize(7).font('Helvetica-Bold')
+           .text('EMPLEADOS GRAVADOS', c2x + 16, cardY + 14, { characterSpacing: 2 });
+        doc.fillColor(DARK).fontSize(13).font('Helvetica-Bold')
+           .text(`${comprobante.detalle.length} colaboradores`, c2x + 16, cardY + 30);
+        doc.fillColor(MUTED).fontSize(8).font('Helvetica')
+           .text('Retención sobre planilla mensual', c2x + 16, cardY + 52);
+
+        // ═══════════════════ TABLA ═══════════════════
+        let y = cardY + cardH + 30;
+
+        doc.fillColor(DARK).font('Helvetica-Bold').fontSize(11)
+           .text('Detalle de Retenciones', M, y);
+        y += 22;
+
+        doc.rect(M, y, W - 2 * M, 22).fill(DARK);
+        doc.fillColor(GOLD).fontSize(7).font('Helvetica-Bold');
+        doc.text('EMPLEADO',      M + 10,  y + 8, { width: 200, characterSpacing: 1.5 });
+        doc.text('BASE GRAVABLE', M + 230, y + 8, { width: 120, align: 'right', characterSpacing: 1.5 });
+        doc.text('ISR RETENIDO',  M + 360, y + 8, { width: 135, align: 'right', characterSpacing: 1.5 });
+        y += 22;
+
+        let rowIdx = 0;
         for (const row of comprobante.detalle) {
-            doc.text(row.NOMBRE, 50, y);
-            doc.text(`Q ${Number(row.BASE_ISR).toFixed(2)}`, 300, y);
-            doc.text(`Q ${Number(row.ISR_MONTO).toFixed(2)}`, 430, y);
-            y += 18;
+            const rowH = 22;
+            if (rowIdx % 2 === 0) {
+                doc.rect(M, y, W - 2 * M, rowH).fill('#f8f8f8');
+            }
+            doc.fillColor(DARK).font('Helvetica').fontSize(9);
+            doc.text((row.NOMBRE || '').substring(0, 40), M + 10, y + 7, { width: 200, lineBreak: false });
+            doc.text(fmtQ(row.BASE_ISR), M + 230, y + 7, { width: 120, align: 'right' });
+            doc.fillColor('#d97706').font('Helvetica-Bold');
+            doc.text(fmtQ(row.ISR_MONTO), M + 360, y + 7, { width: 135, align: 'right' });
+            y += rowH;
+            rowIdx++;
             if (y > 700) { doc.addPage(); y = 50; }
         }
 
-        doc.moveDown(2);
-        doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke();
-        doc.moveDown(2);
-        doc.fontSize(14).text('TOTAL PAGADO:', { align: 'center' });
-        doc.fontSize(20).fillColor('green').text(`Q ${total.toFixed(2)}`, { align: 'center' });
-        doc.fillColor('black').moveDown(2);
-        doc.fontSize(30).fillColor('green').text('PAGADO', { align: 'center' });
-        doc.fillColor('black').moveDown();
-        doc.fontSize(10).text('Este documento certifica que el ISR ha sido pagado ante la SAT.', { align: 'center' });
+        y += 10;
+
+        // ═══════════════════ TOTAL HERO ═══════════════════
+        const totalCardH = 90;
+        if (y + totalCardH > 720) { doc.addPage(); y = 50; }
+
+        doc.roundedRect(M, y, W - 2 * M, totalCardH, 12).fill(DARK);
+        doc.rect(M, y, 6, totalCardH).fill(GOLD);
+
+        doc.fillColor(GOLD).fontSize(8).font('Helvetica-Bold')
+           .text('TOTAL ISR RETENIDO Y PAGADO A SAT', M + 25, y + 18, { characterSpacing: 3 });
+        doc.fillColor('#9ca3af').fontSize(9).font('Helvetica')
+           .text('Decreto 10-2012 · Régimen de personas en relación de dependencia', M + 25, y + 35);
+        doc.fillColor('white').fontSize(28).font('Helvetica-Bold')
+           .text(fmtQ(total), M + 25, y + 50, { width: W - 2 * M - 50, align: 'right' });
+        y += totalCardH + 15;
+
+        // Sello PAGADO
+        if (y + 50 > 750) { doc.addPage(); y = 50; }
+        doc.fillColor('#10b981').fontSize(36).font('Helvetica-Bold')
+           .text('✓ PAGADO', M, y, { align: 'center', width: W - 2 * M, characterSpacing: 4 });
+
+        // ═══════════════════ FOOTER ═══════════════════
+        const range = doc.bufferedPageRange();
+        for (let i = range.start; i < range.start + range.count; i++) {
+            doc.switchToPage(i);
+            doc.rect(0, 800, W, 42).fill(SLATE);
+            doc.fillColor(GOLD).fontSize(7).font('Helvetica-Bold')
+               .text('NóminaGT · Enterprise', M, 815, { characterSpacing: 2 });
+            doc.fillColor('#9ca3af').fontSize(7).font('Helvetica')
+               .text(`Página ${i - range.start + 1} de ${range.count}`, M, 815, { width: W - 2 * M, align: 'center' });
+            doc.text(`Generado ${new Date().toLocaleDateString('es-GT')}`, M, 815, { width: W - 2 * M, align: 'right' });
+            doc.fillColor('#6b7280').fontSize(6).font('Helvetica-Oblique')
+               .text('Este documento certifica que el ISR ha sido retenido y pagado ante la Superintendencia de Administración Tributaria (SAT).',
+                     M, 828, { width: W - 2 * M, align: 'center' });
+        }
+
         doc.end();
     } catch (err) {
+        console.error('Error PDF ISR:', err);
         if (!res.headersSent) return error(res, 'Error al generar comprobante PDF', 500, err.message);
     }
 };

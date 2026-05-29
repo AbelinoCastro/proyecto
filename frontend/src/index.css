@@ -18,6 +18,72 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
+  /* 🌙 Calendarios y selectores de tiempo en modo oscuro
+     color-scheme: dark le dice al navegador (Chrome/Edge/Firefox) que use
+     la versión dark de los popups nativos del input. Sin esto, el calendario
+     se ve negro sobre negro. */
+  input[type="date"],
+  input[type="time"],
+  input[type="datetime-local"],
+  input[type="month"],
+  input[type="week"] {
+    color-scheme: dark;
+  }
+
+  /* Icono del calendario y reloj: dorado brillante */
+  input[type="date"]::-webkit-calendar-picker-indicator,
+  input[type="time"]::-webkit-calendar-picker-indicator,
+  input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+  input[type="month"]::-webkit-calendar-picker-indicator,
+  input[type="week"]::-webkit-calendar-picker-indicator {
+    /* Dorado #C5A028 brillante */
+    filter: invert(75%) sepia(85%) saturate(450%) hue-rotate(0deg) brightness(105%) contrast(95%);
+    cursor: pointer;
+    opacity: 1;
+    transition: filter 0.2s, transform 0.15s;
+  }
+
+  input[type="date"]::-webkit-calendar-picker-indicator:hover,
+  input[type="time"]::-webkit-calendar-picker-indicator:hover,
+  input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
+    filter: invert(75%) sepia(100%) saturate(700%) hue-rotate(0deg) brightness(120%) contrast(110%);
+    transform: scale(1.1);
+  }
+
+  /* Asegurar que el placeholder del date se vea en gris claro */
+  input[type="date"]::-webkit-datetime-edit-text,
+  input[type="date"]::-webkit-datetime-edit-month-field,
+  input[type="date"]::-webkit-datetime-edit-day-field,
+  input[type="date"]::-webkit-datetime-edit-year-field {
+    color: #e5e7eb;
+  }
+}
+
+/* 🖨️ Estilos para impresión — solo muestra la boleta, oculta sidebar y controles */
+@media print {
+  body { background: white !important; color: black !important; }
+  /* Oculta sidebar, headers, botones */
+  aside, nav, header, .no-print, button { display: none !important; }
+  /* Quita backgrounds oscuros */
+  * {
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+    border-color: #ddd !important;
+  }
+  /* Tablas con bordes legibles */
+  table { width: 100% !important; border-collapse: collapse !important; }
+  table th, table td {
+    border: 1px solid #ccc !important;
+    padding: 6px !important;
+    font-size: 11px !important;
+    color: black !important;
+  }
+  /* Encabezados resaltados */
+  h1, h2, h3, h4 { color: #1a1a1a !important; }
+  /* Esconder el botón mismo y el sticky */
+  .sticky, .fixed { position: static !important; }
 }
 
 @layer components {

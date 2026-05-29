@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getDepartamentos, createDepartamento, updateDepartamento, deleteDepartamento } from '../../services/departamentosService';
 import EstadoBadge from '../../components/EstadoBadge';
+import { codeMax, safeTextMax, lettersMax } from '../../utils/validators';
 
 const DepartamentosPage = () => {
     const [datos, setDatos] = useState([]);
@@ -46,9 +47,9 @@ const DepartamentosPage = () => {
                 </div>
             </div>
             <div className="flex gap-2 mb-4">
-                <button onClick={abrirCreate} className="px-4 py-2 bg-[#121621] border border-white/5 rounded-lg text-sm hover:bg-white/10 transition">+ Create</button>
-                <button onClick={abrirUpdate} disabled={!selected} className="px-4 py-2 bg-[#121621] border border-white/5 rounded-lg text-sm hover:bg-white/10 transition disabled:opacity-40">Update</button>
-                <button onClick={eliminar} disabled={!selected} className="px-4 py-2 bg-red-600/20 border border-red-500/30 text-red-400 rounded-lg text-sm hover:bg-red-600/30 transition disabled:opacity-40">Delete</button>
+                <button onClick={abrirCreate} className="px-4 py-2 bg-[#121621] border border-white/5 rounded-lg text-sm hover:bg-white/10 transition flex items-center gap-2"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>Crear</button>
+                <button onClick={abrirUpdate} disabled={!selected} className="px-4 py-2 bg-[#121621] border border-white/5 rounded-lg text-sm hover:bg-white/10 transition disabled:opacity-40 flex items-center gap-2"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>Editar</button>
+                <button onClick={eliminar} disabled={!selected} className="px-4 py-2 bg-red-600/20 border border-red-500/30 text-red-400 rounded-lg text-sm hover:bg-red-600/30 transition disabled:opacity-40 flex items-center gap-2"><svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M14 7V4a1 1 0 00-1-1h-2a1 1 0 00-1 1v3"/></svg>Eliminar</button>
             </div>
             <div className="bg-[#121621] rounded-xl border border-white/5 overflow-hidden">
                 <table className="w-full text-sm">
@@ -89,6 +90,8 @@ const DepartamentosPage = () => {
                                         maxLength={5}
                                         value={form.id_departamento}
                                         onChange={e => setForm({ ...form, id_departamento: e.target.value })}
+                                        onInput={codeMax(5)}
+                                        title="Solo letras y números, sin caracteres especiales"
                                     />
                                 </div>
                             )}
@@ -100,6 +103,8 @@ const DepartamentosPage = () => {
                                     maxLength={80}
                                     value={form.nombre_departamento}
                                     onChange={e => setForm({ ...form, nombre_departamento: e.target.value })}
+                                    onInput={lettersMax(80)}
+                                    title="Solo letras y espacios"
                                 />
                             </div>
                             <div>
@@ -110,6 +115,8 @@ const DepartamentosPage = () => {
                                     maxLength={200}
                                     value={form.descripcion}
                                     onChange={e => setForm({ ...form, descripcion: e.target.value })}
+                                    onInput={safeTextMax(200)}
+                                    title="Sin caracteres especiales"
                                 />
                             </div>
                             <div>

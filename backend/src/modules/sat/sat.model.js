@@ -137,7 +137,9 @@ const getPatronoActivo = async () => {
     const conn = await getConnection();
     try {
         const result = await conn.execute(
-            `SELECT razon_social, numero_patronal FROM PATRONO WHERE ROWNUM = 1`,
+            `SELECT razon_social, numero_patronal, nit
+             FROM PATRONO
+             ORDER BY id_patrono FETCH FIRST 1 ROW ONLY`,
             [],
             { outFormat: oracledb.OUT_FORMAT_OBJECT }
         );
