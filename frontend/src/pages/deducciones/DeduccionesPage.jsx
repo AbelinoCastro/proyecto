@@ -72,9 +72,38 @@ const DeduccionesPage = () => {
                         <h2 className="text-lg font-semibold mb-4">{modal === 'create' ? 'Crear Deducción' : 'Actualizar Deducción'}</h2>
                         {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
                         <div className="flex flex-col gap-3">
-                            {modal === 'create' && <input className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none" placeholder="ID (ej: DED01)" value={form.id_deduccion} onChange={e => setForm({ ...form, id_deduccion: e.target.value.toUpperCase() })} />}
-                            <input className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none" placeholder="Nombre" value={form.nombre_deduccion} onChange={e => setForm({ ...form, nombre_deduccion: e.target.value })} />
-                            <input className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none" placeholder="Fórmula (opcional)" value={form.descripcion_formula} onChange={e => setForm({ ...form, descripcion_formula: e.target.value })} />
+                            {modal === 'create' && (
+                                <div>
+                                    <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">ID Deducción *</label>
+                                    <input
+                                        className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none w-full"
+                                        placeholder="Ej: DED01 (código corto)"
+                                        maxLength={10}
+                                        value={form.id_deduccion}
+                                        onChange={e => setForm({ ...form, id_deduccion: e.target.value.toUpperCase() })}
+                                    />
+                                </div>
+                            )}
+                            <div>
+                                <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Nombre *</label>
+                                <input
+                                    className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none w-full"
+                                    placeholder="Ej: IGSS, ISR, Préstamo Bantrab"
+                                    maxLength={80}
+                                    value={form.nombre_deduccion}
+                                    onChange={e => setForm({ ...form, nombre_deduccion: e.target.value })}
+                                />
+                            </div>
+                            <div>
+                                <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Fórmula / Descripción</label>
+                                <input
+                                    className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none w-full"
+                                    placeholder="Ej: 4.83% del salario / Cuota mensual fija"
+                                    maxLength={150}
+                                    value={form.descripcion_formula}
+                                    onChange={e => setForm({ ...form, descripcion_formula: e.target.value })}
+                                />
+                            </div>
                         </div>
                         <div className="flex justify-end gap-2 mt-5">
                             <button onClick={() => setModal(null)} className="px-4 py-2 text-sm text-gray-400 hover:text-white transition">Cancelar</button>

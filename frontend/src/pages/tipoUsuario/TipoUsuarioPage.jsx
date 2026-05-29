@@ -153,25 +153,37 @@ const TipoUsuarioPage = () => {
                         {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
                         <div className="flex flex-col gap-3">
                             {modal === 'create' && (
-                                <input
-                                    className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none"
-                                    placeholder="ID (ej: ADM)"
-                                    value={form.id_tipo_usuario}
-                                    onChange={e => setForm({ ...form, id_tipo_usuario: e.target.value.toUpperCase() })}
-                                />
+                                <div>
+                                    <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">ID Tipo Usuario *</label>
+                                    <input
+                                        className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none w-full"
+                                        placeholder="Ej: ADM, RH, VEN (3 letras)"
+                                        maxLength={10}
+                                        value={form.id_tipo_usuario}
+                                        onChange={e => setForm({ ...form, id_tipo_usuario: e.target.value.toUpperCase() })}
+                                    />
+                                </div>
                             )}
-                            <input
-                                className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none"
-                                placeholder="Nombre"
-                                value={form.nombre}
-                                onChange={e => setForm({ ...form, nombre: e.target.value })}
-                            />
-                            <input
-                                className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none"
-                                placeholder="Descripción (opcional)"
-                                value={form.descripcion}
-                                onChange={e => setForm({ ...form, descripcion: e.target.value })}
-                            />
+                            <div>
+                                <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Nombre *</label>
+                                <input
+                                    className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none w-full"
+                                    placeholder="Ej: Administrador, Recursos Humanos"
+                                    maxLength={50}
+                                    value={form.nombre}
+                                    onChange={e => setForm({ ...form, nombre: e.target.value })}
+                                />
+                            </div>
+                            <div>
+                                <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Descripción</label>
+                                <input
+                                    className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none w-full"
+                                    placeholder="Ej: Acceso completo al sistema"
+                                    maxLength={150}
+                                    value={form.descripcion}
+                                    onChange={e => setForm({ ...form, descripcion: e.target.value })}
+                                />
+                            </div>
                         </div>
                         <div className="flex justify-end gap-2 mt-5">
                             <button onClick={() => setModal(null)} className="px-4 py-2 text-sm text-gray-400 hover:text-white transition">Cancelar</button>

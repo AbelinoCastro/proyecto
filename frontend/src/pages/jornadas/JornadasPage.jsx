@@ -77,14 +77,70 @@ const JornadasPage = () => {
                         <h2 className="text-lg font-semibold mb-4">{modal === 'create' ? 'Crear Jornada' : 'Actualizar Jornada'}</h2>
                         {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
                         <div className="flex flex-col gap-3">
-                            {modal === 'create' && <input className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none" placeholder="ID (ej: J1)" value={form.id_jornada} onChange={e => setForm({ ...form, id_jornada: e.target.value })} />}
-                            <input className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none" placeholder="Nombre" value={form.nombre_jornada} onChange={e => setForm({ ...form, nombre_jornada: e.target.value })} />
-                            <input className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none" placeholder="Descripción (opcional)" value={form.descripcion} onChange={e => setForm({ ...form, descripcion: e.target.value })} />
-                            <div className="flex gap-2">
-                                <input className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none flex-1" placeholder="Hora inicio (08:00)" value={form.hora_inicio} onChange={e => setForm({ ...form, hora_inicio: e.target.value })} />
-                                <input className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none flex-1" placeholder="Hora fin (17:00)" value={form.hora_fin} onChange={e => setForm({ ...form, hora_fin: e.target.value })} />
+                            {modal === 'create' && (
+                                <div>
+                                    <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">ID Jornada</label>
+                                    <input
+                                        className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none w-full"
+                                        placeholder="Ej: J1, J2 (máx 10 caracteres)"
+                                        maxLength={10}
+                                        value={form.id_jornada}
+                                        onChange={e => setForm({ ...form, id_jornada: e.target.value.toUpperCase() })}
+                                        title="Identificador único, ej: J1"
+                                    />
+                                </div>
+                            )}
+                            <div>
+                                <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Nombre *</label>
+                                <input
+                                    className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none w-full"
+                                    placeholder="Ej: Matutina, Vespertina, Nocturna"
+                                    maxLength={50}
+                                    value={form.nombre_jornada}
+                                    onChange={e => setForm({ ...form, nombre_jornada: e.target.value })}
+                                />
                             </div>
-                            <input type="number" className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none" placeholder="Horas diarias" value={form.horas_diarias} onChange={e => setForm({ ...form, horas_diarias: e.target.value })} />
+                            <div>
+                                <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Descripción</label>
+                                <input
+                                    className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none w-full"
+                                    placeholder="Ej: Turno laboral de mañana"
+                                    maxLength={200}
+                                    value={form.descripcion}
+                                    onChange={e => setForm({ ...form, descripcion: e.target.value })}
+                                />
+                            </div>
+                            <div className="flex gap-2">
+                                <div className="flex-1">
+                                    <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Hora inicio</label>
+                                    <input
+                                        type="time"
+                                        className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none w-full"
+                                        value={form.hora_inicio}
+                                        onChange={e => setForm({ ...form, hora_inicio: e.target.value })}
+                                    />
+                                </div>
+                                <div className="flex-1">
+                                    <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Hora fin</label>
+                                    <input
+                                        type="time"
+                                        className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none w-full"
+                                        value={form.hora_fin}
+                                        onChange={e => setForm({ ...form, hora_fin: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Horas diarias *</label>
+                                <input
+                                    type="number" min="1" max="12" step="0.5"
+                                    className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none w-full"
+                                    placeholder="Ej: 8 (entre 1 y 12)"
+                                    value={form.horas_diarias}
+                                    onChange={e => setForm({ ...form, horas_diarias: e.target.value })}
+                                    title="Horas por jornada (1-12)"
+                                />
+                            </div>
                         </div>
                         <div className="flex justify-end gap-2 mt-5">
                             <button onClick={() => setModal(null)} className="px-4 py-2 text-sm text-gray-400 hover:text-white transition">Cancelar</button>

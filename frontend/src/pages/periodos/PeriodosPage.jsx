@@ -50,130 +50,121 @@ const PeriodosPage = () => {
         }
     };
 
-    const inputCls = 'bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white outline-none w-full';
-    const selectCls = 'bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white outline-none w-full';
+    const labelCls = "text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-2 block";
+    const inputCls = "bg-[#0b0b0b] border border-white/5 rounded-lg px-4 py-2 text-[13px] text-white outline-none focus:border-[#C5A028]/30 transition-all w-full";
 
     return (
-        <div className="text-white">
-            <div className="flex items-center justify-between mb-6">
-                <h1 className="text-xl font-semibold">Períodos de Nómina</h1>
+        <div className="max-w-[1100px] mx-auto py-10 px-6 animate-in fade-in duration-700">
+
+            {/* Header / Titulo */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+                <div>
+                    <p className="text-[#C5A028] text-[10px] font-black uppercase tracking-[0.4em] mb-3 opacity-60">Configuración Cronológica</p>
+                    <h1 className="font-serif-title text-5xl text-white tracking-tight">Períodos Operativos</h1>
+                </div>
                 <button
                     onClick={() => { setModal(true); setError(''); }}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition"
+                    className="gold-button text-[11px] uppercase tracking-[0.2em] py-3 shadow-2xl"
                 >
-                    + Crear período
+                    + Nuevo Ciclo de Nómina
                 </button>
             </div>
 
             {error && (
-                <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
+                <div className="mb-8 p-4 bg-red-500/5 border border-red-500/20 rounded-xl text-red-400 text-xs font-bold uppercase tracking-widest flex items-center gap-3">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     {error}
                 </div>
             )}
 
-            {/* TABLA */}
-            <div className="bg-[#121621] rounded-xl border border-white/5 overflow-hidden">
-                <table className="w-full text-sm">
-                    <thead>
-                        <tr className="border-b border-white/5">
-                            <th className="px-4 py-3 text-left text-xs text-gray-400 font-medium">Período</th>
-                            <th className="px-4 py-3 text-left text-xs text-gray-400 font-medium">Fecha inicio</th>
-                            <th className="px-4 py-3 text-left text-xs text-gray-400 font-medium">Fecha fin</th>
-                            <th className="px-4 py-3 text-left text-xs text-gray-400 font-medium">Fecha cierre</th>
-                            <th className="px-4 py-3 text-left text-xs text-gray-400 font-medium">Estado</th>
-                            <th className="px-4 py-3 text-left text-xs text-gray-400 font-medium">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {periodos.length === 0 && (
-                            <tr>
-                                <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
-                                    No hay períodos registrados
-                                </td>
+            {/* LISTADO DE PERÍODOS (Más intuitivo y con botones visibles) */}
+            <div className="luxury-card overflow-hidden shadow-2xl">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="border-b border-white/[0.04] bg-white/[0.01]">
+                                <th className="px-8 py-6 text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Mes y Año</th>
+                                <th className="px-8 py-6 text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Rango de Fecha</th>
+                                <th className="px-8 py-6 text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">Estado Actual</th>
+                                <th className="px-8 py-6 text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] text-right">Acciones de Control</th>
                             </tr>
-                        )}
-                        {periodos.map(p => (
-                            <tr key={p.ID_PERIODO} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                                <td className="px-4 py-3 font-medium">
-                                    {MESES[p.NUMERO_PERIODO]} {p.ANIO}
-                                </td>
-                                <td className="px-4 py-3 text-gray-400">{formatFecha(p.FECHA_INICIO)}</td>
-                                <td className="px-4 py-3 text-gray-400">{formatFecha(p.FECHA_FIN)}</td>
-                                <td className="px-4 py-3 text-gray-400">{formatFecha(p.FECHA_CIERRE)}</td>
-                                <td className="px-4 py-3">
-                                    <EstadoBadge estado={p.ESTADO} />
-                                </td>
-                                <td className="px-4 py-3">
-                                    <div className="flex gap-2">
-                                        {p.ESTADO === 'ABIERTO' && (
-                                            <button
-                                                onClick={() => handleCambiarEstado(p, 'CERRADO')}
-                                                className="px-3 py-1 text-xs bg-red-500/20 border border-red-500/30 text-red-400 rounded-lg hover:bg-red-500/30 transition"
-                                            >
-                                                Cerrar
-                                            </button>
-                                        )}
-                                        {p.ESTADO === 'CERRADO' && (
-                                            <button
-                                                onClick={() => handleCambiarEstado(p, 'ABIERTO')}
-                                                className="px-3 py-1 text-xs bg-green-500/20 border border-green-500/30 text-green-400 rounded-lg hover:bg-green-500/30 transition"
-                                            >
-                                                Abrir
-                                            </button>
-                                        )}
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody className="divide-y divide-white/[0.02]">
+                            {periodos.length === 0 && (
+                                <tr>
+                                    <td colSpan={4} className="px-8 py-20 text-center opacity-30 italic text-sm">No hay períodos registrados.</td>
+                                </tr>
+                            )}
+                            {periodos.map(p => (
+                                <tr key={p.ID_PERIODO} className="hover:bg-white/[0.01] transition-all group">
+                                    <td className="px-8 py-6">
+                                        <div className="flex items-center gap-4">
+                                            <div className={`w-2 h-2 rounded-full ${p.ESTADO === 'ABIERTO' ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-gray-700'}`}></div>
+                                            <span className={`text-[14px] font-bold ${p.ESTADO === 'ABIERTO' ? 'text-white' : 'text-gray-500'}`}>
+                                                {MESES[p.NUMERO_PERIODO]} {p.ANIO}
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td className="px-8 py-6">
+                                        <p className="text-[12px] text-gray-400 font-medium">{formatFecha(p.FECHA_INICIO)} <span className="mx-2 opacity-20">→</span> {formatFecha(p.FECHA_FIN)}</p>
+                                    </td>
+                                    <td className="px-8 py-6">
+                                        <EstadoBadge estado={p.ESTADO} />
+                                    </td>
+                                    <td className="px-8 py-6 text-right">
+                                        <div className="flex justify-end gap-3">
+                                            {p.ESTADO === 'ABIERTO' ? (
+                                                <button
+                                                    onClick={() => handleCambiarEstado(p, 'CERRADO')}
+                                                    className="px-5 py-2 text-[10px] font-black uppercase tracking-widest bg-red-600/10 border border-red-600/20 text-red-500 rounded-lg hover:bg-red-600 hover:text-white transition-all shadow-lg"
+                                                >
+                                                    Cerrar Período
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    onClick={() => handleCambiarEstado(p, 'ABIERTO')}
+                                                    className="px-5 py-2 text-[10px] font-black uppercase tracking-widest bg-emerald-600/10 border border-emerald-600/20 text-emerald-500 rounded-lg hover:bg-emerald-600 hover:text-white transition-all shadow-lg"
+                                                >
+                                                    Reabrir Período
+                                                </button>
+                                            )}
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
-            {/* MODAL CREAR */}
+            {/* MODAL CREAR — REFINADO */}
             {modal && (
-                <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-                    <div className="bg-[#121621] rounded-xl border border-white/5 p-6 w-full max-w-sm">
-                        <h2 className="text-lg font-semibold mb-4">Crear período de nómina</h2>
-                        {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
-                        <div className="flex flex-col gap-3">
-                            <div>
-                                <label className="text-xs text-gray-400 mb-1 block">Mes</label>
-                                <select
-                                    className={selectCls}
-                                    value={form.mes}
-                                    onChange={e => setForm({ ...form, mes: parseInt(e.target.value) })}
-                                >
-                                    {MESES.slice(1).map((m, i) => (
-                                        <option key={i + 1} value={i + 1}>{m}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div>
-                                <label className="text-xs text-gray-400 mb-1 block">Año</label>
-                                <input
-                                    type="number"
-                                    className={inputCls}
-                                    value={form.anio}
-                                    onChange={e => setForm({ ...form, anio: parseInt(e.target.value) })}
-                                    min={2020} max={2099}
-                                />
-                            </div>
+                <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-50 p-4">
+                    <div className="luxury-card w-full max-w-md shadow-2xl border-[#C5A028]/20 animate-in zoom-in-95 duration-500">
+                        <div className="p-8 border-b border-white/5 flex justify-between items-center">
+                            <h2 className="text-white text-xs font-black uppercase tracking-[0.3em]">Apertura de Ciclo</h2>
+                            <button onClick={() => setModal(false)} className="text-gray-500 hover:text-white transition-colors">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+                            </button>
                         </div>
-                        <p className="text-xs text-gray-500 mt-3">
-                            Se creará el período del 01/{String(form.mes).padStart(2, '0')}/{form.anio}
-                            al {new Date(form.anio, form.mes, 0).getDate()}/{String(form.mes).padStart(2, '0')}/{form.anio} con estado ABIERTO.
-                        </p>
-                        <div className="flex justify-end gap-2 mt-5">
-                            <button onClick={() => setModal(false)} className="px-4 py-2 text-sm text-gray-400 hover:text-white transition">
-                                Cancelar
-                            </button>
-                            <button
-                                onClick={handleCrear}
-                                disabled={loading}
-                                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-40 text-white text-sm rounded-lg transition"
-                            >
-                                {loading ? 'Creando...' : 'Crear período'}
-                            </button>
+
+                        <div className="p-10">
+                            <div className="space-y-6">
+                                <div>
+                                    <label className={labelCls}>Mes de Operación</label>
+                                    <select className={inputCls} value={form.mes} onChange={e => setForm({ ...form, mes: parseInt(e.target.value) })}>
+                                        {MESES.slice(1).map((m, i) => <option key={i + 1} value={i + 1}>{m}</option>)}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className={labelCls}>Año Calendario</label>
+                                    <input type="number" className={inputCls} value={form.anio} onChange={e => setForm({ ...form, anio: parseInt(e.target.value) })} min={2020} max={2099} />
+                                </div>
+                            </div>
+                            <div className="flex gap-4 mt-12">
+                                <button onClick={() => setModal(false)} className="flex-1 dark-button py-4 text-[10px] uppercase tracking-widest">Descartar</button>
+                                <button onClick={handleCrear} disabled={loading} className="flex-1 gold-button py-4 text-[10px] uppercase tracking-widest">{loading ? 'Procesando...' : 'Crear Período'}</button>
+                            </div>
                         </div>
                     </div>
                 </div>

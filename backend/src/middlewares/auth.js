@@ -3,7 +3,11 @@ const { error } = require('../helpers/response');
 const { getConnection } = require('../config/db');
 const oracledb = require('oracledb');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'cambia-este-secreto-en-produccion-nomina-2026';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+    console.error('❌ JWT_SECRET no está definido en .env. La app no puede arrancar de forma segura.');
+    process.exit(1);
+}
 
 // Genera un JWT con la información del usuario
 const signToken = (payload) =>

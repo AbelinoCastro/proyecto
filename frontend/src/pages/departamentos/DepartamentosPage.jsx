@@ -80,13 +80,49 @@ const DepartamentosPage = () => {
                         <h2 className="text-lg font-semibold mb-4">{modal === 'create' ? 'Crear Departamento' : 'Actualizar Departamento'}</h2>
                         {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
                         <div className="flex flex-col gap-3">
-                            {modal === 'create' && <input className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none" placeholder="ID (ej: 01)" value={form.id_departamento} onChange={e => setForm({ ...form, id_departamento: e.target.value })} />}
-                            <input className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none" placeholder="Nombre" value={form.nombre_departamento} onChange={e => setForm({ ...form, nombre_departamento: e.target.value })} />
-                            <input className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none" placeholder="Descripción (opcional)" value={form.descripcion} onChange={e => setForm({ ...form, descripcion: e.target.value })} />
-                            <select className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white outline-none" value={form.estado} onChange={e => setForm({ ...form, estado: e.target.value })}>
-                                <option value="ACTIVO">ACTIVO</option>
-                                <option value="INACTIVO">INACTIVO</option>
-                            </select>
+                            {modal === 'create' && (
+                                <div>
+                                    <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">ID Departamento *</label>
+                                    <input
+                                        className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none w-full"
+                                        placeholder="Ej: 01, 02, 03 (2 caracteres)"
+                                        maxLength={5}
+                                        value={form.id_departamento}
+                                        onChange={e => setForm({ ...form, id_departamento: e.target.value })}
+                                    />
+                                </div>
+                            )}
+                            <div>
+                                <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Nombre *</label>
+                                <input
+                                    className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none w-full"
+                                    placeholder="Ej: Ventas, Contabilidad, Recursos Humanos"
+                                    maxLength={80}
+                                    value={form.nombre_departamento}
+                                    onChange={e => setForm({ ...form, nombre_departamento: e.target.value })}
+                                />
+                            </div>
+                            <div>
+                                <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Descripción</label>
+                                <input
+                                    className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none w-full"
+                                    placeholder="Ej: Área encargada de la atención al cliente"
+                                    maxLength={200}
+                                    value={form.descripcion}
+                                    onChange={e => setForm({ ...form, descripcion: e.target.value })}
+                                />
+                            </div>
+                            <div>
+                                <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Estado</label>
+                                <select
+                                    className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white outline-none w-full"
+                                    value={form.estado}
+                                    onChange={e => setForm({ ...form, estado: e.target.value })}
+                                >
+                                    <option value="ACTIVO">ACTIVO</option>
+                                    <option value="INACTIVO">INACTIVO</option>
+                                </select>
+                            </div>
                         </div>
                         <div className="flex justify-end gap-2 mt-5">
                             <button onClick={() => setModal(null)} className="px-4 py-2 text-sm text-gray-400 hover:text-white transition">Cancelar</button>

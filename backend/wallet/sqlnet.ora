@@ -1,2 +1,0 @@
-WALLET_LOCATION = (SOURCE = (METHOD = file) (METHOD_DATA = (DIRECTORY="C:\Users\Abelino\oracle21\proyecto-nomina\backend\wallet")))
-SSL_SERVER_DN_MATCH=yes

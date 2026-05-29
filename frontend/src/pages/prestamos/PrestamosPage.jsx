@@ -6,6 +6,29 @@ import {
     procesarPagosMensuales, getUltimoComprobante
 } from '../../services/prestamoService';
 
+const formatQ = (n) => `Q ${Number(n || 0).toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+const Toast = ({ mensaje, tipo, onClose }) => {
+  useEffect(() => {
+    const t = setTimeout(onClose, 3500);
+    return () => clearTimeout(t);
+  }, [onClose]);
+
+  return (
+    <div className={`fixed bottom-10 right-10 z-[100] flex items-center gap-4 px-6 py-4 rounded-2xl shadow-2xl border animate-in slide-in-from-right-10 duration-500 ${
+      tipo === 'error' ? 'bg-red-950/60 border-red-500/50 text-red-100' : 'bg-emerald-950/60 border-emerald-500/50 text-emerald-100'
+    } backdrop-blur-2xl`}>
+      <div className={`w-8 h-8 rounded-full flex items-center justify-center border ${tipo === 'error' ? 'border-red-500/30' : 'border-emerald-500/30'}`}>
+        {tipo === 'error' ? '✕' : '✔'}
+      </div>
+      <div className="flex flex-col">
+        <span className="text-[9px] font-black uppercase tracking-widest opacity-60">{tipo === 'error' ? 'Sistema / Alerta' : 'Notificación'}</span>
+        <span className="text-[13px] font-bold">{mensaje}</span>
+      </div>
+    </div>
+  );
+};
+
 const PrestamosPage = () => {
     const [prestamos, setPrestamos]     = useState([]);
     const [showModal, setShowModal]     = useState(false);
@@ -16,10 +39,7 @@ const PrestamosPage = () => {
     const [toast, setToast]             = useState(null);
     const [loading, setLoading]         = useState(false);
 
-    const showToast = (msg, tipo = 'success') => {
-        setToast({ msg, tipo });
-        setTimeout(() => setToast(null), 3500);
-    };
+    const showToast = (msg, tipo = 'exito') => setToast({ mensaje: msg, tipo });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => { cargarPrestamos(); }, []);
@@ -28,7 +48,7 @@ const PrestamosPage = () => {
         try {
             const res = await getPrestamos();
             setPrestamos(res.data?.data || []);
-        } catch { showToast('Error al cargar préstamos', 'error'); }
+        } catch { showToast('Fallo al sincronizar cartera de préstamos', 'error'); }
     };
 
     const verCuotas = async (prestamo) => {
@@ -37,7 +57,7 @@ const PrestamosPage = () => {
             setCuotas(res.data?.data || []);
             setPrestamoSel(prestamo);
             setShowCuotas(true);
-        } catch { showToast('Error al obtener cuotas', 'error'); }
+        } catch { showToast('No se pudo obtener el cronograma de pagos', 'error'); }
     };
 
     const handleSubmit = async (e) => {
@@ -45,27 +65,27 @@ const PrestamosPage = () => {
         setLoading(true);
         try {
             await createPrestamo(formData);
-            showToast('Préstamo creado correctamente');
+            showToast('Instrumento de deuda registrado formalmente');
             setShowModal(false);
             setFormData({ id_prestamo: '', id_empleado: '', monto: '', cuotas: '' });
             cargarPrestamos();
         } catch (err) {
-            showToast(err.response?.data?.message || 'Error al crear préstamo', 'error');
+            showToast(err.response?.data?.message || 'Error en el registro del préstamo', 'error');
         } finally { setLoading(false); }
     };
 
     const procesarPagos = async () => {
-        if (!window.confirm('¿Desea procesar la cuota mensual de todos los préstamos activos?')) return;
+        if (!window.confirm('¿Desea ejecutar la deducción mensual masiva de todos los préstamos activos?')) return;
         setLoading(true);
         try {
             const res = await procesarPagosMensuales();
             if (res.data?.ok && res.data?.data) {
-                showToast(`Cuotas procesadas. Total: Q ${Number(res.data.data.total).toFixed(2)}`);
+                showToast(`Ciclo de cobro ejecutado. Total: ${formatQ(res.data.data.total)}`);
                 cargarPrestamos();
             } else {
-                showToast(res.data?.mensaje || 'No hay cuotas pendientes', 'error');
+                showToast(res.data?.mensaje || 'No se detectaron cobros pendientes', 'error');
             }
-        } catch { showToast('Error al procesar pagos', 'error'); }
+        } catch { showToast('Fallo en la ejecución del proceso masivo', 'error'); }
         finally { setLoading(false); }
     };
 
@@ -75,189 +95,178 @@ const PrestamosPage = () => {
             if (res.data?.ok && res.data?.data) {
                 generarPDFGeneral(res.data.data);
             } else {
-                showToast('No hay ningún pago registrado todavía.', 'error');
+                showToast('No se localizó un historial de cierres previo.', 'error');
             }
-        } catch { showToast('Error al obtener comprobante', 'error'); }
+        } catch { showToast('Error al generar reporte histórico', 'error'); }
     };
 
     const generarPDFGeneral = (datos) => {
         const doc = new jsPDF();
         doc.setFontSize(18);
-        doc.text('COMPROBANTE DE DESCUENTOS MENSUALES', 105, 20, { align: 'center' });
+        doc.text('REPORTE CORPORATIVO DE DESCUENTOS', 105, 20, { align: 'center' });
         doc.setFontSize(12);
-        doc.text(`No. Transacción: ${datos.ID_TRANSACCION}`, 20, 40);
-        doc.text(`Fecha: ${new Date(datos.FECHA_PROCESO).toLocaleString('es-GT')}`, 20, 50);
+        doc.text(`Transacción: ${datos.ID_TRANSACCION}`, 20, 40);
+        doc.text(`Cierre: ${new Date(datos.FECHA_PROCESO).toLocaleString('es-GT')}`, 20, 50);
         autoTable(doc, {
             startY: 62,
-            head: [['Descripción', 'Valor']],
+            head: [['Descripción Técnica', 'Valor Contable']],
             body: [
-                ['Cantidad de Empleados Procesados', datos.CANTIDAD_EMPLEADOS],
-                ['Estado de las Cuotas', 'PAGADO'],
-                ['Moneda', 'Quetzales (GTQ)'],
-                ['TOTAL DESCONTADO', `Q ${Number(datos.TOTAL_DESCONTADO).toFixed(2)}`]
+                ['Volumen de Colaboradores', datos.CANTIDAD_EMPLEADOS],
+                ['Estatus de Cartera', 'LIQUIDADO'],
+                ['Divisa Operativa', 'Quetzales (GTQ)'],
+                ['IMPORTE TOTAL', formatQ(datos.TOTAL_DESCONTADO)]
             ],
             theme: 'striped',
-            headStyles: { fillColor: [30, 41, 59] }
+            headStyles: { fillColor: [20, 20, 22] }
         });
-        doc.save(`Reporte_Prestamos_${datos.ID_TRANSACCION}.pdf`);
+        doc.save(`Audit_Prestamos_${datos.ID_TRANSACCION}.pdf`);
     };
 
     const generarComprobanteCuota = (cuota) => {
         const doc = new jsPDF();
         doc.setFontSize(18);
-        doc.text('COMPROBANTE DE DESCUENTO — PRÉSTAMO', 105, 20, { align: 'center' });
+        doc.text('CERTIFICADO DE ABONO — PRÉSTAMO', 105, 20, { align: 'center' });
         doc.setFontSize(12);
-        doc.text(`No. Préstamo: #${prestamoSel.ID_PRESTAMO}`, 20, 40);
-        doc.text(`Empleado: ${prestamoSel.NOMBRE_EMPLEADO}`, 20, 50);
+        doc.text(`Contrato: #${prestamoSel.ID_PRESTAMO}`, 20, 40);
+        doc.text(`Titular: ${prestamoSel.NOMBRE_EMPLEADO}`, 20, 50);
         autoTable(doc, {
             startY: 62,
-            head: [['Descripción', 'Monto']],
+            head: [['Descripción', 'Importe']],
             body: [
-                [`Cuota No. ${cuota.NUMERO_CUOTA}`, `Q ${Number(cuota.MONTO_CUOTA).toFixed(2)}`],
-                ['Estado', 'PAGADO'],
-                ['Moneda', 'Quetzales (GTQ)']
+                [`Amortización No. ${cuota.NUMERO_CUOTA}`, formatQ(cuota.MONTO_CUOTA)],
+                ['Estatus de Cuota', 'PAGADO'],
+                ['Moneda de Pago', 'Quetzales (GTQ)']
             ],
             theme: 'grid',
-            headStyles: { fillColor: [37, 99, 235] }
+            headStyles: { fillColor: [197, 160, 40] }
         });
         const finalY = doc.lastAutoTable?.finalY || 100;
         doc.setFontSize(10);
-        doc.text('Este documento sirve como comprobante de descuento de nómina.', 20, finalY + 20);
-        doc.text('Firma Recibido: ________________________', 20, finalY + 35);
-        doc.save(`Comprobante_Prestamo_${prestamoSel.ID_PRESTAMO}_Cuota_${cuota.NUMERO_CUOTA}.pdf`);
+        doc.text('Este documento certifica el descuento realizado mediante el sistema de nómina.', 20, finalY + 20);
+        doc.text('Firma Autorizada: ________________________', 20, finalY + 35);
+        doc.save(`Abono_${prestamoSel.ID_PRESTAMO}_C${cuota.NUMERO_CUOTA}.pdf`);
     };
 
-    return (
-        <div className="p-6 text-slate-100 min-h-screen bg-[#0b0e14]">
-            {/* Toast */}
-            {toast && (
-                <div className={`fixed top-4 right-4 z-50 px-5 py-3 rounded-xl shadow-lg text-sm font-medium
-                    ${toast.tipo === 'error' ? 'bg-red-600 text-white' : 'bg-emerald-600 text-white'}`}>
-                    {toast.msg}
-                </div>
-            )}
+    const labelCls = "text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] mb-2 block opacity-60";
+    const inputCls = "bg-[#0b0b0b] border border-white/5 rounded-xl px-4 py-3 text-[12px] text-white outline-none focus:border-[#C5A028]/30 transition-all w-full shadow-inner";
 
-            {/* Header */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 bg-[#121621] p-5 rounded-2xl border border-slate-700/60">
+    return (
+        <div className="max-w-[1450px] mx-auto py-10 px-8 animate-in fade-in duration-1000 min-h-screen">
+            {toast && <Toast mensaje={toast.mensaje} tipo={toast.tipo} onClose={() => setToast(null)} />}
+
+            {/* Header Maestro */}
+            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-10 mb-12">
                 <div>
-                    <h1 className="text-2xl font-bold text-white flex items-center gap-2">🏦 Gestión de Préstamos</h1>
-                    <p className="text-slate-400 text-sm mt-1">Administración de cuotas y descuentos en nómina (GTQ)</p>
+                    <p className="text-[#C5A028] text-[10px] font-black uppercase tracking-[0.4em] mb-3 opacity-60">Servicios Financieros</p>
+                    <h1 className="font-serif-title text-6xl text-white tracking-tighter leading-none">Gestión de Préstamos</h1>
+                    <p className="text-gray-600 text-[13px] mt-4 font-medium max-w-2xl leading-relaxed">
+                        Control integral de financiamiento interno. Gestione amortizaciones, saldos pendientes y
+                        ejecute los cobros automáticos integrados al motor de nómina corporativa.
+                    </p>
                 </div>
-                <div className="flex flex-wrap gap-3">
-                    <button onClick={handleComprobanteGeneral}
-                        className="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 px-4 py-2.5 rounded-xl text-sm font-medium text-slate-200 border border-slate-600 transition-colors">
-                        📊 Último Reporte
-                    </button>
-                    <button onClick={procesarPagos} disabled={loading}
-                        className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 px-4 py-2.5 rounded-xl text-sm font-medium text-white transition-colors">
-                        ⚙️ Procesar Mes
-                    </button>
-                    <button onClick={() => setShowModal(true)}
-                        className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 px-4 py-2.5 rounded-xl text-sm font-medium text-white transition-colors">
-                        + Nuevo Préstamo
-                    </button>
+                <div className="flex items-center gap-4 bg-[#111112] border border-white/5 p-2 rounded-[28px] shadow-2xl">
+                    <button onClick={handleComprobanteGeneral} className="dark-button text-[9px] uppercase tracking-widest px-6 py-3.5">📊 Último Reporte</button>
+                    <button onClick={procesarPagos} disabled={loading} className="gold-button !bg-emerald-600/10 !text-emerald-500 border border-emerald-500/20 text-[9px] uppercase tracking-widest px-6 py-3.5 hover:!bg-emerald-600 hover:!text-white disabled:opacity-20">⚙️ Procesar Ciclo</button>
+                    <button onClick={() => setShowModal(true)} className="gold-button text-[9px] uppercase tracking-widest px-8 py-3.5 shadow-xl shadow-[#C5A028]/10">+ Nuevo Instrumento</button>
                 </div>
             </div>
 
-            {/* Tabla principal */}
-            <div className="bg-[#121621] rounded-2xl border border-slate-700/60 overflow-hidden">
+            {/* Listado de Préstamos */}
+            <div className="luxury-card overflow-hidden shadow-2xl">
+                <div className="px-8 py-6 border-b border-white/[0.04] bg-white/[0.01] flex items-center justify-between">
+                    <h2 className="text-[11px] font-black text-white uppercase tracking-[0.4em]">Cartera de Créditos Activa</h2>
+                    <span className="text-[9px] text-gray-600 font-bold uppercase tracking-widest">{prestamos.length} Contratos Vigentes</span>
+                </div>
+
                 <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left">
-                        <thead className="bg-slate-800/80 text-slate-300 text-xs uppercase font-semibold">
-                            <tr>
-                                <th className="px-5 py-4">#</th>
-                                <th className="px-5 py-4">Empleado</th>
-                                <th className="px-5 py-4 text-right">Monto Total</th>
-                                <th className="px-5 py-4 text-center">Cuotas</th>
-                                <th className="px-5 py-4 text-right">Cuota Mensual</th>
-                                <th className="px-5 py-4 text-center">Estado</th>
-                                <th className="px-5 py-4 text-center">Detalle</th>
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="border-b border-white/[0.04] bg-white/[0.005]">
+                                <th className="px-8 py-6 text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Referencia</th>
+                                <th className="px-8 py-6 text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Titular & ID</th>
+                                <th className="px-8 py-6 text-[9px] font-black text-gray-500 uppercase tracking-[0.3em] text-right">Principal Autorizado</th>
+                                <th className="px-8 py-6 text-[9px] font-black text-gray-500 uppercase tracking-[0.3em] text-center">Plazo</th>
+                                <th className="px-8 py-6 text-[9px] font-black text-gray-500 uppercase tracking-[0.3em] text-right">Cuota Mensual</th>
+                                <th className="px-8 py-6 text-[9px] font-black text-gray-500 uppercase tracking-[0.3em] text-center">Estatus</th>
+                                <th className="px-8 py-6 text-[9px] font-black text-gray-500 uppercase tracking-[0.3em] text-center">Acción</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-800">
+                        <tbody className="divide-y divide-white/[0.02]">
                             {prestamos.map(p => (
-                                <tr key={p.ID_PRESTAMO} className="hover:bg-slate-800/30 transition-colors">
-                                    <td className="px-5 py-3 text-slate-400 font-mono text-xs">{p.ID_PRESTAMO}</td>
-                                    <td className="px-5 py-3">
-                                        <div className="font-medium text-slate-200">{p.NOMBRE_EMPLEADO}</div>
-                                        <div className="text-xs text-slate-500">ID {p.ID_EMPLEADO}</div>
+                                <tr key={p.ID_PRESTAMO} className="hover:bg-white/[0.015] transition-all group">
+                                    <td className="px-8 py-5 text-[#C5A028] font-black text-[11px] tracking-widest">#{p.ID_PRESTAMO}</td>
+                                    <td className="px-8 py-5">
+                                        <p className="text-white font-bold text-[13px] tracking-tight">{p.NOMBRE_EMPLEADO}</p>
+                                        <p className="text-[9px] text-gray-600 font-bold uppercase tracking-widest mt-1">Socio ID: {p.ID_EMPLEADO}</p>
                                     </td>
-                                    <td className="px-5 py-3 text-right font-bold text-emerald-400">Q {Number(p.MONTO).toFixed(2)}</td>
-                                    <td className="px-5 py-3 text-center text-slate-300">{p.CUOTAS}</td>
-                                    <td className="px-5 py-3 text-right font-semibold text-blue-400">Q {Number(p.PAGO_MENSUAL).toFixed(2)}</td>
-                                    <td className="px-5 py-3 text-center">
-                                        <span className={`px-2 py-0.5 rounded-full text-xs font-bold border ${
+                                    <td className="px-8 py-5 text-right text-emerald-500 font-bold text-[13px]">{formatQ(p.MONTO)}</td>
+                                    <td className="px-8 py-5 text-center">
+                                        <span className="bg-white/[0.03] border border-white/5 px-3 py-1 rounded-lg text-[11px] text-gray-300 font-black">{p.CUOTAS} <small className="opacity-40 ml-1">Meses</small></span>
+                                    </td>
+                                    <td className="px-8 py-5 text-right text-blue-400 font-black text-[13px]">{formatQ(p.PAGO_MENSUAL)}</td>
+                                    <td className="px-8 py-5 text-center">
+                                        <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border ${
                                             p.ESTADO === 'ACTIVO'
                                                 ? 'bg-blue-500/10 text-blue-400 border-blue-500/20'
                                                 : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
                                         }`}>{p.ESTADO}</span>
                                     </td>
-                                    <td className="px-5 py-3 text-center">
-                                        <button onClick={() => verCuotas(p)}
-                                            className="bg-slate-700 hover:bg-blue-600 text-slate-200 hover:text-white px-4 py-1.5 rounded-lg text-xs font-medium border border-slate-600 transition-colors">
-                                            Ver Cuotas
-                                        </button>
+                                    <td className="px-8 py-5 text-center">
+                                        <button onClick={() => verCuotas(p)} className="dark-button text-[9px] uppercase tracking-widest px-4 py-2 hover:border-[#C5A028]/40 transition-all">Ver Cronograma</button>
                                     </td>
                                 </tr>
                             ))}
                             {prestamos.length === 0 && (
-                                <tr>
-                                    <td colSpan="7" className="p-10 text-center text-slate-500 italic">
-                                        <div className="text-3xl mb-2 opacity-40">📂</div>No hay préstamos registrados.
-                                    </td>
-                                </tr>
+                                <tr><td colSpan="7" className="px-8 py-32 text-center opacity-20 italic text-sm tracking-[0.2em] uppercase">No se localizan instrumentos financieros activos</td></tr>
                             )}
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            {/* Modal: Cuotas */}
+            {/* Modal: Cronograma de Pagos */}
             {showCuotas && (
-                <div className="fixed inset-0 bg-slate-900/80 flex items-center justify-center p-4 backdrop-blur-sm z-50">
-                    <div className="bg-[#121621] border border-slate-700 rounded-2xl w-full max-w-2xl max-h-[85vh] flex flex-col">
-                        <div className="flex justify-between items-center p-5 border-b border-slate-700">
+                <div className="fixed inset-0 bg-black/95 backdrop-blur-md flex items-center justify-center z-[100] p-4">
+                    <div className="luxury-card w-full max-w-3xl shadow-2xl border-[#C5A028]/20 animate-in zoom-in-95 duration-500 overflow-hidden">
+                        <div className="p-8 border-b border-white/5 flex justify-between items-center bg-white/[0.01]">
                             <div>
-                                <h2 className="text-lg font-bold text-white">Detalle de Cuotas</h2>
-                                <p className="text-xs text-slate-400 mt-0.5">
-                                    Préstamo #{prestamoSel?.ID_PRESTAMO} — {prestamoSel?.NOMBRE_EMPLEADO}
-                                </p>
+                                <h2 className="text-white text-xs font-black uppercase tracking-[0.4em]">Cronograma de Amortización</h2>
+                                <p className="text-gray-500 text-[10px] font-bold mt-1 uppercase tracking-widest">Contrato: #{prestamoSel?.ID_PRESTAMO} — {prestamoSel?.NOMBRE_EMPLEADO}</p>
                             </div>
-                            <button onClick={() => setShowCuotas(false)}
-                                className="text-slate-400 hover:text-white hover:bg-slate-700 w-8 h-8 rounded-full flex items-center justify-center transition-colors text-xl leading-none">
-                                &times;
+                            <button onClick={() => setShowCuotas(false)} className="text-gray-500 hover:text-white transition-all hover:rotate-90">
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
                             </button>
                         </div>
-                        <div className="overflow-y-auto p-5">
-                            <table className="w-full text-sm">
-                                <thead className="bg-slate-800 text-slate-300 text-xs uppercase">
+                        <div className="p-10 max-h-[70vh] overflow-y-auto no-scrollbar">
+                            <table className="w-full text-left border-collapse">
+                                <thead className="bg-white/[0.01] border-b border-white/[0.04]">
                                     <tr>
-                                        <th className="px-4 py-3 text-left">No. Cuota</th>
-                                        <th className="px-4 py-3 text-right">Monto</th>
-                                        <th className="px-4 py-3 text-center">Estado</th>
-                                        <th className="px-4 py-3 text-center">Comprobante</th>
+                                        <th className="px-6 py-4 text-[9px] font-black text-gray-500 uppercase tracking-[0.3em]">Amortización No.</th>
+                                        <th className="px-6 py-4 text-[9px] font-black text-gray-500 uppercase tracking-[0.3em] text-right">Monto Cuota</th>
+                                        <th className="px-6 py-4 text-[9px] font-black text-gray-500 uppercase tracking-[0.3em] text-center">Estado</th>
+                                        <th className="px-6 py-4 text-[9px] font-black text-gray-500 uppercase tracking-[0.3em] text-right">Comprobante</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-slate-700/50">
+                                <tbody className="divide-y divide-white/[0.02]">
                                     {cuotas.map((c, i) => (
-                                        <tr key={i} className="hover:bg-slate-800/30 transition-colors">
-                                            <td className="px-4 py-3 text-slate-300">Cuota {c.NUMERO_CUOTA}</td>
-                                            <td className="px-4 py-3 text-right font-bold text-blue-400">Q {Number(c.MONTO_CUOTA).toFixed(2)}</td>
-                                            <td className="px-4 py-3 text-center">
-                                                <span className={`px-2 py-0.5 rounded-full text-xs font-bold border ${
+                                        <tr key={i} className="hover:bg-white/[0.015] transition-colors">
+                                            <td className="px-6 py-4 text-white font-bold text-[12px]">Mensualidad {c.NUMERO_CUOTA}</td>
+                                            <td className="px-6 py-4 text-right font-black text-blue-400 text-[12px]">{formatQ(c.MONTO_CUOTA)}</td>
+                                            <td className="px-6 py-4 text-center">
+                                                <span className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest border ${
                                                     c.ESTADO === 'PENDIENTE'
                                                         ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
                                                         : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
                                                 }`}>{c.ESTADO}</span>
                                             </td>
-                                            <td className="px-4 py-3 text-center">
+                                            <td className="px-6 py-4 text-right">
                                                 {c.ESTADO === 'PAGADO' ? (
-                                                    <button onClick={() => generarComprobanteCuota(c)}
-                                                        className="bg-blue-600/20 text-blue-400 hover:bg-blue-600 hover:text-white border border-blue-500/30 text-xs px-3 py-1 rounded-lg transition-all">
-                                                        📥 Descargar
+                                                    <button onClick={() => generarComprobanteCuota(c)} className="text-[#C5A028] text-[9px] font-black uppercase tracking-widest hover:text-white transition-colors flex items-center justify-end gap-2 ml-auto">
+                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                                        Descargar PDF
                                                     </button>
                                                 ) : (
-                                                    <span className="text-slate-600 text-xs italic">No disponible</span>
+                                                    <span className="text-gray-700 text-[9px] font-bold uppercase tracking-widest italic opacity-40">Pendiente de Procesar</span>
                                                 )}
                                             </td>
                                         </tr>
@@ -269,44 +278,82 @@ const PrestamosPage = () => {
                 </div>
             )}
 
-            {/* Modal: Nuevo préstamo */}
+            {/* Modal: Registro de Nuevo Instrumento */}
             {showModal && (
-                <div className="fixed inset-0 bg-slate-900/80 flex items-center justify-center p-4 backdrop-blur-sm z-50">
-                    <form onSubmit={handleSubmit}
-                        className="bg-[#121621] p-7 rounded-2xl border border-slate-700 w-full max-w-md space-y-5">
-                        <div>
-                            <h2 className="text-xl font-bold text-white">Nuevo Préstamo</h2>
-                            <p className="text-slate-400 text-sm mt-0.5">La cuota mensual se calcula automáticamente.</p>
+                <div className="fixed inset-0 bg-black/95 backdrop-blur-md flex items-center justify-center z-[100] p-4">
+                    <div className="luxury-card w-full max-w-md shadow-[0_0_80px_rgba(0,0,0,0.8)] border-[#C5A028]/20 animate-in zoom-in-95 duration-500 overflow-hidden">
+                        <div className="p-8 border-b border-white/5 flex justify-between items-center bg-white/[0.01]">
+                            <h2 className="text-white text-xs font-black uppercase tracking-[0.5em]">Nuevo Instrumento Financiero</h2>
+                            <button onClick={() => setShowModal(false)} className="text-gray-500 hover:text-white transition-all hover:rotate-90">
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+                            </button>
                         </div>
-                        <div className="space-y-4">
-                            {[
-                                { label: 'ID Préstamo', key: 'id_prestamo', placeholder: 'Ej: 1001' },
-                                { label: 'ID Empleado',  key: 'id_empleado', placeholder: 'Ej: 5' },
-                                { label: 'Monto Total (Q)', key: 'monto', placeholder: '0.00' },
-                                { label: 'Cantidad de Cuotas', key: 'cuotas', placeholder: 'Ej: 12' },
-                            ].map(f => (
-                                <div key={f.key}>
-                                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">{f.label}</label>
-                                    <input type="number" placeholder={f.placeholder} required
-                                        value={formData[f.key]}
-                                        onChange={e => setFormData({ ...formData, [f.key]: e.target.value })}
-                                        className="w-full bg-[#0b0e14] border border-slate-600 text-white p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none placeholder-slate-600" />
+                        <form onSubmit={handleSubmit} className="p-12 space-y-8">
+                            <div className="space-y-6">
+                                <div>
+                                    <label className={labelCls}>Identificador del Préstamo</label>
+                                    <input
+                                        type="number" min="1"
+                                        placeholder="Ej: 1001 (número único)"
+                                        required
+                                        value={formData.id_prestamo}
+                                        onChange={e => setFormData({ ...formData, id_prestamo: e.target.value })}
+                                        className={inputCls}
+                                        title="Número único de préstamo"
+                                    />
                                 </div>
-                            ))}
-                        </div>
-                        <div className="flex gap-3 pt-2">
-                            <button type="button" onClick={() => setShowModal(false)}
-                                className="flex-1 bg-transparent hover:bg-slate-800 text-slate-300 border border-slate-600 py-2.5 rounded-xl font-medium transition-colors">
-                                Cancelar
-                            </button>
-                            <button type="submit" disabled={loading}
-                                className="flex-1 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white py-2.5 rounded-xl font-bold transition-colors">
-                                {loading ? 'Guardando...' : 'Guardar Préstamo'}
-                            </button>
-                        </div>
-                    </form>
+                                <div>
+                                    <label className={labelCls}>ID del Colaborador Beneficiario</label>
+                                    <input
+                                        type="number" min="1"
+                                        placeholder="Ej: 5 (ID del empleado)"
+                                        required
+                                        value={formData.id_empleado}
+                                        onChange={e => setFormData({ ...formData, id_empleado: e.target.value })}
+                                        className={inputCls}
+                                        title="ID del empleado al que se le otorga"
+                                    />
+                                </div>
+                                <div>
+                                    <label className={labelCls}>Principal Autorizado (Monto)</label>
+                                    <div className="relative">
+                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#C5A028] font-black text-sm">Q</span>
+                                        <input
+                                            type="number" step="0.01" min="0.01"
+                                            placeholder="Ej: 5000.00"
+                                            required
+                                            value={formData.monto}
+                                            onChange={e => setFormData({ ...formData, monto: e.target.value })}
+                                            className={inputCls + " pl-12"}
+                                            title="Monto en quetzales (mayor a 0)"
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className={labelCls}>Plazo del Crédito (Cuotas)</label>
+                                    <input
+                                        type="number" min="1" max="60" step="1"
+                                        placeholder="Ej: 12 (entre 1 y 60 meses)"
+                                        required
+                                        value={formData.cuotas}
+                                        onChange={e => setFormData({ ...formData, cuotas: e.target.value })}
+                                        className={inputCls}
+                                        title="Número de meses (1-60)"
+                                    />
+                                </div>
+                            </div>
+                            <div className="flex gap-4 pt-6">
+                                <button type="button" onClick={() => setShowModal(false)} className="flex-1 dark-button py-4 text-[10px] uppercase tracking-widest">Cancelar</button>
+                                <button type="submit" disabled={loading} className="flex-1 gold-button py-4 text-[10px] uppercase tracking-widest shadow-2xl shadow-[#C5A028]/20 font-black">{loading ? 'Procesando...' : 'Confirmar Préstamo'}</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             )}
+
+            <div className="mt-16 flex justify-center opacity-30">
+                <p className="text-[9px] font-black text-gray-700 uppercase tracking-[1em]">Administración Financiera NóminaGT</p>
+            </div>
         </div>
     );
 };

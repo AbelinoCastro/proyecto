@@ -88,14 +88,60 @@ const PuestosPage = () => {
                         <h2 className="text-lg font-semibold mb-4">{modal === 'create' ? 'Crear Puesto' : 'Actualizar Puesto'}</h2>
                         {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
                         <div className="flex flex-col gap-3">
-                            {modal === 'create' && <input className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none" placeholder="ID (ej: P0004)" value={form.id_puesto} onChange={e => setForm({ ...form, id_puesto: e.target.value.toUpperCase() })} />}
-                            <input className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none" placeholder="Nombre del puesto" value={form.nombre_puesto} onChange={e => setForm({ ...form, nombre_puesto: e.target.value })} />
-                            <select className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white outline-none" value={form.id_departamento} onChange={e => setForm({ ...form, id_departamento: e.target.value })}>
-                                <option value="">Selecciona departamento</option>
-                                {departamentos.map(d => <option key={d.ID_DEPARTAMENTO} value={d.ID_DEPARTAMENTO}>{d.NOMBRE_DEPARTAMENTO}</option>)}
-                            </select>
-                            <input className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none" placeholder="Descripción (opcional)" value={form.descripcion} onChange={e => setForm({ ...form, descripcion: e.target.value })} />
-                            <input type="number" className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none" placeholder="Sueldo base" value={form.sueldo_base} onChange={e => setForm({ ...form, sueldo_base: e.target.value })} />
+                            {modal === 'create' && (
+                                <div>
+                                    <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">ID Puesto *</label>
+                                    <input
+                                        className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none w-full"
+                                        placeholder="Ej: P0004 (5 caracteres alfanuméricos)"
+                                        maxLength={10}
+                                        value={form.id_puesto}
+                                        onChange={e => setForm({ ...form, id_puesto: e.target.value.toUpperCase() })}
+                                    />
+                                </div>
+                            )}
+                            <div>
+                                <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Nombre del puesto *</label>
+                                <input
+                                    className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none w-full"
+                                    placeholder="Ej: Gerente de Ventas, Contador, Asistente"
+                                    maxLength={80}
+                                    value={form.nombre_puesto}
+                                    onChange={e => setForm({ ...form, nombre_puesto: e.target.value })}
+                                />
+                            </div>
+                            <div>
+                                <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Departamento *</label>
+                                <select
+                                    className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white outline-none w-full"
+                                    value={form.id_departamento}
+                                    onChange={e => setForm({ ...form, id_departamento: e.target.value })}
+                                >
+                                    <option value="">Selecciona departamento</option>
+                                    {departamentos.map(d => <option key={d.ID_DEPARTAMENTO} value={d.ID_DEPARTAMENTO}>{d.NOMBRE_DEPARTAMENTO}</option>)}
+                                </select>
+                            </div>
+                            <div>
+                                <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Descripción</label>
+                                <input
+                                    className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none w-full"
+                                    placeholder="Ej: Responsable del área de ventas regionales"
+                                    maxLength={200}
+                                    value={form.descripcion}
+                                    onChange={e => setForm({ ...form, descripcion: e.target.value })}
+                                />
+                            </div>
+                            <div>
+                                <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Sueldo base (Q) *</label>
+                                <input
+                                    type="number" min="0" step="0.01"
+                                    className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none w-full"
+                                    placeholder="Ej: 5000.00"
+                                    value={form.sueldo_base}
+                                    onChange={e => setForm({ ...form, sueldo_base: e.target.value })}
+                                    title="Sueldo mensual base en quetzales"
+                                />
+                            </div>
                         </div>
                         <div className="flex justify-end gap-2 mt-5">
                             <button onClick={() => setModal(null)} className="px-4 py-2 text-sm text-gray-400 hover:text-white transition">Cancelar</button>

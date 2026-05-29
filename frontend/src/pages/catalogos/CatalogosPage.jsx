@@ -14,21 +14,32 @@ import TablaFaltas        from './TablaFaltas';
 import TablaMotivoBaja    from './TablaMotivoBaja';
 import TablaTipoUsuario   from './TablaTipoUsuario';
 
-// ─── Metadatos de catálogos ───────────────────────────────────────────────────
+const Icons = {
+    Empleados: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>,
+    Usuarios: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>,
+    Roles: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg>,
+    Departamentos: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>,
+    Puestos: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>,
+    Jornadas: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
+    Percepciones: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
+    Deducciones: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" /></svg>,
+    Faltas: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>,
+    Motivos: () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>,
+};
+
 const CATALOGOS = [
-    { id: 'empleados',     nombre: 'Empleados',     icon: '👥', acciones: { agregar: true, editar: true, eliminar: true, bajar: false, toggle: true  } },
-    { id: 'usuarios',      nombre: 'Usuarios',      icon: '👤', acciones: { agregar: true, editar: true, eliminar: true, bajar: false, toggle: true  } },
-    { id: 'tipos',         nombre: 'Roles',         icon: '🔑', acciones: { agregar: true, editar: true, eliminar: true,  bajar: false, toggle: true  } },
-    { id: 'departamentos', nombre: 'Departamentos', icon: '🏢', acciones: { agregar: true, editar: true, eliminar: true,  bajar: false, toggle: true  } },
-    { id: 'puestos',       nombre: 'Puestos',       icon: '💼', acciones: { agregar: true, editar: true, eliminar: true,  bajar: false, toggle: false } },
-    { id: 'jornadas',      nombre: 'Jornadas',      icon: '⏰', acciones: { agregar: true, editar: true, eliminar: true,  bajar: false, toggle: false } },
-    { id: 'percepciones',  nombre: 'Percepciones',  icon: '💰', acciones: { agregar: true, editar: true, eliminar: true,  bajar: false, toggle: false } },
-    { id: 'deducciones',   nombre: 'Deducciones',   icon: '📉', acciones: { agregar: true, editar: true, eliminar: true,  bajar: false, toggle: false } },
-    { id: 'faltas',        nombre: 'Faltas',        icon: '⚠️', acciones: { agregar: true, editar: true, eliminar: false, bajar: false, toggle: false } },
-    { id: 'motivos',       nombre: 'Motivos Baja',  icon: '🚪', acciones: { agregar: true, editar: true, eliminar: true,  bajar: false, toggle: true  } },
+    { id: 'empleados',     nombre: 'EMPLEADOS',     icon: <Icons.Empleados />, acciones: { agregar: true, editar: true, eliminar: true, bajar: false, toggle: true  } },
+    { id: 'usuarios',      nombre: 'USUARIOS',      icon: <Icons.Usuarios />, acciones: { agregar: true, editar: true, eliminar: true, bajar: false, toggle: true  } },
+    { id: 'tipos',         nombre: 'ROLES',         icon: <Icons.Roles />, acciones: { agregar: true, editar: true, eliminar: true,  bajar: false, toggle: true  } },
+    { id: 'departamentos', nombre: 'DEPARTAMENTOS', icon: <Icons.Departamentos />, acciones: { agregar: true, editar: true, eliminar: true,  bajar: false, toggle: true  } },
+    { id: 'puestos',       nombre: 'PUESTOS',       icon: <Icons.Puestos />, acciones: { agregar: true, editar: true, eliminar: true,  bajar: false, toggle: false } },
+    { id: 'jornadas',      nombre: 'JORNADAS',      icon: <Icons.Jornadas />, acciones: { agregar: true, editar: true, eliminar: true,  bajar: false, toggle: false } },
+    { id: 'percepciones',  nombre: 'PERCEPCIONES',  icon: <Icons.Percepciones />, acciones: { agregar: true, editar: true, eliminar: true,  bajar: false, toggle: false } },
+    { id: 'deducciones',   nombre: 'DEDUCCIONES',   icon: <Icons.Deducciones />, acciones: { agregar: true, editar: true, eliminar: true,  bajar: false, toggle: false } },
+    { id: 'faltas',        nombre: 'FALTAS',        icon: <Icons.Faltas />, acciones: { agregar: true, editar: true, eliminar: false, bajar: false, toggle: false } },
+    { id: 'motivos',       nombre: 'MOTIVOS BAJA',  icon: <Icons.Motivos />, acciones: { agregar: true, editar: true, eliminar: true,  bajar: false, toggle: true  } },
 ];
 
-// ─── Definición de campos por catálogo ────────────────────────────────────────
 const CAMPOS = {
     empleados: [
         { name: 'nombre',            label: 'Nombre completo',  type: 'text',     required: true },
@@ -111,7 +122,6 @@ const TABLA_MAP = {
     motivos:       TablaMotivoBaja,
 };
 
-// ─── Toast ────────────────────────────────────────────────────────────────────
 const Toast = ({ mensaje, tipo, onClose }) => {
     useEffect(() => {
         const t = setTimeout(onClose, 3500);
@@ -119,17 +129,20 @@ const Toast = ({ mensaje, tipo, onClose }) => {
     }, [onClose]);
 
     return (
-        <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl text-sm font-medium text-white max-w-sm ${
-            tipo === 'error' ? 'bg-red-600' : 'bg-green-600'
+        <div className={`fixed bottom-10 right-10 z-[150] flex items-center gap-4 px-6 py-4 rounded-xl shadow-2xl border animate-in slide-in-from-right-10 duration-500 backdrop-blur-xl ${
+            tipo === 'error' ? 'bg-red-950/60 border-red-500/50 text-red-100' : 'bg-emerald-950/60 border-emerald-500/50 text-emerald-100'
         }`}>
-            <span>{tipo === 'error' ? '✖' : '✔'}</span>
-            <span className="flex-1">{mensaje}</span>
-            <button onClick={onClose} className="text-white/70 hover:text-white text-lg leading-none">×</button>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center border ${tipo === 'error' ? 'border-red-500/30 bg-red-500/10' : 'border-emerald-500/30 bg-emerald-500/10'}`}>
+                {tipo === 'error' ? '✕' : '✔'}
+            </div>
+            <div className="flex flex-col">
+                <span className="text-[9px] font-black uppercase tracking-widest opacity-60 mb-0.5">{tipo === 'error' ? 'Error' : 'Éxito'}</span>
+                <span className="text-[13px] font-bold tracking-tight">{mensaje}</span>
+            </div>
         </div>
     );
 };
 
-// ─── Select con opciones cargadas desde API ───────────────────────────────────
 const SelectAPI = ({ campo, valor, onChange, inputClass }) => {
     const [opciones, setOpciones] = useState([]);
     const fetched = useRef(false);
@@ -158,26 +171,26 @@ const SelectAPI = ({ campo, valor, onChange, inputClass }) => {
     );
 };
 
-// ─── Formulario dinámico ──────────────────────────────────────────────────────
 const FormularioDinamico = ({ catalogo, formData, editandoId, onChange }) => {
     const campos = CAMPOS[catalogo] || [];
 
     if (!campos.length)
-        return <p className="text-gray-400 text-sm text-center py-4">Sin campos configurados para "{catalogo}".</p>;
+        return <p className="text-gray-400 text-sm text-center py-4">Sin campos configurados</p>;
 
-    const inputClass = 'w-full bg-[#0b0e14] border border-white/5 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 transition-colors placeholder-gray-600';
+    const labelCls = "text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 block opacity-80";
+    const inputClass = "bg-[#0c0c0c] border border-white/5 rounded-lg px-4 py-2.5 text-[13px] text-white outline-none focus:border-[#C5A028]/50 transition-all w-full shadow-inner font-medium";
 
     return (
-        <div className="flex flex-col gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {campos.map((campo) => {
                 if (campo.soloCrear && editandoId) return null;
                 const valor = formData[campo.name] ?? '';
 
                 return (
-                    <div key={campo.name}>
-                        <label className="block text-xs font-semibold text-gray-400 mb-1.5 uppercase tracking-wide">
+                    <div key={campo.name} className={campo.type === 'textarea' ? 'md:col-span-2' : ''}>
+                        <label className={labelCls}>
                             {campo.label}
-                            {campo.required && <span className="text-red-400 ml-1">*</span>}
+                            {campo.required && <span className="text-[#C5A028] ml-1.5">*</span>}
                         </label>
 
                         {campo.type === 'select' ? (
@@ -211,7 +224,6 @@ const FormularioDinamico = ({ catalogo, formData, editandoId, onChange }) => {
     );
 };
 
-// ─── Modal Dar de Baja ────────────────────────────────────────────────────────
 const ModalBaja = ({ empleadoId, onClose, onConfirm }) => {
     const [motivos,  setMotivos]  = useState([]);
     const [motivoId, setMotivoId] = useState('');
@@ -224,52 +236,47 @@ const ModalBaja = ({ empleadoId, onClose, onConfirm }) => {
             .catch(() => {});
     }, []);
 
-    const inputClass = 'w-full bg-[#0b0e14] border border-white/5 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 transition-colors';
+    const labelCls = "text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2 block opacity-80";
+    const inputClass = "bg-[#0c0c0c] border border-white/5 rounded-lg px-4 py-2.5 text-[13px] text-white outline-none focus:border-red-500/50 transition-all w-full shadow-inner";
 
     return (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-            <div className="bg-[#121621] border border-white/5 rounded-xl p-6 w-full max-w-sm">
-                <h2 className="text-lg font-bold text-white mb-1">Dar de Baja</h2>
-                <p className="text-gray-400 text-sm mb-4">Esta acción cambia el estado del empleado a INACTIVO.</p>
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-[110] p-4">
+            <div className="bg-[#121214] border border-white/5 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+                <div className="p-8 border-b border-white/5 bg-white/[0.01]">
+                    <h2 className="text-white text-lg font-bold uppercase tracking-widest">Protocolo de Baja</h2>
+                </div>
 
-                <div className="flex flex-col gap-3">
+                <div className="p-8 space-y-6">
                     <div>
-                        <label className="block text-xs font-semibold text-gray-400 mb-1.5 uppercase tracking-wide">
-                            Motivo de baja <span className="text-red-400">*</span>
-                        </label>
+                        <label className={labelCls}>Motivo de Baja *</label>
                         <select value={motivoId} onChange={e => setMotivoId(e.target.value)} className={inputClass}>
-                            <option value="">— Seleccionar motivo —</option>
+                            <option value="">— Seleccionar —</option>
                             {motivos.map(m => (
                                 <option key={m.ID_MOTIVO_BAJA} value={m.ID_MOTIVO_BAJA}>{m.DESCRIPCION}</option>
                             ))}
                         </select>
                     </div>
                     <div>
-                        <label className="block text-xs font-semibold text-gray-400 mb-1.5 uppercase tracking-wide">
-                            Fecha de baja <span className="text-red-400">*</span>
-                        </label>
+                        <label className={labelCls}>Fecha Efectiva *</label>
                         <input type="date" value={fechaFin} onChange={e => setFechaFin(e.target.value)} className={inputClass} />
                     </div>
-                </div>
 
-                <div className="flex justify-end gap-2 mt-5">
-                    <button onClick={onClose} className="px-4 py-2 text-gray-400 hover:text-white text-sm transition-colors">
-                        Cancelar
-                    </button>
-                    <button
-                        onClick={() => onConfirm(empleadoId, motivoId, fechaFin)}
-                        disabled={!motivoId || !fechaFin}
-                        className="px-4 py-2 bg-orange-600 hover:bg-orange-700 disabled:opacity-40 text-white text-sm font-medium rounded-lg transition-colors"
-                    >
-                        Confirmar Baja
-                    </button>
+                    <div className="flex gap-3 pt-4">
+                        <button onClick={onClose} className="flex-1 py-3 text-[11px] font-black uppercase bg-white/5 text-gray-400 rounded-lg hover:text-white transition-all">Cancelar</button>
+                        <button
+                            onClick={() => onConfirm(empleadoId, motivoId, fechaFin)}
+                            disabled={!motivoId || !fechaFin}
+                            className="flex-[2] bg-red-600 text-white font-black py-3 rounded-lg text-[11px] uppercase shadow-lg shadow-red-900/20 disabled:opacity-20 transition-all"
+                        >
+                            Confirmar Baja
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     );
 };
 
-// ─── Página principal ─────────────────────────────────────────────────────────
 const CatalogosPage = () => {
     const [tabActiva,    setTabActiva]    = useState('empleados');
     const [modalAbierto, setModalAbierto] = useState(false);
@@ -278,7 +285,7 @@ const CatalogosPage = () => {
     const [refresh,      setRefresh]      = useState(0);
     const [cargando,     setCargando]     = useState(false);
     const [toast,        setToast]        = useState(null);
-    const [modalBaja,    setModalBaja]    = useState(null); // id del empleado a dar de baja
+    const [modalBaja,    setModalBaja]    = useState(null);
 
     const mostrarToast = useCallback((mensaje, tipo = 'exito') => setToast({ mensaje, tipo }), []);
 
@@ -298,10 +305,7 @@ const CatalogosPage = () => {
     const handleEditar = useCallback((item) => {
         const formatVal = (k, v) => {
             if (!v) return v;
-            // Fechas: convertir ISO a YYYY-MM-DD para input[type=date]
-            if (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(v)) {
-                return v.split('T')[0];
-            }
+            if (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(v)) return v.split('T')[0];
             if (v instanceof Date) return v.toISOString().split('T')[0];
             return v;
         };
@@ -313,31 +317,17 @@ const CatalogosPage = () => {
     }, []);
 
     const handleBorrar = useCallback(async (id) => {
-        if (!window.confirm('¿Eliminar este registro? Esta acción no se puede deshacer.')) return;
+        if (!window.confirm('¿Confirmar la eliminación permanente?')) return;
         setCargando(true);
         try {
             const res = await apiEliminar(tabActiva, id);
-            res.ok ? mostrarToast('Registro eliminado.') : mostrarToast(res.msg || 'No se pudo eliminar.', 'error');
+            res.ok ? mostrarToast('Registro eliminado') : mostrarToast(res.msg || 'Error', 'error');
             if (res.ok) setRefresh((n) => n + 1);
-        } catch { mostrarToast('Error de conexión.', 'error'); }
+        } catch { mostrarToast('Error de conexión', 'error'); }
         finally { setCargando(false); }
     }, [tabActiva, mostrarToast]);
 
-    const handleBaja = useCallback(async (id) => {
-        const entidad = tabActiva === 'empleados' ? 'empleado' : 'usuario';
-        if (!window.confirm(`¿Dar de baja este ${entidad}? El registro se conserva y puede reactivarse.`)) return;
-        setCargando(true);
-        try {
-            const res = await apiBaja(tabActiva, id);
-            res.ok ? mostrarToast(`${entidad.charAt(0).toUpperCase() + entidad.slice(1)} dado de baja.`) : mostrarToast(res.msg || 'No se pudo dar de baja.', 'error');
-            if (res.ok) setRefresh((n) => n + 1);
-        } catch { mostrarToast('Error de conexión.', 'error'); }
-        finally { setCargando(false); }
-    }, [tabActiva, mostrarToast]);
-
-    const handleDarBaja = useCallback((id) => {
-        setModalBaja(id);
-    }, []);
+    const handleDarBaja = useCallback((id) => { setModalBaja(id); }, []);
 
     const confirmarBaja = useCallback(async (id, id_motivo_baja, fecha_fin) => {
         setCargando(true);
@@ -347,27 +337,26 @@ const CatalogosPage = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id_motivo_baja, fecha_fin }),
             });
-            const data = await res.json();
             if (res.ok) {
-                mostrarToast('Empleado dado de baja correctamente.');
+                mostrarToast('Empleado dado de baja');
                 setModalBaja(null);
                 setRefresh(n => n + 1);
             } else {
-                mostrarToast(data.message || 'No se pudo dar de baja.', 'error');
+                const data = await res.json();
+                mostrarToast(data.message || 'Error', 'error');
             }
-        } catch { mostrarToast('Error de conexión.', 'error'); }
+        } catch { mostrarToast('Error de red', 'error'); }
         finally { setCargando(false); }
     }, [mostrarToast]);
 
     const handleToggle = useCallback(async (id, nuevoEstado) => {
-        const accion = nuevoEstado === 'ACTIVO' ? 'activar' : 'desactivar';
-        if (!window.confirm(`¿Desea ${accion} este registro?`)) return;
+        if (!window.confirm(`¿Confirmar cambio de estado?`)) return;
         setCargando(true);
         try {
             const res = await apiToggleEstado(tabActiva, id, nuevoEstado);
-            res.ok ? mostrarToast(`Registro ${nuevoEstado === 'ACTIVO' ? 'activado' : 'desactivado'}.`) : mostrarToast(res.msg || 'No se pudo cambiar el estado.', 'error');
+            res.ok ? mostrarToast(`Estado actualizado`) : mostrarToast(res.msg || 'Error', 'error');
             if (res.ok) setRefresh((n) => n + 1);
-        } catch { mostrarToast('Error de conexión.', 'error'); }
+        } catch { mostrarToast('Error técnico', 'error'); }
         finally { setCargando(false); }
     }, [tabActiva, mostrarToast]);
 
@@ -376,71 +365,87 @@ const CatalogosPage = () => {
         try {
             const res = await apiGuardar(tabActiva, formData, editandoId);
             if (res.ok) {
-                mostrarToast(editandoId ? 'Registro actualizado.' : 'Registro creado.');
+                mostrarToast(editandoId ? 'Actualizado con éxito' : 'Creado con éxito');
                 cerrarModal();
                 setRefresh((n) => n + 1);
             } else {
-                mostrarToast(res.msg || 'No se pudo guardar.', 'error');
+                mostrarToast(res.msg || 'Error al guardar', 'error');
             }
-        } catch { mostrarToast('Error de conexión.', 'error'); }
+        } catch { mostrarToast('Error crítico', 'error'); }
         finally { setCargando(false); }
     }, [tabActiva, formData, editandoId, mostrarToast, cerrarModal]);
 
     return (
-        <div className="p-6 min-h-full">
-            {/* Header */}
-            <div className="mb-6">
-                <h1 className="text-2xl font-bold text-white">Panel Maestro de Catálogos</h1>
-                <p className="text-gray-400 text-sm mt-1">Configuración del sistema de Recursos Humanos</p>
+        <div className="max-w-7xl mx-auto py-8 px-4 animate-in fade-in duration-700 min-h-screen">
+            {/* Header optimized structure */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-12">
+                <div className="space-y-3">
+                    <p className="text-[#C5A028] text-[10px] font-black uppercase tracking-[0.4em] opacity-80">Configuración Estructural</p>
+                    <h1 className="font-serif-title text-6xl text-white tracking-tight leading-tight">Panel Maestro</h1>
+                    <p className="text-gray-500 text-[13px] font-medium max-w-xl leading-relaxed">
+                        Administre catálogos y diccionarios de datos de forma centralizada.
+                    </p>
+                </div>
+
+                <div className="flex items-center gap-5 bg-white/[0.02] border border-white/5 p-4 rounded-2xl shadow-xl">
+                    <div className="text-right border-r border-white/5 pr-5">
+                        <p className="text-gray-500 text-[9px] font-black uppercase tracking-widest opacity-60">Categorías</p>
+                        <p className="text-white font-black text-2xl tracking-tighter">{CATALOGOS.length}</p>
+                    </div>
+                    <div className="w-10 h-10 rounded-xl bg-[#C5A028]/10 flex items-center justify-center border border-[#C5A028]/20 text-[#C5A028]">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                    </div>
+                </div>
             </div>
 
-            {/* Tabs de catálogos */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 mb-6">
+            {/* Optimized Tabs Grid - Smaller and more compact */}
+            <div className="flex flex-wrap gap-2.5 mb-10 pb-4 overflow-x-auto no-scrollbar">
                 {CATALOGOS.map((cat) => {
                     const activo = tabActiva === cat.id;
                     return (
                         <button
                             key={cat.id}
                             onClick={() => handleTabChange(cat.id)}
-                            className={`flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-xl text-xs font-semibold border transition-all ${
+                            className={`flex flex-col items-center justify-center min-w-[90px] h-[90px] rounded-2xl border transition-all duration-300 ${
                                 activo
-                                    ? 'bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-500/20'
-                                    : 'bg-[#121621] border-white/5 text-gray-400 hover:text-white hover:border-white/20'
+                                    ? 'bg-[#C5A028] border-[#C5A028] text-black shadow-xl shadow-[#C5A028]/20 scale-105'
+                                    : 'bg-white/[0.02] border-white/5 text-gray-500 hover:text-white hover:border-white/10'
                             }`}
                         >
-                            <span className="text-lg">{cat.icon}</span>
-                            {cat.nombre}
+                            <div className={`${activo ? 'text-black' : 'text-gray-600'} mb-2`}>{cat.icon}</div>
+                            <span className="text-[9px] font-black uppercase tracking-widest text-center px-1 leading-none">{cat.nombre}</span>
                         </button>
                     );
                 })}
             </div>
 
-            {/* Card con tabla */}
-            <div className="bg-[#121621] border border-white/5 rounded-xl overflow-hidden">
-                {/* Header de tabla */}
-                <div className="flex items-center justify-between px-5 py-4 border-b border-white/5">
-                    <h2 className="text-sm font-semibold text-white uppercase tracking-wide">
-                        {catActivo?.icon} Gestión de {catActivo?.nombre}
-                    </h2>
+            {/* Optimized Table Container */}
+            <div className="luxury-card overflow-hidden shadow-2xl bg-[#0c0c0c] border-white/5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between px-8 py-8 border-b border-white/5 bg-white/[0.01] gap-4">
+                    <div className="flex items-center gap-4">
+                        <div className="text-[#C5A028]/60">{catActivo?.icon}</div>
+                        <div>
+                            <h2 className="text-[12px] font-black text-white uppercase tracking-[0.4em]">Gestión de {catActivo?.nombre}</h2>
+                            <p className="text-gray-600 text-[10px] font-bold uppercase tracking-widest mt-1 opacity-50">Base de Datos Operativa</p>
+                        </div>
+                    </div>
                     {catActivo?.acciones.agregar && (
                         <button
                             onClick={handleNuevo}
                             disabled={cargando}
-                            className="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-colors disabled:opacity-50"
+                            className="bg-[#C5A028] hover:bg-[#A8871E] text-black text-[11px] font-black uppercase tracking-widest py-3.5 px-8 rounded-xl transition-all shadow-xl shadow-[#C5A028]/10"
                         >
-                            + Nuevo
+                            + Registrar Nuevo
                         </button>
                     )}
                 </div>
 
-                {/* Tabla activa */}
-                <div className="min-h-[300px]">
+                <div className="min-h-[400px]">
                     {TablaActiva && (
                         <TablaActiva
                             key={`${tabActiva}-${refresh}`}
                             onEdit={catActivo?.acciones.editar    ? handleEditar   : null}
                             onDelete={catActivo?.acciones.eliminar ? handleBorrar  : null}
-                            onBaja={catActivo?.acciones.bajar      ? handleBaja    : null}
                             onToggle={catActivo?.acciones.toggle   ? handleToggle  : null}
                             onDarBaja={tabActiva === 'empleados'   ? handleDarBaja : null}
                         />
@@ -448,11 +453,10 @@ const CatalogosPage = () => {
                 </div>
             </div>
 
-            {/* Modal */}
             <ModalCatalogo
                 isOpen={modalAbierto}
                 onClose={cerrarModal}
-                title={editandoId ? `✏️ Editar — ${catActivo?.nombre}` : `➕ Nuevo — ${catActivo?.nombre}`}
+                title={editandoId ? `Edición: ${catActivo?.nombre}` : `Nuevo: ${catActivo?.nombre}`}
                 onSave={handleGuardar}
                 cargando={cargando}
             >
@@ -464,7 +468,6 @@ const CatalogosPage = () => {
                 />
             </ModalCatalogo>
 
-            {/* Modal Dar de Baja */}
             {modalBaja && (
                 <ModalBaja
                     empleadoId={modalBaja}
@@ -473,8 +476,11 @@ const CatalogosPage = () => {
                 />
             )}
 
-            {/* Toast */}
             {toast && <Toast mensaje={toast.mensaje} tipo={toast.tipo} onClose={() => setToast(null)} />}
+
+            <div className="mt-16 flex justify-center opacity-30">
+                <p className="text-[9px] font-black text-gray-700 uppercase tracking-[1em]">Diccionario Maestro NóminaGT</p>
+            </div>
         </div>
     );
 };

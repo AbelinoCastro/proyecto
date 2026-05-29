@@ -1,16 +1,18 @@
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 
 const Layout = () => {
-    const { pathname } = useLocation();
-    const isDashboard = pathname === '/';
-
     return (
-        <div className="flex min-h-screen bg-[#0b0e14]">
-            {!isDashboard && <Sidebar />}
-            <main className="flex-1 overflow-auto p-8">
-                <Outlet />
-            </main>
+        <div className="flex h-screen bg-[#080808] overflow-hidden">
+            <Sidebar />
+
+            <div className="flex-1 flex flex-col min-w-0 overflow-y-auto no-scrollbar">
+                <main className="flex-1 py-4">
+                    <div className="max-w-[1200px] mx-auto">
+                        <Outlet />
+                    </div>
+                </main>
+            </div>
         </div>
     );
 };

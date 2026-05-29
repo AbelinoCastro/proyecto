@@ -27,11 +27,10 @@ const CalcularNominaPage = () => {
     const [loadingPreview, setLoadingPreview] = useState(false);
     const [loadingPago, setLoadingPago] = useState(false);
     const [error, setError] = useState('');
-    const [errorTipo, setErrorTipo] = useState(''); // 'periodo_no_existe' | 'periodo_cerrado' | 'general'
+    const [errorTipo, setErrorTipo] = useState('');
     const [resultado, setResultado] = useState(null);
     const printRef = useRef();
 
-    // Cálculo masivo
     const [periodos, setPeriodos]           = useState([]);
     const [modalMasivo, setModalMasivo]     = useState(false);
     const [loadingMasivo, setLoadingMasivo] = useState(false);
@@ -59,7 +58,6 @@ const CalcularNominaPage = () => {
         } catch (err) {
             const msg = err.response?.data?.message || 'Error al cargar datos';
             setError(msg);
-            // Detectar tipo de error para mostrar acciones específicas
             if (err.response?.status === 404 && msg.includes('No existe período')) {
                 setErrorTipo('periodo_no_existe');
             } else if (err.response?.status === 400 && msg.includes('CERRADO')) {
@@ -127,35 +125,42 @@ const CalcularNominaPage = () => {
         }
     };
 
-    const inputCls = 'bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white outline-none w-full';
-    const selectCls = 'bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white outline-none w-full';
+    const labelCls = "text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-2 block";
+    const inputCls = "bg-[#0b0b0b] border border-white/5 rounded-lg px-4 py-2.5 text-[13px] text-white outline-none focus:border-[#C5A028]/30 transition-all w-full";
 
     return (
-        <div className="text-white">
-            <div className="flex items-center justify-between mb-6">
-                <h1 className="text-xl font-semibold">Calcular Nómina</h1>
+        <div className="max-w-[1200px] mx-auto py-10 px-6 animate-in fade-in duration-700">
+
+            {/* Header / Titulo */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+                <div>
+                    <p className="text-[#C5A028] text-[10px] font-black uppercase tracking-[0.4em] mb-3 opacity-60">Dirección Financiera</p>
+                    <h1 className="font-serif-title text-5xl text-white tracking-tight leading-none">Cálculo de Nómina</h1>
+                </div>
                 <button
                     onClick={() => { setModalMasivo(true); setResultadoMasivo(null); }}
-                    className="bg-emerald-600 hover:bg-emerald-500 text-white text-sm px-4 py-2 rounded-lg font-medium"
+                    className="gold-button text-[11px] uppercase tracking-[0.2em] py-3 shadow-2xl"
                 >
-                    Calcular todos los empleados
+                    Ejecutar Proceso Masivo ⚡
                 </button>
             </div>
 
-            {/* PASO 1 — SELECCIÓN */}
-            <div className="bg-[#121621] rounded-xl border border-white/5 p-5 mb-4">
-                <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-4">
-                    Paso 1 — Seleccionar empleado y período
-                </p>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="md:col-span-1">
-                        <label className="text-xs text-gray-400 mb-1 block">Empleado</label>
+            {/* SELECCIÓN DE PARÁMETROS */}
+            <div className="luxury-card p-10 mb-10 border-t-2 border-t-[#C5A028]/30 shadow-2xl">
+                <div className="flex items-center gap-3 mb-8">
+                    <span className="bg-[#C5A028] text-black w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black">1</span>
+                    <h2 className="text-white text-xs font-black uppercase tracking-[0.2em]">Configurar Parámetros del Ciclo</h2>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-end">
+                    <div className="md:col-span-6">
+                        <label className={labelCls}>Colaborador</label>
                         <select
-                            className={selectCls}
+                            className={inputCls}
                             value={idEmpleado}
                             onChange={e => { setIdEmpleado(e.target.value); setPreview(null); setResultado(null); setError(''); setErrorTipo(''); }}
                         >
-                            <option value="">Seleccionar empleado...</option>
+                            <option value="">Seleccionar de la lista operativa...</option>
                             {empleados.map(emp => (
                                 <option key={emp.ID_EMPLEADO} value={emp.ID_EMPLEADO}>
                                     {emp.NOMBRE}
@@ -163,10 +168,10 @@ const CalcularNominaPage = () => {
                             ))}
                         </select>
                     </div>
-                    <div>
-                        <label className="text-xs text-gray-400 mb-1 block">Mes</label>
+                    <div className="md:col-span-3">
+                        <label className={labelCls}>Mes Fiscal</label>
                         <select
-                            className={selectCls}
+                            className={inputCls}
                             value={mes}
                             onChange={e => { setMes(parseInt(e.target.value)); setPreview(null); setResultado(null); setError(''); setErrorTipo(''); }}
                         >
@@ -175,8 +180,8 @@ const CalcularNominaPage = () => {
                             ))}
                         </select>
                     </div>
-                    <div>
-                        <label className="text-xs text-gray-400 mb-1 block">Año</label>
+                    <div className="md:col-span-3">
+                        <label className={labelCls}>Año Calendario</label>
                         <input
                             type="number"
                             className={inputCls}
@@ -186,420 +191,269 @@ const CalcularNominaPage = () => {
                         />
                     </div>
                 </div>
-                <div className="mt-4">
+
+                <div className="mt-10">
                     <button
                         onClick={handleCargar}
                         disabled={!idEmpleado || loadingPreview}
-                        className="px-5 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-40 text-white text-sm rounded-lg transition"
+                        className="gold-button w-full md:w-auto px-12 py-3.5 shadow-xl shadow-[#C5A028]/10 disabled:opacity-30 active:scale-95 transition-all text-[11px] uppercase tracking-[0.2em]"
                     >
-                        {loadingPreview ? 'Cargando...' : 'Cargar datos'}
+                        {loadingPreview ? 'Analizando Base de Datos...' : 'Generar Liquidación Individual'}
                     </button>
                 </div>
             </div>
 
-            {/* ALERTAS DE PERÍODO */}
-            {errorTipo === 'periodo_no_existe' && (
-                <div className="mb-4 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded-xl">
-                    <p className="text-yellow-400 font-medium text-sm mb-1">Período no encontrado</p>
-                    <p className="text-yellow-300/70 text-xs mb-3">
-                        No existe un período de nómina para {MESES[mes]} {anio}.
-                        Debes crearlo antes de poder calcular.
-                    </p>
-                    <button
-                        onClick={() => navigate('/periodos')}
-                        className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white text-xs font-medium rounded-lg transition"
-                    >
-                        Ir a Períodos → crear el período
-                    </button>
-                </div>
-            )}
-
-            {errorTipo === 'periodo_cerrado' && (
-                <div className="mb-4 p-4 bg-red-500/10 border border-red-500/30 rounded-xl">
-                    <p className="text-red-400 font-medium text-sm mb-1">Período cerrado</p>
-                    <p className="text-red-300/70 text-xs mb-3">
-                        El período {MESES[mes]} {anio} está CERRADO.
-                        Debes abrirlo nuevamente para poder calcular nóminas.
-                    </p>
-                    <button
-                        onClick={() => navigate('/periodos')}
-                        className="px-4 py-2 bg-red-700 hover:bg-red-800 text-white text-xs font-medium rounded-lg transition"
-                    >
-                        Ir a Períodos → abrir el período
-                    </button>
-                </div>
-            )}
-
-            {errorTipo === 'general' && error && (
-                <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
-                    {error}
-                </div>
-            )}
-
-            {/* PASO 2 — VISTA PREVIA */}
+            {/* VISTA PREVIA DETALLADA Y PROFESIONAL */}
             {preview && (
-                <div ref={printRef}>
-                    <div className="bg-[#121621] rounded-xl border border-white/5 p-5 mb-4">
-                        <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-4">
-                            Paso 2 — Vista previa del cálculo
-                        </p>
+                <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-1000" ref={printRef}>
 
-                        {/* Info período */}
-                        <div className="flex items-center gap-2 mb-4 p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
-                            <span className="w-2 h-2 rounded-full bg-green-400 shrink-0"></span>
-                            <span className="text-green-400 text-xs">
-                                Período {MESES[preview.periodo.NUMERO_PERIODO]} {preview.periodo.ANIO} — ABIERTO
-                            </span>
+                    <div className="flex items-center gap-3 px-2">
+                        <span className="bg-[#C5A028] text-black w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black">2</span>
+                        <h2 className="text-white text-xs font-black uppercase tracking-[0.2em]">Auditoría y Validación de Datos</h2>
+                    </div>
+
+                    <div className="luxury-card overflow-hidden">
+                        {/* Header Boleta Real */}
+                        <div className="p-10 border-b border-white/5 bg-white/[0.01] flex flex-col md:flex-row justify-between items-center gap-8">
+                            <div className="flex items-center gap-6">
+                                <div className="w-20 h-20 rounded-3xl bg-[#0b0b0b] border border-white/5 flex items-center justify-center text-white text-3xl font-black shadow-inner">
+                                    {preview.empleado.NOMBRE.slice(0, 1)}
+                                </div>
+                                <div>
+                                    <h2 className="font-serif-title text-4xl text-white tracking-tight leading-none">{preview.empleado.NOMBRE}</h2>
+                                    <p className="text-[#C5A028] text-[11px] font-black uppercase tracking-[0.3em] mt-3">{preview.empleado.NOMBRE_PUESTO}</p>
+                                    <p className="text-gray-500 text-[10px] font-bold uppercase mt-1 opacity-60">{preview.empleado.NOMBRE_DEPARTAMENTO} · {preview.empleado.NOMBRE_JORNADA}</p>
+                                </div>
+                            </div>
+                            <div className="text-right">
+                                <div className="bg-emerald-500/10 border border-emerald-500/20 px-8 py-4 rounded-[20px]">
+                                    <p className="text-gray-500 text-[9px] font-black uppercase tracking-[0.25em] mb-1 text-center">Estado del Ciclo</p>
+                                    <p className="text-emerald-500 font-black text-base uppercase text-center">{MESES[preview.periodo.NUMERO_PERIODO]} {preview.periodo.ANIO}</p>
+                                    <p className="text-emerald-500/40 text-[8px] font-bold uppercase mt-1 text-center tracking-widest">Sincronizado</p>
+                                </div>
+                            </div>
                         </div>
 
-                        {/* Datos del empleado */}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+                        {/* Bases de Cálculo (NO SIMPLIFICADO) */}
+                        <div className="grid grid-cols-2 md:grid-cols-5 divide-x divide-white/5 border-b border-white/5 bg-white/[0.01]">
                             {[
-                                { label: 'Empleado', val: preview.empleado.NOMBRE },
-                                { label: 'Puesto', val: preview.empleado.NOMBRE_PUESTO },
-                                { label: 'Departamento', val: preview.empleado.NOMBRE_DEPARTAMENTO },
-                                { label: 'Jornada', val: preview.empleado.NOMBRE_JORNADA },
-                                { label: 'Sueldo base', val: formatQ(preview.calculo.sueldo_base) },
-                                { label: 'Valor / hora', val: formatQ(preview.calculo.valor_hora) },
-                                { label: 'Valor / día', val: formatQ(preview.calculo.valor_dia) },
-                                { label: 'Período', val: `${MESES[mes]} ${anio}` },
-                            ].map(({ label, val }) => (
-                                <div key={label} className="bg-[#0b0e14] rounded-lg p-3">
-                                    <p className="text-xs text-gray-400 mb-1">{label}</p>
-                                    <p className="text-sm font-medium">{val}</p>
+                                { label: 'Sueldo Base', val: formatQ(preview.calculo.sueldo_base) },
+                                { label: 'Base IGSS', val: formatQ(preview.calculo.igss_base) },
+                                { label: 'Base ISR Anual', val: formatQ(preview.calculo.isr_base_anual) },
+                                { label: 'Valor Jornada', val: formatQ(preview.calculo.valor_dia) },
+                                { label: 'Valor Hora', val: formatQ(preview.calculo.valor_hora) },
+                            ].map((d, i) => (
+                                <div key={i} className="p-6 text-center">
+                                    <p className="text-[8px] text-gray-500 font-black uppercase tracking-[0.3em] mb-2 opacity-50">{d.label}</p>
+                                    <p className="text-white font-black text-[13px] tracking-tight">{d.val}</p>
                                 </div>
                             ))}
                         </div>
 
-                        {/* Horas extra */}
-                        <div className="mb-5">
-                            <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-2">
-                                Horas extra aprobadas
-                            </p>
-                            {preview.calculo.horas_extra.length === 0 ? (
-                                <p className="text-sm text-gray-500 italic">Sin horas extra aprobadas este mes</p>
-                            ) : (
-                                <div className="bg-[#0b0e14] rounded-lg overflow-hidden">
-                                    <table className="w-full text-sm">
-                                        <thead>
-                                            <tr className="border-b border-white/5">
-                                                <th className="text-left py-2 px-4 text-xs text-gray-400 font-medium">Fecha</th>
-                                                <th className="text-left py-2 px-4 text-xs text-gray-400 font-medium">Horas</th>
-                                                <th className="text-left py-2 px-4 text-xs text-gray-400 font-medium">Factor</th>
-                                                <th className="text-right py-2 px-4 text-xs text-gray-400 font-medium">Monto</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {preview.calculo.horas_extra.map((he, i) => (
-                                                <tr key={i} className="border-b border-white/5">
-                                                    <td className="py-2 px-4 text-gray-300">{formatFecha(he.fecha)}</td>
-                                                    <td className="py-2 px-4 text-gray-300">{he.cantidad}</td>
-                                                    <td className="py-2 px-4">
-                                                        <span className={`text-xs px-2 py-0.5 rounded-full ${he.factor === 2.0 ? 'bg-orange-500/20 text-orange-400' : 'bg-blue-500/20 text-blue-400'}`}>
-                                                            x{he.factor}
-                                                        </span>
-                                                    </td>
-                                                    <td className="py-2 px-4 text-right text-green-400">{formatQ(he.monto)}</td>
-                                                </tr>
-                                            ))}
-                                            <tr className="bg-white/5">
-                                                <td colSpan={3} className="py-2 px-4 text-xs text-gray-400">Subtotal horas extra</td>
-                                                <td className="py-2 px-4 text-right text-green-400 font-medium">{formatQ(preview.calculo.total_horas_extra)}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            )}
+                        {/* Desglose de Operaciones (Horas Extra y Faltas) */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 border-b border-white/5">
+                            <div className="p-8 border-r border-white/5">
+                                <h4 className="text-emerald-500/60 text-[9px] font-black uppercase tracking-[0.4em] mb-6 flex items-center gap-3">
+                                    <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></div>
+                                    Registro de Tiempo Extraordinario
+                                </h4>
+                                {preview.calculo.horas_extra.length === 0 ? (
+                                    <p className="text-gray-700 italic text-[11px] py-4">No se detectaron horas adicionales en este período.</p>
+                                ) : (
+                                    <div className="space-y-2">
+                                        {preview.calculo.horas_extra.map((he, i) => (
+                                            <div key={i} className="flex justify-between items-center text-[12px] p-3 bg-[#0b0b0b] rounded-lg border border-white/[0.02]">
+                                                <span className="text-gray-400 font-medium">{formatFecha(he.fecha)} — {he.cantidad}h (x{he.factor})</span>
+                                                <span className="text-emerald-500 font-bold">{formatQ(he.monto)}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                            <div className="p-8">
+                                <h4 className="text-red-500/60 text-[9px] font-black uppercase tracking-[0.4em] mb-6 flex items-center gap-3">
+                                    <div className="w-1 h-1 rounded-full bg-red-500"></div>
+                                    Control de Inasistencias y Faltas
+                                </h4>
+                                {preview.calculo.faltas.length === 0 ? (
+                                    <p className="text-gray-700 italic text-[11px] py-4">Asistencia completa verificada para el ciclo.</p>
+                                ) : (
+                                    <div className="space-y-2">
+                                        {preview.calculo.faltas.map((f, i) => (
+                                            <div key={i} className="flex justify-between items-center text-[12px] p-3 bg-[#0b0b0b] rounded-lg border border-white/[0.02]">
+                                                <span className="text-gray-400 font-medium">{formatFecha(f.fecha)} — {f.tipo_falta}</span>
+                                                <span className={f.descuenta ? 'text-red-500 font-bold' : 'text-gray-600'}>{f.descuenta ? formatQ(f.monto) : 'Q 0.00'}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
-                        {/* Faltas */}
-                        <div className="mb-5">
-                            <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-2">
-                                Faltas del período
-                            </p>
-                            {preview.calculo.faltas.length === 0 ? (
-                                <p className="text-sm text-gray-500 italic">Sin faltas registradas este mes</p>
-                            ) : (
-                                <div className="bg-[#0b0e14] rounded-lg overflow-hidden">
-                                    <table className="w-full text-sm">
-                                        <thead>
-                                            <tr className="border-b border-white/5">
-                                                <th className="text-left py-2 px-4 text-xs text-gray-400 font-medium">Fecha</th>
-                                                <th className="text-left py-2 px-4 text-xs text-gray-400 font-medium">Tipo</th>
-                                                <th className="text-left py-2 px-4 text-xs text-gray-400 font-medium">¿Descuenta?</th>
-                                                <th className="text-right py-2 px-4 text-xs text-gray-400 font-medium">Monto</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {preview.calculo.faltas.map((f, i) => (
-                                                <tr key={i} className="border-b border-white/5">
-                                                    <td className="py-2 px-4 text-gray-300">{formatFecha(f.fecha)}</td>
-                                                    <td className="py-2 px-4 text-gray-300">{f.tipo_falta}</td>
-                                                    <td className="py-2 px-4">
-                                                        <span className={`text-xs px-2 py-0.5 rounded-full ${f.descuenta ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
-                                                            {f.descuenta ? 'Sí descuenta' : 'No descuenta'}
-                                                        </span>
-                                                    </td>
-                                                    <td className="py-2 px-4 text-right text-red-400">
-                                                        {f.descuenta ? formatQ(f.monto) : '—'}
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                            <tr className="bg-white/5">
-                                                <td colSpan={3} className="py-2 px-4 text-xs text-gray-400">Subtotal descuento faltas</td>
-                                                <td className="py-2 px-4 text-right text-red-400 font-medium">{formatQ(preview.calculo.total_descuento_faltas)}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* PASO 3 — TOTALES Y CONFIRMACIÓN */}
-                        <div className="border-t border-white/5 pt-5">
-                            <p className="text-xs text-gray-400 font-medium uppercase tracking-wider mb-4">
-                                Paso 3 — Resumen y confirmación
-                            </p>
-
-                            {/* Desglose percepciones / deducciones */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                                <div className="bg-[#0b0e14] rounded-lg p-4">
-                                    <p className="text-xs text-green-400 font-medium uppercase tracking-wider mb-3">Percepciones</p>
-                                    <div className="space-y-1.5 text-sm">
-                                        <div className="flex justify-between"><span className="text-gray-400">Sueldo base</span><span className="text-green-400">{formatQ(preview.calculo.sueldo_base)}</span></div>
-                                        <div className="flex justify-between"><span className="text-gray-400">Bonificación incentivo</span><span className="text-green-400">{formatQ(preview.calculo.bonificacion_incentivo)}</span></div>
-                                        {preview.calculo.total_horas_extra > 0 && (
-                                            <div className="flex justify-between"><span className="text-gray-400">Horas extra</span><span className="text-green-400">{formatQ(preview.calculo.total_horas_extra)}</span></div>
-                                        )}
-                                        {(preview.calculo.percepciones_empleado || []).map((p, i) => (
-                                            <div key={i} className="flex justify-between"><span className="text-gray-400">{p.nombre}</span><span className="text-green-400">{formatQ(p.monto)}</span></div>
-                                        ))}
-                                        <div className="flex justify-between border-t border-white/5 pt-1.5 font-semibold"><span className="text-white">Total</span><span className="text-green-400">{formatQ(preview.calculo.total_percepciones)}</span></div>
-                                    </div>
-                                </div>
-                                <div className="bg-[#0b0e14] rounded-lg p-4">
-                                    <p className="text-xs text-red-400 font-medium uppercase tracking-wider mb-3">Deducciones</p>
-                                    <div className="space-y-1.5 text-sm">
-                                        <div className="flex justify-between">
-                                            <span className="text-gray-400">IGSS {preview.calculo.igss_porcentaje}% (base {formatQ(preview.calculo.igss_base)})</span>
-                                            <span className="text-red-400">{formatQ(preview.calculo.igss_monto)}</span>
-                                        </div>
-                                        {preview.calculo.isr_monto > 0 && (
-                                            <div className="flex justify-between">
-                                                <span className="text-gray-400">ISR SAT (base anual {formatQ(preview.calculo.isr_base_anual)})</span>
-                                                <span className="text-red-400">{formatQ(preview.calculo.isr_monto)}</span>
-                                            </div>
-                                        )}
-                                        {preview.calculo.isr_monto === 0 && (
-                                            <div className="flex justify-between">
-                                                <span className="text-gray-400">ISR SAT</span>
-                                                <span className="text-gray-600">Exento (bajo Q48,000/año)</span>
-                                            </div>
-                                        )}
-                                        {preview.calculo.total_descuento_faltas > 0 && (
-                                            <div className="flex justify-between"><span className="text-gray-400">Descuento faltas</span><span className="text-red-400">{formatQ(preview.calculo.total_descuento_faltas)}</span></div>
-                                        )}
-                                        {(preview.calculo.deducciones_empleado || []).map((d, i) => (
-                                            <div key={i} className="flex justify-between"><span className="text-gray-400">{d.nombre}</span><span className="text-red-400">{formatQ(d.monto)}</span></div>
-                                        ))}
-                                        <div className="flex justify-between border-t border-white/5 pt-1.5 font-semibold"><span className="text-white">Total</span><span className="text-red-400">{formatQ(preview.calculo.total_deducciones)}</span></div>
-                                    </div>
-                                    {preview.calculo.igss_patronal > 0 && (
-                                        <div className="mt-3 pt-3 border-t border-white/5 text-xs">
-                                            <div className="flex justify-between text-amber-400/80">
-                                                <span>IGSS patronal ({preview.calculo.igss_patronal_porcentaje}%) — paga la empresa</span>
-                                                <span className="font-semibold">{formatQ(preview.calculo.igss_patronal)}</span>
-                                            </div>
-                                            <p className="text-gray-600 mt-0.5">Este aporte no se descuenta al empleado.</p>
-                                        </div>
+                        {/* Liquidación Final (DETALLADA) */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2">
+                            {/* Columna Percepciones */}
+                            <div className="p-10 border-r border-white/5 space-y-6 bg-white/[0.005]">
+                                <h4 className="text-white text-[10px] font-black uppercase tracking-[0.4em] mb-8">Desglose de Haberes</h4>
+                                <div className="space-y-4">
+                                    <div className="flex justify-between text-[13px]"><span className="text-gray-500">Sueldo Ordinario Mensual</span><span className="text-white font-bold">{formatQ(preview.calculo.sueldo_base)}</span></div>
+                                    <div className="flex justify-between text-[13px]"><span className="text-gray-500">Bonificación de Ley (Decreto 37-2001)</span><span className="text-white font-bold">{formatQ(preview.calculo.bonificacion_incentivo)}</span></div>
+                                    {preview.calculo.total_horas_extra > 0 && (
+                                        <div className="flex justify-between text-[13px]"><span className="text-gray-500">Subtotal Horas Extraordinarias</span><span className="text-emerald-500 font-bold">{formatQ(preview.calculo.total_horas_extra)}</span></div>
                                     )}
+                                    {(preview.calculo.percepciones_empleado || []).map((p, i) => (
+                                        <div key={i} className="flex justify-between text-[13px]"><span className="text-gray-500">{p.nombre}</span><span className="text-white font-bold">{formatQ(p.monto)}</span></div>
+                                    ))}
+                                </div>
+                                <div className="flex justify-between pt-6 border-t-2 border-emerald-500/20 mt-10">
+                                    <span className="text-[11px] font-black text-white uppercase tracking-widest">Total Bruto Devengado</span>
+                                    <span className="text-emerald-500 font-black text-2xl tracking-tighter">{formatQ(preview.calculo.total_percepciones)}</span>
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-3 gap-3 mb-5">
-                                <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-4 text-center">
-                                    <p className="text-xs text-green-400 mb-1">Total percepciones</p>
-                                    <p className="text-lg font-semibold text-green-400">{formatQ(preview.calculo.total_percepciones)}</p>
-                                    <p className="text-xs text-green-400/60 mt-1">Sueldo + bonif + extras</p>
+                            {/* Columna Deducciones */}
+                            <div className="p-10 space-y-6">
+                                <h4 className="text-white text-[10px] font-black uppercase tracking-[0.4em] mb-8">Retenciones y Descuentos</h4>
+                                <div className="space-y-4">
+                                    <div className="flex justify-between text-[13px]">
+                                        <span className="text-gray-500">Cuota Laboral IGSS ({preview.calculo.igss_porcentaje}%)</span>
+                                        <span className="text-white font-bold">{formatQ(preview.calculo.igss_monto)}</span>
+                                    </div>
+                                    <div className="flex justify-between text-[13px]">
+                                        <span className="text-gray-500">Retención ISR Asalariados</span>
+                                        <span className="text-white font-bold">{preview.calculo.isr_monto > 0 ? formatQ(preview.calculo.isr_monto) : 'Exento'}</span>
+                                    </div>
+                                    {preview.calculo.total_descuento_faltas > 0 && (
+                                        <div className="flex justify-between text-[13px]"><span className="text-gray-500">Descuento por Inasistencias</span><span className="text-red-500 font-bold">{formatQ(preview.calculo.total_descuento_faltas)}</span></div>
+                                    )}
+                                    {(preview.calculo.deducciones_empleado || []).map((d, i) => (
+                                        <div key={i} className="flex justify-between text-[13px]"><span className="text-gray-500">{d.nombre}</span><span className="text-white font-bold">{formatQ(d.monto)}</span></div>
+                                    ))}
                                 </div>
-                                <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-center">
-                                    <p className="text-xs text-red-400 mb-1">Total deducciones</p>
-                                    <p className="text-lg font-semibold text-red-400">{formatQ(preview.calculo.total_deducciones)}</p>
-                                    <p className="text-xs text-red-400/60 mt-1">IGSS + ISR + faltas + otros</p>
-                                </div>
-                                <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 text-center">
-                                    <p className="text-xs text-blue-400 mb-1">Líquido a pagar</p>
-                                    <p className="text-xl font-bold text-blue-400">{formatQ(preview.calculo.liquido_a_pagar)}</p>
-                                    <p className="text-xs text-blue-400/60 mt-1">Percepciones − Deducciones</p>
+                                <div className="flex justify-between pt-6 border-t-2 border-red-500/20 mt-10">
+                                    <span className="text-[11px] font-black text-white uppercase tracking-widest">Total Deducciones</span>
+                                    <span className="text-red-500 font-black text-2xl tracking-tighter">{formatQ(preview.calculo.total_deducciones)}</span>
                                 </div>
                             </div>
+                        </div>
 
-                            <div className="flex gap-3">
+                        {/* Aportes Patronales (DETALLE ADICIONAL) */}
+                        <div className="px-10 py-6 bg-[#0d0d0e] border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
+                            <p className="text-[10px] text-gray-600 font-bold uppercase tracking-widest">Información Complementaria</p>
+                            <div className="flex items-center gap-8">
+                                <div className="flex items-center gap-3">
+                                    <span className="text-gray-500 text-[11px]">IGSS Patronal ({preview.calculo.igss_patronal_porcentaje}%):</span>
+                                    <span className="text-[#C5A028] font-bold text-[11px]">{formatQ(preview.calculo.igss_patronal)}</span>
+                                </div>
+                                <div className="w-[1px] h-4 bg-white/5"></div>
+                                <div className="text-gray-500 text-[10px] italic">Aporte de la empresa (No descontado al colaborador)</div>
+                            </div>
+                        </div>
+
+                        {/* Neto Final de Impacto */}
+                        <div className="bg-[#0b0b0b] p-12 flex flex-col md:flex-row items-center justify-between gap-10 border-t border-white/5 shadow-inner">
+                            <div>
+                                <p className="text-gray-600 text-[10px] font-black uppercase tracking-[0.6em] mb-3 text-center md:text-left">Neto Líquido a Transferir</p>
+                                <p className="font-serif-title text-6xl text-white tracking-tighter text-center md:text-left">{formatQ(preview.calculo.liquido_a_pagar)}</p>
+                            </div>
+                            <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
                                 <button
                                     onClick={handleProcesar}
                                     disabled={loadingPago}
-                                    className="px-6 py-2.5 bg-green-600 hover:bg-green-700 disabled:opacity-40 text-white text-sm font-medium rounded-lg transition"
+                                    className="px-12 py-4 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-[11px] uppercase tracking-[0.2em] rounded-xl shadow-2xl shadow-emerald-600/20 disabled:opacity-30 transition-all flex items-center justify-center gap-3 active:scale-95"
                                 >
-                                    {loadingPago ? 'Procesando...' : 'Procesar pago / transferencia'}
+                                    {loadingPago ? 'Confirmando...' : 'Procesar Pago Ahora'}
                                 </button>
                                 <button
                                     onClick={() => window.print()}
-                                    className="px-5 py-2.5 bg-[#0b0e14] border border-white/5 hover:bg-white/5 text-white text-sm rounded-lg transition"
+                                    className="px-8 py-4 bg-white/[0.03] hover:bg-white/[0.06] text-white font-black text-[11px] uppercase tracking-[0.2em] rounded-xl border border-white/5 transition-all flex items-center gap-2"
                                 >
-                                    Imprimir boleta
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+                                    Imprimir Boleta
                                 </button>
                             </div>
                         </div>
                     </div>
+                </div>
+            )}
+
+            {/* ALERTAS DE ERROR GENERAL */}
+            {errorTipo === 'general' && error && (
+                <div className="mt-8 p-4 bg-red-500/5 border border-red-500/20 rounded-xl text-red-400 text-xs font-bold uppercase tracking-widest flex items-center gap-3">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    {error}
                 </div>
             )}
 
             {/* PAGO EXITOSO */}
             {resultado && (
-                <div className="bg-[#121621] rounded-xl border border-green-500/30 p-6">
-                    <div className="flex items-center gap-3 mb-5">
-                        <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
-                            <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                            </svg>
-                        </div>
-                        <div>
-                            <p className="font-semibold text-green-400">Pago procesado exitosamente</p>
-                            <p className="text-xs text-gray-400">La nómina ha sido registrada en el sistema</p>
-                        </div>
+                <div className="luxury-card p-16 text-center border-emerald-500/20 animate-in zoom-in-95 duration-500 shadow-[0_0_50px_rgba(16,185,129,0.1)]">
+                    <div className="w-20 h-20 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto mb-8 border border-emerald-500/20">
+                        <svg className="w-10 h-10 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" /></svg>
                     </div>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
-                        {[
-                            { label: 'ID Nómina', val: `#${resultado.id_nomina}` },
-                            { label: 'Referencia', val: resultado.referencia },
-                            { label: 'Fecha pago', val: formatFecha(resultado.fecha_pago) },
-                            { label: 'Monto pagado', val: formatQ(resultado.liquido_a_pagar) },
-                        ].map(({ label, val }) => (
-                            <div key={label} className="bg-[#0b0e14] rounded-lg p-3">
-                                <p className="text-xs text-gray-400 mb-1">{label}</p>
-                                <p className="text-sm font-medium">{val}</p>
-                            </div>
-                        ))}
-                    </div>
-                    <div className="flex gap-3">
-                        <button onClick={() => window.print()}
-                            className="px-5 py-2.5 bg-[#0b0e14] border border-white/5 hover:bg-white/5 text-white text-sm rounded-lg transition">
-                            Imprimir boleta
-                        </button>
-                        <button
-                            onClick={() => { setIdEmpleado(''); setPreview(null); setResultado(null); setError(''); setErrorTipo(''); }}
-                            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition">
-                            Calcular otra nómina
-                        </button>
-                    </div>
+                    <h3 className="font-serif-title text-4xl text-white mb-3 tracking-tight">Liquidación Registrada</h3>
+                    <p className="text-gray-500 text-sm mb-12">La transacción ha sido procesada exitosamente en el historial del período.</p>
+                    <button onClick={() => { setIdEmpleado(''); setPreview(null); setResultado(null); setError(''); setErrorTipo(''); }} className="gold-button mx-auto text-[11px] uppercase tracking-widest px-12 py-4">Nueva Liquidación</button>
                 </div>
             )}
-            {/* MODAL — CÁLCULO MASIVO */}
+
+            {/* MODAL MASIVO — PROFESIONAL */}
             {modalMasivo && (
-                <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/60">
-                    <div className="bg-[#121621] border border-white/5 rounded-xl p-6 w-full max-w-xl mx-4 max-h-[90vh] overflow-y-auto">
-                        <div className="flex justify-between items-center mb-5">
-                            <h3 className="text-white font-semibold text-base">Calcular nómina — todos los empleados</h3>
-                            <button onClick={() => setModalMasivo(false)} className="text-gray-400 hover:text-white text-xl leading-none">&times;</button>
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-4">
+                    <div className="luxury-card w-full max-w-xl shadow-2xl border-[#C5A028]/20 animate-in zoom-in-95 duration-300">
+                        <div className="p-8 border-b border-white/5 flex justify-between items-center bg-white/[0.01]">
+                            <h3 className="text-white text-xs font-black uppercase tracking-[0.3em]">Cálculo Masivo por Período</h3>
+                            <button onClick={() => setModalMasivo(false)} className="text-gray-500 hover:text-white transition-colors">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+                            </button>
                         </div>
-
-                        {!resultadoMasivo && !loadingMasivo && (
-                            <>
-                                <p className="text-gray-400 text-sm mb-4">
-                                    Selecciona el período activo. Se calculará y procesará la nómina de <strong className="text-white">todos los empleados ACTIVOS</strong> de una sola vez. Los empleados que ya tengan nómina en ese período serán omitidos.
-                                </p>
-                                {periodos.length === 0 ? (
-                                    <div className="p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg text-yellow-400 text-sm mb-4">
-                                        No hay períodos abiertos. Crea uno desde la sección Períodos.
+                        <div className="p-10">
+                            {!resultadoMasivo && !loadingMasivo && (
+                                <>
+                                    <p className="text-gray-500 text-[13px] leading-relaxed mb-8">Esta operación generará la liquidación de <strong className="text-white">todos los colaboradores activos</strong> para el ciclo seleccionado.</p>
+                                    <div className="space-y-3">
+                                        {periodos.length === 0 ? (
+                                            <div className="p-4 bg-amber-500/5 border border-amber-500/10 rounded-xl text-center text-amber-500 text-[10px] font-bold uppercase tracking-widest">No hay períodos operativos disponibles</div>
+                                        ) : (
+                                            periodos.map(p => (
+                                                <button key={p.ID_PERIODO} onClick={() => handleProcesarTodos(p)} className="w-full flex justify-between items-center bg-[#0b0b0b] hover:bg-[#C5A028]/5 border border-white/5 hover:border-[#C5A028]/20 rounded-2xl px-6 py-5 transition-all text-left group">
+                                                    <div>
+                                                        <p className="text-white font-black text-sm uppercase tracking-widest">{MESES[p.NUMERO_PERIODO]} {p.ANIO}</p>
+                                                        <p className="text-[10px] text-gray-600 font-bold mt-1 uppercase tracking-widest">Estado: Abierto</p>
+                                                    </div>
+                                                    <div className="gold-button text-[9px] py-1 px-4">Procesar Todos</div>
+                                                </button>
+                                            ))
+                                        )}
                                     </div>
-                                ) : (
-                                    <div className="flex flex-col gap-2 mb-5">
-                                        {periodos.map(p => (
-                                            <button
-                                                key={p.ID_PERIODO}
-                                                onClick={() => handleProcesarTodos(p)}
-                                                className="flex justify-between items-center bg-[#0b0e14] hover:bg-white/5 border border-white/5 rounded-lg px-4 py-3 text-left transition"
-                                            >
-                                                <span className="text-white font-medium">{MESES[p.NUMERO_PERIODO]} {p.ANIO}</span>
-                                                <span className="text-xs bg-green-600/20 text-green-400 px-2 py-0.5 rounded-full">ABIERTO</span>
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
-                            </>
-                        )}
-
-                        {loadingMasivo && (
-                            <div className="text-center py-10">
-                                <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-                                <p className="text-gray-400 text-sm">Procesando nóminas... esto puede tardar unos segundos</p>
-                            </div>
-                        )}
-
-                        {resultadoMasivo && !resultadoMasivo.error && (
-                            <>
-                                {/* Resumen */}
-                                <div className="grid grid-cols-3 gap-3 mb-5">
-                                    <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-3 text-center">
-                                        <p className="text-2xl font-bold text-green-400">{resultadoMasivo.resumen.procesados}</p>
-                                        <p className="text-xs text-green-400/70">Procesados</p>
-                                    </div>
-                                    <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3 text-center">
-                                        <p className="text-2xl font-bold text-yellow-400">{resultadoMasivo.resumen.omitidos}</p>
-                                        <p className="text-xs text-yellow-400/70">Ya existían</p>
-                                    </div>
-                                    <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 text-center">
-                                        <p className="text-2xl font-bold text-red-400">{resultadoMasivo.resumen.errores}</p>
-                                        <p className="text-xs text-red-400/70">Errores</p>
-                                    </div>
+                                </>
+                            )}
+                            {loadingMasivo && (
+                                <div className="text-center py-10">
+                                    <div className="w-12 h-12 border-4 border-[#C5A028]/20 border-t-[#C5A028] rounded-full animate-spin mx-auto mb-6" />
+                                    <p className="text-white text-[10px] font-black uppercase tracking-[0.3em]">Procesando Liquidaciones...</p>
                                 </div>
-
-                                {/* Detalle */}
-                                <div className="max-h-64 overflow-y-auto">
-                                    <table className="w-full text-sm">
-                                        <thead>
-                                            <tr className="text-xs text-gray-400 uppercase">
-                                                <th className="text-left pb-2">Empleado</th>
-                                                <th className="text-right pb-2">Líquido</th>
-                                                <th className="text-center pb-2">Estado</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {resultadoMasivo.resultados.map((r, i) => (
-                                                <tr key={i} className="border-t border-white/5">
-                                                    <td className="py-1.5 text-white text-xs">{r.nombre}</td>
-                                                    <td className="py-1.5 text-right text-emerald-400 text-xs">
-                                                        {r.liquido_a_pagar ? formatQ(r.liquido_a_pagar) : '—'}
-                                                    </td>
-                                                    <td className="py-1.5 text-center">
-                                                        <span className={`text-xs px-2 py-0.5 rounded-full ${
-                                                            r.estado === 'procesado' ? 'bg-green-600/20 text-green-400' :
-                                                            r.estado === 'omitido'   ? 'bg-yellow-600/20 text-yellow-400' :
-                                                                                       'bg-red-600/20 text-red-400'
-                                                        }`}>
-                                                            {r.estado}
-                                                        </span>
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
+                            )}
+                            {resultadoMasivo && (
+                                <div className="text-center animate-in fade-in duration-700">
+                                    <div className="flex justify-center gap-8 mb-12">
+                                        <div className="text-center">
+                                            <p className="text-3xl font-black text-emerald-500 leading-none">{resultadoMasivo.resumen.procesados}</p>
+                                            <p className="text-[9px] text-gray-600 font-bold uppercase tracking-widest mt-2">Exitosos</p>
+                                        </div>
+                                        <div className="text-center border-x border-white/5 px-8">
+                                            <p className="text-3xl font-black text-amber-500 leading-none">{resultadoMasivo.resumen.omitidos}</p>
+                                            <p className="text-[9px] text-gray-600 font-bold uppercase tracking-widest mt-2">Omitidos</p>
+                                        </div>
+                                        <div className="text-center">
+                                            <p className="text-3xl font-black text-red-500 leading-none">{resultadoMasivo.resumen.errores}</p>
+                                            <p className="text-[9px] text-gray-600 font-bold uppercase tracking-widest mt-2">Fallidos</p>
+                                        </div>
+                                    </div>
+                                    <button onClick={() => setModalMasivo(false)} className="dark-button mx-auto text-[10px] uppercase tracking-widest px-10">Cerrar Consola</button>
                                 </div>
-
-                                <button
-                                    onClick={() => setModalMasivo(false)}
-                                    className="mt-4 w-full bg-blue-600 hover:bg-blue-500 text-white rounded-lg py-2 text-sm font-medium"
-                                >
-                                    Cerrar
-                                </button>
-                            </>
-                        )}
-
-                        {resultadoMasivo?.error && (
-                            <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
-                                {resultadoMasivo.error}
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
                 </div>
             )}

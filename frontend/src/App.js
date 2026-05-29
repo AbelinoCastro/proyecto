@@ -13,6 +13,7 @@ import RegistroHorasExtra from './pages/registroHorasExtras/RegistroHorasExtra';
 import ListadoFaltas from './pages/registroFaltas/ListadoFaltas';
 import AsignacionesPage from './pages/asignaciones/AsignacionesPage';
 import ReporteriaPage from './pages/reporteria/ReporteriaPage';
+import ReporteriaCloudPage from './pages/reporteriaCloud/ReporteriaCloudPage';
 import ISRPage from './pages/isr/ISRPage';
 import IGSSPage from './pages/igss/IGSSPage';
 import PrestamosPage from './pages/prestamos/PrestamosPage';
@@ -59,6 +60,7 @@ function App() {
                         <Route path="asignaciones"     element={<P mod="ASIGNAC"><AsignacionesPage /></P>} />
 
                         <Route path="reporteria"       element={<P mod="REPORTERIA"><ReporteriaPage /></P>} />
+                        <Route path="reporteria-cloud" element={<P mod="REPORTERIA_CLOUD"><ReporteriaCloudPage /></P>} />
                         <Route path="isr"              element={<P mod="ISR"><ISRPage /></P>} />
                         <Route path="igss"             element={<P mod="IGSS"><IGSSPage /></P>} />
                         <Route path="prestamos"        element={<P mod="PRESTAMOS"><PrestamosPage /></P>} />

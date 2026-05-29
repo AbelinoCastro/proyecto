@@ -58,7 +58,10 @@ const getNominasPagadasAnio = async (id_empleado, anio) => {
         const nominas = resNominas.rows;
         if (nominas.length === 0) return [];
 
-        const ids = nominas.map(n => n.ID_NOMINA);
+        // Validar que todos los IDs sean números enteros (defensa anti-inyección)
+        const ids = nominas.map(n => Number(n.ID_NOMINA)).filter(Number.isInteger);
+        if (ids.length === 0) return nominas.map(n => ({ ...n, PERCEPCIONES: [], DEDUCCIONES: [] }));
+
         const binds = {};
         const placeholders = ids.map((id, i) => { binds[`id${i}`] = id; return `:id${i}`; }).join(',');
 

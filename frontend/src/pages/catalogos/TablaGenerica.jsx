@@ -4,16 +4,11 @@ export const API_BASE = 'http://localhost:4000/api';
 
 export const EstadoBadge = ({ value }) => {
     const upper = value?.toUpperCase();
-    const color =
-        upper === 'ACTIVO'     ? 'bg-green-500/20 text-green-400' :
-        upper === 'INACTIVO'   ? 'bg-red-500/20 text-red-400'    :
-        upper === 'SUSPENDIDO' ? 'bg-yellow-500/20 text-yellow-400' :
-                                 'bg-gray-500/20 text-gray-400';
-    return (
-        <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${color}`}>
-            {value || '—'}
-        </span>
-    );
+    if (upper === 'ACTIVO')
+        return <span className="bg-[#10b981] text-white px-3 py-1 rounded text-[10px] font-black uppercase tracking-tighter">ACTIVO</span>;
+    if (upper === 'INACTIVO')
+        return <span className="bg-[#ef4444] text-white px-3 py-1 rounded text-[10px] font-black uppercase tracking-tighter">INACTIVO</span>;
+    return <span className="bg-slate-700 text-gray-300 px-3 py-1 rounded text-[10px] font-black uppercase tracking-tighter">{value || '—'}</span>;
 };
 
 const TablaGenerica = ({
@@ -29,105 +24,60 @@ const TablaGenerica = ({
 }) => {
     const [datos, setDatos] = useState([]);
     const [cargando, setCargando] = useState(true);
-    const [error, setError] = useState(null);
 
     useEffect(() => {
-        const controller = new AbortController();
-
-        const cargar = async () => {
-            try {
-                setCargando(true);
-                const res = await fetch(url, { signal: controller.signal });
-                const data = await res.json();
-                if (data.ok) setDatos(data.data);
-                else setError('Error al cargar datos');
-            } catch (err) {
-                if (err.name !== 'AbortError') setError('Error de conexión');
-            } finally {
-                setCargando(false);
-            }
-        };
-
-        cargar();
-        return () => controller.abort();
+        fetch(url)
+            .then(r => r.json())
+            .then(data => { if (data.ok) setDatos(data.data); })
+            .finally(() => setCargando(false));
     }, [url]);
 
     if (cargando) return (
-        <div className="flex items-center justify-center py-10 text-gray-400 text-sm gap-2">
-            <span className="animate-spin">⏳</span> Cargando...
+        <div className="py-24 text-center">
+            <div className="w-8 h-8 border-2 border-[#C5A028]/20 border-t-[#C5A028] rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest">Sincronizando...</p>
         </div>
-    );
-
-    if (error) return (
-        <div className="py-10 text-center text-red-400 text-sm">{error}</div>
     );
 
     const hasActions = onEdit || onDelete || onBaja || onToggle || onDarBaja;
 
     return (
         <div className="overflow-x-auto">
-            <table className="w-full text-sm border-collapse">
+            <table className="w-full text-left border-collapse">
                 <thead>
-                    <tr className="bg-slate-800/80 text-gray-300 text-left">
+                    <tr className="bg-[#1a202c] border-b border-white/5">
                         {columns.map((col) => (
-                            <th key={col.key} className="px-4 py-3 font-semibold tracking-wide">
+                            <th key={col.key} className="px-6 py-4 text-[11px] font-black text-white/50 uppercase tracking-widest">
                                 {col.label}
                             </th>
                         ))}
-                        {hasActions && (
-                            <th className="px-4 py-3 font-semibold text-center">Acciones</th>
-                        )}
+                        {hasActions && <th className="px-6 py-4 text-[11px] font-black text-white/50 uppercase tracking-widest">Acciones</th>}
                     </tr>
                 </thead>
-                <tbody>
+                <tbody className="divide-y divide-white/[0.03]">
                     {datos.length > 0 ? (
                         datos.map((row) => (
-                            <tr
-                                key={row[rowKey]}
-                                className="border-t border-white/5 hover:bg-white/5 transition-colors"
-                            >
+                            <tr key={row[rowKey]} className="hover:bg-white/[0.01] transition-all duration-200">
                                 {columns.map((col) => (
-                                    <td
-                                        key={col.key}
-                                        className={`px-4 py-3 ${col.className ?? 'text-gray-300'}`}
-                                    >
-                                        {col.render
-                                            ? col.render(row[col.key], row)
-                                            : (row[col.key] ?? '—')}
+                                    <td key={col.key} className={`px-6 py-4 ${col.className || 'text-gray-300'}`}>
+                                        {col.render ? col.render(row[col.key], row) : (row[col.key] ?? '—')}
                                     </td>
                                 ))}
                                 {hasActions && (
-                                    <td className="px-4 py-3">
-                                        <div className="flex justify-center gap-2">
+                                    <td className="px-6 py-4">
+                                        <div className="flex gap-2">
                                             {onEdit && (
-                                                <button
-                                                    onClick={() => onEdit(row)}
-                                                    className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-md transition-colors"
-                                                >
+                                                <button onClick={() => onEdit(row)} className="px-4 py-2 bg-[#0061f2] hover:bg-blue-600 text-white text-[10px] font-black uppercase rounded shadow-lg transition-all active:scale-95">
                                                     Editar
                                                 </button>
                                             )}
                                             {onDelete && (
-                                                <button
-                                                    onClick={() => onDelete(row[rowKey])}
-                                                    className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white text-xs rounded-md transition-colors"
-                                                >
+                                                <button onClick={() => onDelete(row[rowKey])} className="px-4 py-2 bg-[#e81500] hover:bg-red-600 text-white text-[10px] font-black uppercase rounded shadow-lg transition-all active:scale-95">
                                                     Eliminar
                                                 </button>
                                             )}
-                                            {onBaja && (
-                                                <button
-                                                    onClick={() => onBaja(row[rowKey])}
-                                                    className="px-3 py-1 bg-yellow-600 hover:bg-yellow-700 text-white text-xs rounded-md transition-colors"
-                                                >
-                                                    Dar de Baja
-                                                </button>
-                                            )}
                                             {onDarBaja && (
-                                                <button
-                                                    onClick={() => onDarBaja(row[rowKey])}
-                                                    className="px-3 py-1 bg-orange-600 hover:bg-orange-700 text-white text-xs rounded-md transition-colors"
-                                                >
+                                                <button onClick={() => onDarBaja(row[rowKey])} className="px-4 py-2 bg-[#f4a100] hover:bg-orange-600 text-white text-[10px] font-black uppercase leading-tight rounded shadow-lg transition-all active:scale-95">
                                                     Dar de Baja
                                                 </button>
                                             )}
@@ -136,10 +86,10 @@ const TablaGenerica = ({
                                                 return (
                                                     <button
                                                         onClick={() => onToggle(row[rowKey], activo ? 'INACTIVO' : 'ACTIVO')}
-                                                        className={`px-3 py-1 text-white text-xs rounded-md transition-colors ${
+                                                        className={`px-4 py-2 text-[10px] font-black uppercase rounded shadow-lg transition-all active:scale-95 ${
                                                             activo
-                                                                ? 'bg-yellow-600 hover:bg-yellow-700'
-                                                                : 'bg-green-600 hover:bg-green-700'
+                                                            ? 'bg-[#C5A028] text-black hover:bg-[#A8871E]'
+                                                            : 'bg-emerald-600 text-white hover:bg-emerald-500'
                                                         }`}
                                                     >
                                                         {activo ? 'Desactivar' : 'Activar'}
@@ -153,10 +103,7 @@ const TablaGenerica = ({
                         ))
                     ) : (
                         <tr>
-                            <td
-                                colSpan={columns.length + (hasActions ? 1 : 0)}
-                                className="px-4 py-12 text-center text-gray-500"
-                            >
+                            <td colSpan={columns.length + (hasActions ? 1 : 0)} className="px-8 py-24 text-center text-gray-600 uppercase tracking-widest font-black italic opacity-20">
                                 {emptyText}
                             </td>
                         </tr>

@@ -1,11 +1,36 @@
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const { initPool } = require('./src/config/db');
 require('dotenv').config();
 
 const app = express();
-app.use(cors());
-app.use(express.json());
+
+// 🔒 Headers de seguridad HTTP (CSP, XSS, clickjacking, etc.)
+app.use(helmet({
+    contentSecurityPolicy: false,  // Desactivado para permitir Tableau embed
+    crossOriginEmbedderPolicy: false,
+}));
+
+// 🌐 CORS restrictivo (solo el origin del frontend)
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+app.use(cors({
+    origin: FRONTEND_URL,
+    credentials: true,
+}));
+
+app.use(express.json({ limit: '5mb' }));
+
+// 🛡️ Rate limit en login (5 intentos por IP cada 15 min) — anti-brute force
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { ok: false, message: 'Demasiados intentos de login. Espera 15 minutos.' },
+});
+app.use('/api/auth/login', loginLimiter);
 
 // Autenticación y permisos (deben ir antes de las demás rutas protegidas)
 app.use('/api/auth',     require('./src/modules/auth/auth.routes'));

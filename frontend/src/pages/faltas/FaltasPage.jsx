@@ -76,11 +76,28 @@ const FaltasPage = () => {
                         <h2 className="text-lg font-semibold mb-4">{modal === 'create' ? 'Crear Falta' : 'Actualizar Falta'}</h2>
                         {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
                         <div className="flex flex-col gap-3">
-                            <input className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none" placeholder="Descripción" value={form.descripcion} onChange={e => setForm({ ...form, descripcion: e.target.value })} />
-                            <select className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white outline-none" value={form.es_pagado} onChange={e => setForm({ ...form, es_pagado: e.target.value })}>
-                                <option value="N">No pagado</option>
-                                <option value="S">Pagado</option>
-                            </select>
+                            <div>
+                                <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">Descripción *</label>
+                                <input
+                                    className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white placeholder-gray-500 outline-none w-full"
+                                    placeholder="Ej: Falta justificada por enfermedad"
+                                    maxLength={100}
+                                    value={form.descripcion}
+                                    onChange={e => setForm({ ...form, descripcion: e.target.value })}
+                                />
+                            </div>
+                            <div>
+                                <label className="text-[10px] text-gray-500 uppercase tracking-wider block mb-1">¿Genera pago?</label>
+                                <select
+                                    className="bg-[#0b0e14] border border-white/5 rounded-lg px-3 py-2 text-sm text-white outline-none w-full"
+                                    value={form.es_pagado}
+                                    onChange={e => setForm({ ...form, es_pagado: e.target.value })}
+                                    title="Si se marca No, se descontará el día"
+                                >
+                                    <option value="N">No (se descuenta)</option>
+                                    <option value="S">Sí (pagado)</option>
+                                </select>
+                            </div>
                         </div>
                         <div className="flex justify-end gap-2 mt-5">
                             <button onClick={() => setModal(null)} className="px-4 py-2 text-sm text-gray-400 hover:text-white transition">Cancelar</button>
