@@ -82,6 +82,8 @@ const getISRPreviewPDF = async (req, res) => {
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', `inline; filename=Preview_ISR_${id_periodo}.pdf`);
         doc.pipe(res);
+        doc.on('error', (e) => console.error('PDF stream error:', e.message));
+        res.on('error', (e) => console.error('Response stream error:', e.message));
 
         const W = doc.page.width;
         const M = 50;
@@ -117,7 +119,7 @@ const getISRPreviewPDF = async (req, res) => {
         for (const emp of empleados) {
             if (rowIdx % 2 === 0) doc.rect(M, y, W - 2 * M, 22).fill('#f8f8f8');
             doc.fillColor(DARK).font('Helvetica').fontSize(9);
-            doc.text((emp.nombre || '').substring(0, 42), M + 10, y + 7, { width: 220, lineBreak: false });
+            doc.text(String(emp.nombre || '').substring(0, 42), M + 10, y + 7, { width: 220, lineBreak: false });
             doc.text(fmtQ(emp.base_isr), M + 240, y + 7, { width: 120, align: 'right' });
             doc.fillColor('#d97706').font('Helvetica-Bold');
             doc.text(fmtQ(emp.isr), M + 370, y + 7, { width: 125, align: 'right' });
@@ -181,6 +183,8 @@ const getComprobanteISRPDF = async (req, res) => {
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', `inline; filename=Comprobante_ISR_${id_periodo}.pdf`);
         doc.pipe(res);
+        doc.on('error', (e) => console.error('PDF stream error:', e.message));
+        res.on('error', (e) => console.error('Response stream error:', e.message));
 
         const W = doc.page.width;
         const M = 50;
@@ -257,7 +261,7 @@ const getComprobanteISRPDF = async (req, res) => {
                 doc.rect(M, y, W - 2 * M, rowH).fill('#f8f8f8');
             }
             doc.fillColor(DARK).font('Helvetica').fontSize(9);
-            doc.text((row.NOMBRE || '').substring(0, 40), M + 10, y + 7, { width: 200, lineBreak: false });
+            doc.text(String(row.NOMBRE || '').substring(0, 40), M + 10, y + 7, { width: 200, lineBreak: false });
             doc.text(fmtQ(row.BASE_ISR), M + 230, y + 7, { width: 120, align: 'right' });
             doc.fillColor('#d97706').font('Helvetica-Bold');
             doc.text(fmtQ(row.ISR_MONTO), M + 360, y + 7, { width: 135, align: 'right' });

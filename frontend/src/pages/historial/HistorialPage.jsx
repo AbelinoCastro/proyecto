@@ -30,7 +30,9 @@ const HistorialPage = () => {
     const [selectedPuesto,    setSelectedPuesto]    = useState('');
     const [anioFormato,       setAnioFormato]       = useState(new Date().getFullYear());
     const [todosLosRegistros, setTodosLosRegistros] = useState([]);
+    // eslint-disable-next-line no-unused-vars
     const [cargando,          setCargando]          = useState(true);
+    // eslint-disable-next-line no-unused-vars
     const [error,             setError]             = useState(null);
 
     useEffect(() => {
@@ -426,7 +428,7 @@ const HistorialPage = () => {
                               <span class="item-amount">${formatQ(d.MONTO)}</span>
                             </div>
                           `).join('')
-                          : '<div class="item-row"><span class="item-name" style="color:#999;font-style:italic">Sin deducciones aplicables</span><span class="item-amount">${formatQ(0)}</span></div>'
+                          : `<div class="item-row"><span class="item-name" style="color:#999;font-style:italic">Sin deducciones aplicables</span><span class="item-amount">${formatQ(0)}</span></div>`
                         }
                         <div class="subtotal-row">
                           <span>Total egresos</span>

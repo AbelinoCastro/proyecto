@@ -112,6 +112,9 @@ const getComprobanteIGSSPDF = async (req, res) => {
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Disposition', `inline; filename=Comprobante_IGSS_${id_periodo}.pdf`);
         doc.pipe(res);
+        // Si algo falla en el stream, no propagamos el error que rompe el server
+        doc.on('error', (e) => console.error('PDF stream error:', e.message));
+        res.on('error', (e) => console.error('Response stream error:', e.message));
 
         const W = doc.page.width;   // 595
         const M = 50;                // margen lateral
@@ -198,9 +201,9 @@ const getComprobanteIGSSPDF = async (req, res) => {
                 doc.rect(M, y, W - 2 * M, rowH).fill('#f8f8f8');
             }
             doc.fillColor(DARK).font('Helvetica').fontSize(9);
-            doc.text((row.EMPLEADO || '').substring(0, 28), M + 10, y + 7, { width: 130, lineBreak: false });
+            doc.text(String(row.EMPLEADO || '').substring(0, 28), M + 10, y + 7, { width: 130, lineBreak: false });
             doc.fillColor(MUTED).font('Helvetica-Oblique').fontSize(8);
-            doc.text(row.NO_AFILIACION_IGSS || '—', M + 145, y + 8, { width: 65 });
+            doc.text(String(row.NO_AFILIACION_IGSS || '—'), M + 145, y + 8, { width: 65 });
             doc.fillColor(DARK).font('Helvetica').fontSize(9);
             doc.text(fmtQ(row.BASE),      M + 215, y + 7, { width: 60, align: 'right' });
             doc.fillColor('#2563eb').font('Helvetica-Bold');
