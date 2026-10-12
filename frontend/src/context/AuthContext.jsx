@@ -2,6 +2,15 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import { login as loginApi, getMe } from '../services/authService';
 
 const AuthContext = createContext(null);
+const DEMO_MODE = process.env.REACT_APP_DEMO_MODE === 'true';
+const DEMO_USER = {
+    id: 'demo',
+    username: 'demo',
+    rol: 'ADM',
+    rol_nombre: 'Administrador demo',
+    id_empleado: null,
+    nombre_empleado: 'Usuario de demostración',
+};
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser]         = useState(null);
@@ -12,6 +21,12 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (!token) { setLoading(false); return; }
+        if (DEMO_MODE && token === 'demo-token') {
+            setUser(DEMO_USER);
+            setPermisos([]);
+            setLoading(false);
+            return;
+        }
         getMe()
             .then(res => {
                 setUser(res.data.data.user);
@@ -28,6 +43,14 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const login = async (username, password) => {
+        if (DEMO_MODE) {
+            localStorage.setItem('token', 'demo-token');
+            localStorage.setItem('user', JSON.stringify(DEMO_USER));
+            localStorage.setItem('permisos', JSON.stringify([]));
+            setUser(DEMO_USER);
+            setPermisos([]);
+            return DEMO_USER;
+        }
         const res = await loginApi(username, password);
         const { token, user: u, permisos: p } = res.data.data;
         localStorage.setItem('token', token);

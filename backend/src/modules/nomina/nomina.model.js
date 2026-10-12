@@ -160,7 +160,7 @@ const getOCrearPeriodo = async (anio, mes) => {
     } finally { await conn.close(); }
 };
 
-// Guardar la nómina procesada con todos sus detalles
+// Guardar la nómina procesada con todos sus detalles y actualizar estados operativos
 const procesarNomina = async ({
     id_empleado, id_periodo, fecha_pago,
     total_percepciones, total_deducciones, liquido_a_pagar,
@@ -186,36 +186,51 @@ const procesarNomina = async ({
         );
         const id_nomina = resNomina.outBinds.id_nomina[0];
 
-        // 2. Insertar detalles de percepciones
+        // 2. Procesar detalles de percepciones y sellar Horas Extra
         for (const det of detalles_percepciones) {
             await conn.execute(
-                `INSERT INTO HISTORICO_PERCEPCIONES_DETALLE
-                    (id_nomina, id_percepcion, id_hora_extra, monto)
+                `INSERT INTO HISTORICO_PERCEPCIONES_DETALLE (id_nomina, id_percepcion, id_hora_extra, monto)
                  VALUES (:id_nomina, :id_percepcion, :id_hora_extra, :monto)`,
-                {
-                    id_nomina,
-                    id_percepcion: det.id_percepcion,
-                    id_hora_extra: det.id_hora_extra || null,
-                    monto: det.monto
-                },
+                { id_nomina, id_percepcion: det.id_percepcion, id_hora_extra: det.id_hora_extra || null, monto: det.monto },
                 { autoCommit: false }
             );
+
+            if (det.id_hora_extra) {
+                await conn.execute(
+                    `UPDATE REGISTRO_HORAS_EXTRA SET estado = 'PAGADO' WHERE id_hora_extra = :id`,
+                    { id: det.id_hora_extra }, { autoCommit: false }
+                );
+            }
         }
 
-        // 3. Insertar detalles de deducciones
+        // 3. Procesar detalles de deducciones y sellar Faltas / Préstamos
         for (const det of detalles_deducciones) {
             await conn.execute(
-                `INSERT INTO HISTORICO_DEDUCCIONES_DETALLE
-                    (id_nomina, id_deduccion, id_registro_falta, monto)
+                `INSERT INTO HISTORICO_DEDUCCIONES_DETALLE (id_nomina, id_deduccion, id_registro_falta, monto)
                  VALUES (:id_nomina, :id_deduccion, :id_registro_falta, :monto)`,
-                {
-                    id_nomina,
-                    id_deduccion: det.id_deduccion,
-                    id_registro_falta: det.id_registro_falta || null,
-                    monto: det.monto
-                },
+                { id_nomina, id_deduccion: det.id_deduccion, id_registro_falta: det.id_registro_falta || null, monto: det.monto },
                 { autoCommit: false }
             );
+
+            if (det.id_registro_falta) {
+                await conn.execute(
+                    `UPDATE REGISTRO_FALTAS SET estado = 'PAGADO' WHERE id_registro_falta = :id`,
+                    { id: det.id_registro_falta }, { autoCommit: false }
+                );
+            }
+
+            // Si es descuento por Préstamo (DED06), sellar la cuota pendiente más antigua
+            if (det.id_deduccion === 'DED06') {
+                await conn.execute(
+                    `UPDATE DETALLE_PRESTAMO SET estado = 'PAGADO'
+                     WHERE id_detalle = (
+                        SELECT MIN(id_detalle) FROM DETALLE_PRESTAMO dp
+                        JOIN PRESTAMOS p ON p.id_prestamo = dp.id_prestamo
+                        WHERE p.id_empleado = :id_emp AND dp.estado = 'PENDIENTE'
+                     )`,
+                    { id_emp: id_empleado }, { autoCommit: false }
+                );
+            }
         }
 
         await conn.commit();
@@ -225,6 +240,63 @@ const procesarNomina = async ({
         throw err;
     } finally { await conn.close(); }
 };
+
+// Anular una nómina y liberar registros operativos asociados
+const eliminarNomina = async (id_nomina) => {
+    const conn = await getConnection();
+    try {
+        // 1. Obtener datos de la nómina para reversión
+        const info = await conn.execute(
+            `SELECT id_empleado FROM HISTORICO_NOMINA WHERE id_nomina = :id`,
+            { id: id_nomina }, { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+        if (!info.rows[0]) throw new Error('Nómina no encontrada');
+        const id_empleado = info.rows[0].ID_EMPLEADO;
+
+        // 2. Liberar Horas Extra (PAGADO -> APROBADO)
+        await conn.execute(
+            `UPDATE REGISTRO_HORAS_EXTRA SET estado = 'APROBADO'
+             WHERE id_hora_extra IN (SELECT id_hora_extra FROM HISTORICO_PERCEPCIONES_DETALLE WHERE id_nomina = :id AND id_hora_extra IS NOT NULL)`,
+            { id: id_nomina }, { autoCommit: false }
+        );
+
+        // 3. Liberar Faltas (PAGADO -> APROBADO)
+        await conn.execute(
+            `UPDATE REGISTRO_FALTAS SET estado = 'APROBADO'
+             WHERE id_registro_falta IN (SELECT id_registro_falta FROM HISTORICO_DEDUCCIONES_DETALLE WHERE id_nomina = :id AND id_registro_falta IS NOT NULL)`,
+            { id: id_nomina }, { autoCommit: false }
+        );
+
+        // 4. Revertir Pago de Préstamo (PAGADO -> PENDIENTE) - La última cuota pagada del empleado
+        const hasLoan = await conn.execute(
+            `SELECT COUNT(*) as TOTAL FROM HISTORICO_DEDUCCIONES_DETALLE WHERE id_nomina = :id AND id_deduccion = 'DED06'`,
+            { id: id_nomina }, { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+        if (hasLoan.rows[0].TOTAL > 0) {
+            await conn.execute(
+                `UPDATE DETALLE_PRESTAMO SET estado = 'PENDIENTE'
+                 WHERE id_detalle = (
+                    SELECT MAX(id_detalle) FROM DETALLE_PRESTAMO dp
+                    JOIN PRESTAMOS p ON p.id_prestamo = dp.id_prestamo
+                    WHERE p.id_empleado = :id_emp AND dp.estado = 'PAGADO'
+                 )`,
+                { id_emp: id_empleado }, { autoCommit: false }
+            );
+        }
+
+        // 5. Eliminar detalles y encabezado
+        await conn.execute(`DELETE FROM HISTORICO_PERCEPCIONES_DETALLE WHERE id_nomina = :id`, { id: id_nomina }, { autoCommit: false });
+        await conn.execute(`DELETE FROM HISTORICO_DEDUCCIONES_DETALLE WHERE id_nomina = :id`, { id: id_nomina }, { autoCommit: false });
+        await conn.execute(`DELETE FROM HISTORICO_NOMINA WHERE id_nomina = :id`, { id: id_nomina }, { autoCommit: false });
+
+        await conn.commit();
+        return true;
+    } catch (err) {
+        await conn.rollback();
+        throw err;
+    } finally { await conn.close(); }
+};
+
 
 // Obtener histórico de nóminas procesadas
 const getHistorico = async () => {

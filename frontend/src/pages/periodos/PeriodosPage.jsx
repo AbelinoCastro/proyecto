@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getPeriodos, createPeriodo, cambiarEstadoPeriodo } from '../../services/periodosService';
+import { getPeriodos, createPeriodo, cambiarEstadoPeriodo, deletePeriodo } from '../../services/periodosService';
 import EstadoBadge from '../../components/EstadoBadge';
 
 const MESES = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -47,6 +47,19 @@ const PeriodosPage = () => {
             cargar();
         } catch (err) {
             alert(err.response?.data?.message || `Error al ${accion} período`);
+        }
+    };
+
+    const handleEliminar = async (periodo) => {
+        // Validación de seguridad "discreta": solo eliminar si el usuario confirma dos veces
+        // o si es un periodo que no tiene nóminas (el backend ya valida esto)
+        if (!window.confirm(`¿Está seguro de eliminar permanentemente el ciclo ${MESES[periodo.NUMERO_PERIODO]} ${periodo.ANIO}?\n\nEsta acción no se puede deshacer.`)) return;
+
+        try {
+            await deletePeriodo(periodo.ID_PERIODO);
+            cargar();
+        } catch (err) {
+            alert(err.response?.data?.message || 'No se puede eliminar un periodo con nóminas pagadas.');
         }
     };
 
@@ -113,7 +126,16 @@ const PeriodosPage = () => {
                                         <EstadoBadge estado={p.ESTADO} />
                                     </td>
                                     <td className="px-8 py-6 text-right">
-                                        <div className="flex justify-end gap-3">
+                                        <div className="flex justify-end gap-3 items-center">
+                                            {/* Botón de eliminación discreto (solo icono basura) */}
+                                            <button
+                                                onClick={() => handleEliminar(p)}
+                                                className="p-2.5 text-gray-700 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                                                title="Eliminar ciclo vacío"
+                                            >
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h14" /></svg>
+                                            </button>
+
                                             {p.ESTADO === 'ABIERTO' ? (
                                                 <button
                                                     onClick={() => handleCambiarEstado(p, 'CERRADO')}

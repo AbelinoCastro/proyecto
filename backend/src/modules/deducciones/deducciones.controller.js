@@ -8,8 +8,11 @@ const getAll = async (req, res) => {
 
 const getById = async (req, res) => {
     try {
-        const data = await model.getById(req.params.id);
-        if (!data) return error(res, 'Deducción no encontrada', 404);
+        const id = req.params.id;
+        if (!id) return error(res, 'ID de deducción no proporcionado', 400);
+
+        const data = await model.getById(id);
+        if (!data) return error(res, `Deducción con ID '${id}' no encontrada`, 404);
         return success(res, data);
     } catch (err) { return error(res, 'Error al obtener deducción', 500, err.message); }
 };

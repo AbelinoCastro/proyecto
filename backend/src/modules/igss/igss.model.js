@@ -18,8 +18,12 @@ const getIGSSPreview = async (id_periodo) => {
              JOIN EMPLEADO e ON e.id_empleado = n.id_empleado
              LEFT JOIN HISTORICO_DEDUCCIONES_DETALLE d_igss
                  ON d_igss.id_nomina = n.id_nomina AND d_igss.id_deduccion = 'DED01'
-             LEFT JOIN HISTORICO_PERCEPCIONES_DETALLE p_base
-                 ON p_base.id_nomina = n.id_nomina AND p_base.id_percepcion = 'PER01'
+             LEFT JOIN (
+                 SELECT id_nomina, MAX(monto) AS monto
+                 FROM HISTORICO_PERCEPCIONES_DETALLE
+                 WHERE id_percepcion = 'PER01'
+                 GROUP BY id_nomina
+             ) p_base ON p_base.id_nomina = n.id_nomina
              LEFT JOIN (
                  SELECT id_nomina, SUM(monto) AS he_total
                  FROM HISTORICO_PERCEPCIONES_DETALLE

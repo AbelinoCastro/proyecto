@@ -32,6 +32,20 @@ const getByMesAnio = async (mes, anio) => {
     } finally { await conn.close(); }
 };
 
+const getById = async (id_periodo) => {
+    const conn = await getConnection();
+    try {
+        const result = await conn.execute(
+            `SELECT id_periodo, numero_periodo, anio, fecha_inicio, fecha_fin,
+                    estado, fecha_cierre, creado_en
+             FROM PERIODO_NOMINA
+             WHERE id_periodo = :id`,
+            { id: id_periodo }, { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+        return result.rows[0] || null;
+    } finally { await conn.close(); }
+};
+
 const create = async (mes, anio) => {
     const conn = await getConnection();
     try {
@@ -70,4 +84,19 @@ const cambiarEstado = async (id_periodo, estado) => {
     } finally { await conn.close(); }
 };
 
-module.exports = { getAll, getByMesAnio, create, cambiarEstado };
+const remove = async (id_periodo) => {
+    const conn = await getConnection();
+    try {
+        // Primero intentamos eliminar la nómina asociada si fuera necesario,
+        // pero por integridad referencial Oracle fallará si hay nóminas pagadas.
+        const result = await conn.execute(
+            `DELETE FROM PERIODO_NOMINA WHERE id_periodo = :id`,
+            { id: id_periodo },
+            { autoCommit: true }
+        );
+        return result.rowsAffected;
+    } finally { await conn.close(); }
+};
+
+
+module.exports = { getAll, getByMesAnio, getById, create, cambiarEstado, remove };

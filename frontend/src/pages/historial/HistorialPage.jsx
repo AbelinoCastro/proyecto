@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getEmpleados } from '../../services/empleadoService';
-import { getHistoricoNomina, getDetalleNomina } from '../../services/nominaService';
+import { getHistoricoNomina, getDetalleNomina, deleteNomina } from '../../services/nominaService';
 import { urlFormatoUnico } from '../../services/formatoSalariosService';
 
 const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
@@ -79,6 +79,7 @@ const HistorialPage = () => {
             const res = await getDetalleNomina(idNomina);
             const det = res.data?.data;
             if (!det) return;
+            // ... (rest of the boleta logic)
             const enc = det.encabezado;
             const periodoLabel = `${MESES[(enc.NUMERO_PERIODO || 1) - 1] || enc.NUMERO_PERIODO} ${enc.ANIO}`;
             const slug = (enc.NOMBRE_EMPLEADO || 'empleado').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-zA-Z0-9]/g, '_').replace(/_+/g, '_');
@@ -468,6 +469,16 @@ const HistorialPage = () => {
         } catch { alert('Error al cargar detalle'); }
     };
 
+    const handleEliminar = async (idNomina) => {
+        if (!window.confirm('¿Confirmar la anulación de esta nómina?\n\nEsta acción liberará las horas extra y faltas asociadas para que puedan volver a ser calculadas.')) return;
+        try {
+            await deleteNomina(idNomina);
+            const resHist = await getHistoricoNomina();
+            setTodosLosRegistros(resHist.data?.data || []);
+        } catch { alert('Error al anular la nómina'); }
+    };
+
+
     const labelCls = "text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] mb-2 block opacity-60";
     const inputCls = "bg-[#0b0b0b] border border-white/5 rounded-xl px-4 py-2.5 text-[12px] text-white outline-none focus:border-[#C5A028]/30 transition-all w-full";
 
@@ -590,9 +601,14 @@ const HistorialPage = () => {
                                         </td>
                                         <td className="px-6 py-6"><EstadoBadge value={r.ESTADO} /></td>
                                         <td className="px-6 py-6 text-center">
-                                            <button onClick={() => handleVerBoleta(r.ID_NOMINA)} className="w-8 h-8 rounded-lg bg-white/[0.03] border border-white/5 flex items-center justify-center text-gray-500 hover:text-[#C5A028] hover:border-[#C5A028]/30 transition-all shadow-lg mx-auto">
-                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
-                                            </button>
+                                            <div className="flex items-center justify-center gap-2">
+                                                <button onClick={() => handleVerBoleta(r.ID_NOMINA)} className="w-8 h-8 rounded-lg bg-white/[0.03] border border-white/5 flex items-center justify-center text-gray-500 hover:text-[#C5A028] hover:border-[#C5A028]/30 transition-all shadow-lg">
+                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+                                                </button>
+                                                <button onClick={() => handleEliminar(r.ID_NOMINA)} className="w-8 h-8 rounded-lg bg-red-600/10 border border-red-600/20 flex items-center justify-center text-red-500 hover:bg-red-600 hover:text-white transition-all shadow-lg opacity-0 group-hover:opacity-100">
+                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h14" /></svg>
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))

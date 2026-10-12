@@ -14,8 +14,8 @@ const getAll = async () => {
     } finally { await conn.close(); }
 };
 
-const getById = async (id) => {
-    const conn = await getConnection();
+const getById = async (id, connection = null) => {
+    const conn = connection || await getConnection();
     try {
         const result = await conn.execute(
             `SELECT ID_HORA_EXTRA, ID_EMPLEADO, ID_JORNADA, ID_USUARIO, FECHA, CANTIDAD, FACTOR, JUSTIFICACION, ESTADO, CREADO_EN 
@@ -24,7 +24,9 @@ const getById = async (id) => {
             { id }, { outFormat: oracledb.OUT_FORMAT_OBJECT }
         );
         return result.rows[0] || null;
-    } finally { await conn.close(); }
+    } finally {
+        if (!connection) await conn.close();
+    }
 };
 
 const create = async ({ id_empleado, id_jornada, id_usuario, fecha, cantidad, factor, justificacion }) => {
@@ -47,7 +49,7 @@ const create = async ({ id_empleado, id_jornada, id_usuario, fecha, cantidad, fa
             },
             { autoCommit: true }
         );
-        return await getById(result.outBinds.id_hora_extra[0]);
+        return await getById(result.outBinds.id_hora_extra[0], conn);
     } finally { await conn.close(); }
 };
 

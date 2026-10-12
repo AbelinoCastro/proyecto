@@ -12,11 +12,17 @@ const ISR_TRAMO1_PCT         = 5;
 const ISR_TRAMO2_PCT         = 7;     // Segundo tramo: exceso de Q300,000 → 7%
 
 const calcularISRMensual = (total_percepciones_mes, igss_mes) => {
-    const base_anual = (total_percepciones_mes * 12) - (igss_mes * 12) - ISR_EXENCION_ANUAL;
+    // La Bonificación Incentivo (Q250) es exenta de ISR según Decreto 37-2001
+    // Renta Bruta Proyectada = (Total Percepciones - Bonificación) * 12
+    const base_anual = ((total_percepciones_mes - BONIFICACION_INCENTIVO) * 12) - (igss_mes * 12) - ISR_EXENCION_ANUAL;
+
     if (base_anual <= 0) return 0;
+
+    // Cálculo según tramos del Artículo 73 (Decreto 10-2012)
     const isr_anual = base_anual <= ISR_TRAMO1_LIMITE
         ? base_anual * ISR_TRAMO1_PCT / 100
         : (ISR_TRAMO1_LIMITE * ISR_TRAMO1_PCT / 100) + ((base_anual - ISR_TRAMO1_LIMITE) * ISR_TRAMO2_PCT / 100);
+
     return parseFloat((isr_anual / 12).toFixed(2));
 };
 
@@ -29,16 +35,17 @@ const getVistaPrevia = async (req, res) => {
 
         const periodo = await periodoModel.getByMesAnio(mes, anio);
         if (!periodo)
-            return error(res, `No existe período de nómina para ${mes}/${anio}. Debe crearlo antes de calcular.`, 404);
+            return error(res, `El periodo ${mes}/${anio} no ha sido aperturado.`, 404);
+
         if (periodo.ESTADO === 'CERRADO')
-            return error(res, `El período ${mes}/${anio} está CERRADO. Debe abrirlo antes de calcular.`, 400);
+            return error(res, `El periodo ${mes}/${anio} ya está CERRADO. No se pueden realizar nuevos cálculos.`, 403);
 
         const empleado = await model.getDatosEmpleado(id_empleado);
         if (!empleado) return error(res, 'Empleado no encontrado o inactivo', 404);
 
         const nominaExistente = await model.getNominaExistente(id_empleado, periodo.ID_PERIODO);
         if (nominaExistente)
-            return error(res, `${empleado.NOMBRE} ya tiene nómina procesada para ${mes}/${anio}`, 400);
+            return error(res, `Ya existe una nómina registrada para ${empleado.NOMBRE} en ${mes}/${anio}.`, 409);
 
         const horasExtra     = await model.getHorasExtra(id_empleado, anio, mes);
         const faltas         = await model.getFaltas(id_empleado, anio, mes);
@@ -80,7 +87,7 @@ const getVistaPrevia = async (req, res) => {
         const igss_monto    = parseFloat((igss_base * IGSS_EMPLEADO_PCT / 100).toFixed(2));
         const igss_patronal = parseFloat((igss_base * IGSS_PATRONO_PCT / 100).toFixed(2));
         // ISR: base anual = (percepciones × 12) − (IGSS × 12) − Q48,000; tramos 5%/7%
-        const isr_base_anual = parseFloat(((total_percepciones * 12) - (igss_monto * 12) - ISR_EXENCION_ANUAL).toFixed(2));
+        const isr_base_anual = parseFloat((((total_percepciones - BONIFICACION_INCENTIVO) * 12) - (igss_monto * 12) - ISR_EXENCION_ANUAL).toFixed(2));
         const isr_monto      = calcularISRMensual(total_percepciones, igss_monto);
 
         const detalleFaltas = faltas.map(f => ({
@@ -101,17 +108,17 @@ const getVistaPrevia = async (req, res) => {
             monto: parseFloat(d.MONTO)
         }));
 
-        // Agregar préstamo y seguro automáticamente si el empleado los tiene activos
+        // Validar existencia de conceptos core en deducciones del sistema
         if (prestamo_monto > 0) {
             deduccionesEmpleado.push({
-                id_deduccion: 'DED06',
+                id_deduccion: 'DED06', // ID Reservado para Préstamos
                 nombre: 'Préstamo Bantrab',
                 monto: prestamo_monto
             });
         }
         if (seguro_monto > 0) {
             deduccionesEmpleado.push({
-                id_deduccion: 'DED04',
+                id_deduccion: 'DED04', // ID Reservado para Seguros
                 nombre: 'Seguro Médico',
                 monto: seguro_monto
             });
@@ -173,6 +180,11 @@ const procesarNomina = async (req, res) => {
 
         if (!id_empleado || !id_periodo)
             return error(res, 'id_empleado e id_periodo son requeridos', 400);
+
+        const periodo = await periodoModel.getById(id_periodo);
+        if (!periodo) return error(res, 'El período de nómina no existe', 404);
+        if (periodo.ESTADO === 'CERRADO')
+            return error(res, 'El período de nómina está cerrado. No se puede procesar.', 403);
 
         const existe = await model.getNominaExistente(id_empleado, id_periodo);
         if (existe) return error(res, 'Ya existe una nómina procesada para este empleado y período', 400);
@@ -256,6 +268,17 @@ const getDetalleNomina = async (req, res) => {
     } catch (err) { return error(res, 'Error al obtener detalle de nómina', 500, err.message); }
 };
 
+// DELETE /api/nomina/:id
+const eliminarNomina = async (req, res) => {
+    try {
+        const id = req.params.id;
+        await model.eliminarNomina(id);
+        return success(res, null, 'Nómina anulada y registros liberados correctamente');
+    } catch (err) {
+        return error(res, 'Error al anular nómina', 500, err.message);
+    }
+};
+
 // POST /api/nomina/procesar-todos
 // Body: { id_periodo, mes, anio }
 const procesarTodos = async (req, res) => {
@@ -263,6 +286,11 @@ const procesarTodos = async (req, res) => {
         const { id_periodo, mes, anio } = req.body;
         if (!id_periodo || !mes || !anio)
             return error(res, 'id_periodo, mes y anio son requeridos', 400);
+
+        const periodo = await periodoModel.getById(id_periodo);
+        if (!periodo) return error(res, 'El período de nómina no existe', 404);
+        if (periodo.ESTADO === 'CERRADO')
+            return error(res, 'El período de nómina está cerrado. No se puede procesar.', 403);
 
         const empleados = await model.getAllEmpleadosActivos();
         if (!empleados.length)
@@ -356,4 +384,4 @@ const procesarTodos = async (req, res) => {
     }
 };
 
-module.exports = { getVistaPrevia, procesarNomina, procesarTodos, getHistorico, getDetalleNomina };
+module.exports = { getVistaPrevia, procesarNomina, procesarTodos, getHistorico, getDetalleNomina, eliminarNomina };

@@ -15,3 +15,6 @@ export const getDetalleNomina = (id_nomina) => api.get(`/nomina/historico/${id_n
 
 // Procesar nómina para todos los empleados activos de un período
 export const procesarNominaTodos = (data) => api.post('/nomina/procesar-todos', data);
+
+// Eliminar (Anular) una nómina procesada
+export const deleteNomina = (id) => api.delete(`/nomina/${id}`);

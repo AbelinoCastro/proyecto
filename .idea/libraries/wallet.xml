@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="wallet">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/db/wallet.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

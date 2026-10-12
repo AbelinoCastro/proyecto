@@ -27,11 +27,11 @@ const { getConnection } = require('../../config/db');
 
 // Actualizar el estado de un registro
 exports.updateEstado = async (req, res) => {
+  const conn = await getConnection();
   try {
     const { id } = req.params;
     const { estado } = req.body;
 
-    const conn = await getConnection();
     await conn.execute(
       `UPDATE REGISTRO_HORAS_EXTRA SET ESTADO = :estado WHERE ID_HORA_EXTRA = :id`,
       { estado, id: Number(id) },
@@ -42,5 +42,7 @@ exports.updateEstado = async (req, res) => {
   } catch (error) {
     console.error("Error al actualizar estado", error);
     res.status(500).json({ error: "Error al actualizar estado" });
+  } finally {
+    if (conn) await conn.close();
   }
 };

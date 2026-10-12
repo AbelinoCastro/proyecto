@@ -1,16 +1,36 @@
-const oracledb = require("oracledb");
+const oracledb = require('oracledb');
+const path = require('path');
+require('dotenv').config();
 
-const walletPath = "C:/Users/Abelino/oracle21/proyecto-nomina/backend/wallet";
+const isCloud = Boolean(process.env.WALLET_LOCATION);
+const walletLocation = isCloud
+    ? path.resolve(__dirname, process.env.WALLET_LOCATION)
+    : undefined;
+
+const connectionConfig = {
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    connectString: process.env.DB_CONNECTION_STRING,
+    ...(isCloud ? {
+        configDir: walletLocation,
+        walletLocation,
+        walletPassword: process.env.WALLET_PASSWORD,
+    } : {}),
+};
 
 async function getConnection() {
-return await oracledb.getConnection({
-    user: "nomina_admin",
-    password: "NominaGT_2026!",
-    connectString: "proyectodb_tp",
-    configDir: walletPath,
-    walletLocation: walletPath,
-    walletPassword: "Proyecto2026#Gt"
-});
+    return oracledb.getConnection(connectionConfig);
+}
+
+async function ejecutarQuery(sql, binds = {}, options = {}) {
+    const connection = await getConnection();
+    try {
+        return await connection.execute(sql, binds, options);
+    } finally {
+        await connection.close();
+    }
 }
 
 module.exports = getConnection;
+module.exports.getConnection = getConnection;
+module.exports.ejecutarQuery = ejecutarQuery;

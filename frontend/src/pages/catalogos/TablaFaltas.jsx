@@ -1,6 +1,6 @@
 import TablaGenerica, { API_BASE } from './TablaGenerica';
 
-const TablaFaltas = ({ onEdit }) => (
+const TablaFaltas = ({ onEdit, onDelete, onToggle }) => (
     <TablaGenerica
         url={`${API_BASE}/faltas`}
         rowKey="ID_FALTA"
@@ -19,6 +19,8 @@ const TablaFaltas = ({ onEdit }) => (
             },
         ]}
         onEdit={onEdit}
+        onDelete={onDelete}
+        onToggle={onToggle}
         emptyText="No hay tipos de falta registrados"
     />
 );

@@ -1,6 +1,6 @@
 import TablaGenerica, { API_BASE } from './TablaGenerica';
 
-const TablaJornadas = ({ onEdit, onDelete }) => (
+const TablaJornadas = ({ onEdit, onDelete, onToggle }) => (
     <TablaGenerica
         url={`${API_BASE}/jornadas`}
         rowKey="ID_JORNADA"
@@ -11,6 +11,7 @@ const TablaJornadas = ({ onEdit, onDelete }) => (
         ]}
         onEdit={onEdit}
         onDelete={onDelete}
+        onToggle={onToggle}
         emptyText="No hay jornadas registradas"
     />
 );

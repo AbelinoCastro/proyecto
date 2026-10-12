@@ -1,6 +1,6 @@
 import TablaGenerica, { API_BASE } from './TablaGenerica';
 
-const TablaPuestos = ({ onEdit, onDelete }) => (
+const TablaPuestos = ({ onEdit, onDelete, onToggle }) => (
     <TablaGenerica
         url={`${API_BASE}/puestos`}
         rowKey="ID_PUESTO"
@@ -13,6 +13,7 @@ const TablaPuestos = ({ onEdit, onDelete }) => (
         ]}
         onEdit={onEdit}
         onDelete={onDelete}
+        onToggle={onToggle}
         emptyText="No hay puestos registrados"
     />
 );

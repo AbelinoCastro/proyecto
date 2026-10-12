@@ -22,10 +22,10 @@ app.use(cors({
 
 app.use(express.json({ limit: '5mb' }));
 
-// 🛡️ Rate limit en login (5 intentos por IP cada 15 min) — anti-brute force
+// 🛡️ Límite estricto en producción; margen amplio durante desarrollo local.
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 5,
+    max: process.env.NODE_ENV === 'production' ? 5 : 100,
     standardHeaders: true,
     legacyHeaders: false,
     message: { ok: false, message: 'Demasiados intentos de login. Espera 15 minutos.' },

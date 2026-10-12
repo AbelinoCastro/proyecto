@@ -71,4 +71,18 @@ const cambiarEstado = async (req, res) => {
     }
 };
 
-module.exports = { getAll, verificar, create, cambiarEstado };
+// DELETE /api/periodos/:id
+const remove = async (req, res) => {
+    try {
+        const rows = await model.remove(req.params.id);
+        if (rows === 0) return error(res, 'Período no encontrado', 404);
+        return success(res, null, 'Período eliminado correctamente');
+    } catch (err) {
+        if (err.message.includes('ORA-02292')) {
+            return error(res, 'No se puede eliminar el período porque ya tiene nóminas procesadas y pagadas.', 400);
+        }
+        return error(res, 'Error al eliminar período', 500, err.message);
+    }
+};
+
+module.exports = { getAll, verificar, create, cambiarEstado, remove };

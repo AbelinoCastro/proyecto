@@ -1,6 +1,6 @@
 import TablaGenerica, { API_BASE } from './TablaGenerica';
 
-const TablaDeducciones = ({ onEdit, onDelete }) => (
+const TablaDeducciones = ({ onEdit, onDelete, onToggle }) => (
     <TablaGenerica
         url={`${API_BASE}/deducciones`}
         rowKey="ID_DEDUCCION"
@@ -11,6 +11,7 @@ const TablaDeducciones = ({ onEdit, onDelete }) => (
         ]}
         onEdit={onEdit}
         onDelete={onDelete}
+        onToggle={onToggle}
         emptyText="No hay deducciones registradas"
     />
 );

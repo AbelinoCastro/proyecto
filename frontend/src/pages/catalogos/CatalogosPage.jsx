@@ -36,7 +36,7 @@ const CATALOGOS = [
     { id: 'jornadas',      nombre: 'JORNADAS',      icon: <Icons.Jornadas />, acciones: { agregar: true, editar: true, eliminar: true,  bajar: false, toggle: false } },
     { id: 'percepciones',  nombre: 'PERCEPCIONES',  icon: <Icons.Percepciones />, acciones: { agregar: true, editar: true, eliminar: true,  bajar: false, toggle: false } },
     { id: 'deducciones',   nombre: 'DEDUCCIONES',   icon: <Icons.Deducciones />, acciones: { agregar: true, editar: true, eliminar: true,  bajar: false, toggle: false } },
-    { id: 'faltas',        nombre: 'FALTAS',        icon: <Icons.Faltas />, acciones: { agregar: true, editar: true, eliminar: false, bajar: false, toggle: false } },
+    { id: 'faltas',        nombre: 'FALTAS',        icon: <Icons.Faltas />, acciones: { agregar: true, editar: true, eliminar: true,  bajar: false, toggle: true  } },
     { id: 'motivos',       nombre: 'MOTIVOS BAJA',  icon: <Icons.Motivos />, acciones: { agregar: true, editar: true, eliminar: true,  bajar: false, toggle: true  } },
 ];
 
@@ -54,6 +54,7 @@ const CAMPOS = {
         { name: 'id_jornada',        label: 'Jornada',          type: 'select-api', required: true,
           endpoint: '/jornadas', valueKey: 'ID_JORNADA', labelKey: 'NOMBRE_JORNADA' },
         { name: 'fecha_inicio',      label: 'Fecha inicio',     type: 'date',     required: true },
+        { name: 'porcentaje_pago_comision', label: '% Comisión', type: 'number', placeholder: '0.00' },
         { name: 'correo',            label: 'Correo',           type: 'email' },
         { name: 'telefono',          label: 'Teléfono',         type: 'text' },
         { name: 'cuenta_bancaria',   label: 'Cuenta bancaria',  type: 'text' },
@@ -87,27 +88,31 @@ const CAMPOS = {
         { name: 'id_jornada',     label: 'Código (ej: J5)',  type: 'text',   required: true, soloCrear: true, placeholder: 'Máx 2 caracteres' },
         { name: 'nombre_jornada', label: 'Nombre',           type: 'text',   required: true },
         { name: 'horas_diarias',  label: 'Horas Diarias',    type: 'number', required: true },
+        { name: 'hora_inicio',    label: 'Hora Inicio',      type: 'text',   placeholder: '08:00 AM' },
+        { name: 'hora_fin',       label: 'Hora Fin',         type: 'text',   placeholder: '05:00 PM' },
+        { name: 'descripcion',    label: 'Descripción',      type: 'textarea' },
     ],
     percepciones: [
         { name: 'id_percepcion',       label: 'Código (ej: PER10)', type: 'text',     required: true, soloCrear: true, placeholder: 'Máx 5 caracteres' },
         { name: 'nombre_percepcion',   label: 'Nombre',             type: 'text',     required: true },
-        { name: 'descripcion_formula', label: 'Descripción',        type: 'textarea' },
+        { name: 'descripcion_formula', label: 'Descripción / Fórmula', type: 'textarea' },
     ],
     deducciones: [
         { name: 'id_deduccion',        label: 'Código (ej: DED09)', type: 'text',     required: true, soloCrear: true, placeholder: 'Máx 5 caracteres' },
         { name: 'nombre_deduccion',    label: 'Nombre',             type: 'text',     required: true },
-        { name: 'descripcion_formula', label: 'Descripción',        type: 'textarea' },
+        { name: 'descripcion_formula', label: 'Descripción / Fórmula', type: 'textarea' },
     ],
     faltas: [
         { name: 'descripcion', label: 'Descripción', type: 'textarea', required: true },
-        { name: 'es_pagado',   label: '¿Con goce?',  type: 'select',   required: true,
-          options: [{ value: 'S', label: 'Sí' }, { value: 'N', label: 'No' }] },
+        { name: 'es_pagado',   label: '¿Genera pago (con goce)?',  type: 'select',   required: true,
+          options: [{ value: 'S', label: 'Sí (Pagado)' }, { value: 'N', label: 'No (Descuento)' }] },
     ],
     motivos: [
         { name: 'id_motivo_baja', label: 'Código (ej: MB006)', type: 'text',     required: true, soloCrear: true, placeholder: 'Máx 5 caracteres' },
         { name: 'descripcion',    label: 'Descripción',        type: 'textarea', required: true },
     ],
 };
+
 
 const TABLA_MAP = {
     empleados:     TablaEmpleados,

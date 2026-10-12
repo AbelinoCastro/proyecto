@@ -1,6 +1,6 @@
 import TablaGenerica, { API_BASE } from './TablaGenerica';
 
-const TablaPercepciones = ({ onEdit, onDelete }) => (
+const TablaPercepciones = ({ onEdit, onDelete, onToggle }) => (
     <TablaGenerica
         url={`${API_BASE}/percepciones`}
         rowKey="ID_PERCEPCION"
@@ -11,6 +11,7 @@ const TablaPercepciones = ({ onEdit, onDelete }) => (
         ]}
         onEdit={onEdit}
         onDelete={onDelete}
+        onToggle={onToggle}
         emptyText="No hay percepciones registradas"
     />
 );

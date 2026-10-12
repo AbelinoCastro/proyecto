@@ -18,4 +18,7 @@ router.get('/historico', ctrl.getHistorico);
 // Detalle de una nómina para el recibo — GET /api/nomina/historico/:id
 router.get('/historico/:id', ctrl.getDetalleNomina);
 
+// Anular una nómina — DELETE /api/nomina/:id
+router.delete('/:id', ctrl.eliminarNomina);
+
 module.exports = router;
